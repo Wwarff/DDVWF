@@ -2,5 +2,6 @@
   <Project Path="src/DDVWF.App/DDVWF.App.csproj" />
   <Project Path="src/DDVWF.Core/DDVWF.Core.csproj" />
   <Project Path="src/DDVWF.Server/DDVWF.Server.csproj" />
+  <Project Path="src/DDVWF.Sage/DDVWF.Sage.csproj" />
   <Project Path="tests/DDVWF.Core.Tests/DDVWF.Core.Tests.csproj" />
 </Solution>
