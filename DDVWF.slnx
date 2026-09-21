@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/DDVWF.Core/DDVWF.Core.csproj" />
+  <Project Path="src/DDVWF.Server/DDVWF.Server.csproj" />
+  <Project Path="tests/DDVWF.Core.Tests/DDVWF.Core.Tests.csproj" />
+</Solution>
