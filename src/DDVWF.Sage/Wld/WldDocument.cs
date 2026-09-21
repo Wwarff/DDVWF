@@ -24,12 +24,13 @@ public sealed class WldDocument
     public static WldDocument Parse(ReadOnlySpan<byte> data, string name)
     {
         if (data.Length < 28) throw new InvalidDataException("WLD header is truncated.");
+        var bytes = data.ToArray();
         var p = 0;
-        uint U32(){var v=BinaryPrimitives.ReadUInt32LittleEndian(data[p..]);p+=4;return v;}
+        uint U32(){var v=BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(p));p+=4;return v;}
         var identifier=U32(); var version=U32(); var fragmentCount=U32(); var bsp=U32();
         p += 4; var stringBytes=checked((int)U32()); p += 4;
-        if (p + stringBytes > data.Length) throw new InvalidDataException("WLD string table is truncated.");
-        var table=data.Slice(p,stringBytes).ToArray(); p += stringBytes;
+        if (p + stringBytes > bytes.Length) throw new InvalidDataException("WLD string table is truncated.");
+        var table=bytes.AsSpan(p,stringBytes).ToArray(); p += stringBytes;
         for(var i=0;i<table.Length;i++) table[i]^=XorKey[i%XorKey.Length];
 
         string Resolve(int reference)
@@ -45,14 +46,14 @@ public sealed class WldDocument
         var fragments=new List<WldFragment>(checked((int)fragmentCount));
         for(var i=0;i<fragmentCount;i++)
         {
-            if(p+12>data.Length) throw new InvalidDataException($"WLD fragment {i} header is truncated.");
-            var size=BinaryPrimitives.ReadUInt32LittleEndian(data[p..]); p+=4;
+            if(p+12>bytes.Length) throw new InvalidDataException($"WLD fragment {i} header is truncated.");
+            var size=BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(p)); p+=4;
             var type=BinaryPrimitives.ReadUInt32LittleEndian(data[p..]); p+=4;
             var original=p;
-            var nameRef=BinaryPrimitives.ReadInt32LittleEndian(data[p..]); p+=4;
+            var nameRef=BinaryPrimitives.ReadInt32LittleEndian(bytes.AsSpan(p)); p+=4;
             fragments.Add(new(i,size,type,Resolve(nameRef),p));
             var next=checked(original+(int)size);
-            if(next<p || next>data.Length) throw new InvalidDataException($"WLD fragment {i} exceeds file bounds.");
+            if(next<p || next>bytes.Length) throw new InvalidDataException($"WLD fragment {i} exceeds file bounds.");
             p=next;
         }
         return new WldDocument { Identifier=identifier,Version=version,BspRegionCount=bsp,Name=name,StringTable=table,Fragments=fragments };
