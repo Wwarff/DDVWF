@@ -1,5 +1,9 @@
 name: DDVWF CI
 on:
+  push:
+    branches: [ main, integration/complete-zone-ir ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 jobs:
   build-test:
