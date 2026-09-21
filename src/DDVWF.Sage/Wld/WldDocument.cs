@@ -21,6 +21,16 @@ public sealed class WldDocument
     public bool IsOldS3D => Version == 0x00015500;
     public WldKind Kind => WldClassification.Classify(Name);
 
+    public string ResolveString(int reference)
+    {
+        if (reference >= 0) return string.Empty;
+        var start = -reference;
+        if (start < 0 || start >= StringTable.Length) return string.Empty;
+        var end = Array.IndexOf(StringTable, (byte)0, start);
+        if (end < 0) end = StringTable.Length;
+        return Encoding.Latin1.GetString(StringTable, start, end - start);
+    }
+
     public static WldDocument Parse(ReadOnlySpan<byte> data, string name)
     {
         if (data.Length < 28) throw new InvalidDataException("WLD header is truncated.");
