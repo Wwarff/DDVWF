@@ -17,7 +17,7 @@ public sealed class VwfColorPicker : Window
     public VwfColorPicker(Color initial,Action<Color> live,DDVWF.Core.Workspace.ThemeSettings? theme=null)
     {
         SelectedColor=initial;preview=live;activeTheme=theme;Title="Color";Width=300;Height=610;MinWidth=300;ResizeMode=ResizeMode.CanResize;WindowStartupLocation=WindowStartupLocation.CenterOwner;FontFamily=new FontFamily("Verdana");FontSize=12;Background=B("#030706");Foreground=B("#70B93B");
-        var root=new DockPanel{Margin=new Thickness(7)};Content=theme is null?root:DdvwfChrome.Wrap(this,"COLOR",root,theme);
+        var root=new DockPanel{Margin=new Thickness(7)};Content=theme is null?root:DdvwfChrome.Wrap(this,"COLOR",root,theme);DdvwfChrome.AttachPersistentGeometry(this,"color-picker");
         var close=new Button{Content="X",Width=25,Height=22,HorizontalAlignment=HorizontalAlignment.Right};close.Click+=(_,_)=>{DialogResult=true;Close();};DockPanel.SetDock(close,Dock.Top);root.Children.Add(close);
         var stack=new StackPanel();root.Children.Add(stack);
         var top=new Grid{Height=260};top.ColumnDefinitions.Add(new ColumnDefinition());top.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(27)});stack.Children.Add(top);
