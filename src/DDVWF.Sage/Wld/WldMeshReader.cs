@@ -5,10 +5,11 @@ namespace DDVWF.Sage.Wld;
 
 public sealed record SagePolygon(bool IsSolid,ushort A,ushort B,ushort C);
 public sealed record SageRenderGroup(ushort PolygonCount,ushort MaterialIndex);
+public sealed record SageMobPiece(int BoneIndex,int Start,int Count);
 public sealed record SageMesh(
  int MaterialListIndex,int AnimatedVerticesReferenceIndex,Vector3 Center,float MaxDistance,Vector3 Min,Vector3 Max,
  IReadOnlyList<Vector3> Vertices,IReadOnlyList<Vector2> Uvs,IReadOnlyList<Vector3> Normals,
- IReadOnlyList<uint> Colors,IReadOnlyList<SagePolygon> Polygons,IReadOnlyList<SageRenderGroup> MaterialGroups);
+ IReadOnlyList<uint> Colors,IReadOnlyList<SagePolygon> Polygons,IReadOnlyList<SageRenderGroup> MaterialGroups,IReadOnlyList<SageMobPiece> MobPieces);
 
 public static class WldMeshReader
 {
@@ -33,10 +34,10 @@ public static class WldMeshReader
   for(var i=0;i<normalCount;i++){Need(3);var v=new Vector3(unchecked((sbyte)b[p++])/128f,unchecked((sbyte)b[p++])/128f,unchecked((sbyte)b[p++])/128f);normals.Add(v==Vector3.Zero?v:Vector3.Normalize(v));}
   var colors=new List<uint>(colorCount);for(var i=0;i<colorCount;i++){Need(4);colors.Add(BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4)));p+=4;}
   var polygons=new List<SagePolygon>(polygonCount);for(var i=0;i<polygonCount;i++)polygons.Add(new(I16()==0,U16(),U16(),U16()));
-  Need(vertexPieceCount*4);p+=vertexPieceCount*4;
+  var pieces=new List<SageMobPiece>(vertexPieceCount);var mobStart=0;for(var i=0;i<vertexPieceCount;i++){var count=I16();var bone=I16();if(count<0||bone<0)throw new InvalidDataException("Mesh mob piece contains a negative value.");pieces.Add(new(bone,mobStart,count));mobStart+=count;}
   var groups=new List<SageRenderGroup>(groupCount);for(var i=0;i<groupCount;i++)groups.Add(new(U16(),U16()));
   Need(vertexTextureCount*4+size9*12);p+=vertexTextureCount*4+size9*12;
   while(uvs.Count<vertices.Count)uvs.Add(Vector2.Zero);
-  return new(materials,animated,center,maxDistance,min,max,vertices,uvs,normals,colors,polygons,groups);
+  return new(materials,animated,center,maxDistance,min,max,vertices,uvs,normals,colors,polygons,groups,pieces);
  }
 }
