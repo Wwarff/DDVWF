@@ -6,6 +6,7 @@ public enum ZoneEntityKind
 }
 
 public readonly record struct EqPosition(float X, float Y, float Z, float Heading = 0);
+public readonly record struct EqRotation(float X, float Y, float Z);
 
 public abstract record ZoneEntityData;
 public sealed record SpawnEntityData(long SpawnGroupId,int RespawnTime,int Variance,int PathGrid) : ZoneEntityData;
@@ -20,7 +21,8 @@ public sealed record ZoneEntity(
     float Scale = 1.0f,
     long? ServerId = null,
     string? ClientAsset = null,
-    ZoneEntityData? Data = null);
+    ZoneEntityData? Data = null,
+    EqRotation? Rotation = null);
 
 public sealed class CompleteZone
 {
