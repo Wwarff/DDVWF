@@ -45,6 +45,19 @@ public static class ServerZoneJoiner
                 door.Id,
                 door.Model,
                 new DoorEntityData(door.DoorId,door.OpenType)));
+        foreach (var point in snapshot.ZonePoints ?? Array.Empty<ZonePointRecord>())
+        {
+            if (!string.Equals(point.Zone, zone.ShortName, StringComparison.OrdinalIgnoreCase)) continue;
+            zone.Add(new ZoneEntity(
+                DeterministicId("zonepoint", point.Id, point.Number),
+                ZoneEntityKind.ZonePoint,
+                $"Zone Point {point.Number}",
+                new EqPosition(point.X, point.Y, point.Z, point.Heading),
+                1f,
+                point.Id,
+                null,
+                new ZonePointEntityData(point.Version,point.Number,point.TargetX,point.TargetY,point.TargetZ,point.TargetHeading,point.TargetZoneId,point.TargetInstance)));
+        }
     }
 
     private static Guid DeterministicId(string kind, long a, long b)
