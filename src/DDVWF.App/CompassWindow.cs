@@ -16,7 +16,7 @@ public sealed class CompassWindow:Window
     ThemeSettings theme;
     public CompassWindow(ThemeSettings value)
     {
-        theme=value;Title="Compass";Width=520;Height=520;MinWidth=180;MinHeight=180;WindowStyle=WindowStyle.None;ResizeMode=ResizeMode.CanResize;ShowInTaskbar=false;Background=Brushes.Transparent;AllowsTransparency=false;
+        theme=value;Title="Compass";Width=520;Height=520;MinWidth=180;MinHeight=180;WindowStyle=WindowStyle.None;ResizeMode=ResizeMode.CanResize;ShowInTaskbar=false;Background=Brushes.Transparent;AllowsTransparency=true;
         WindowChrome.SetWindowChrome(this,new WindowChrome{CaptionHeight=0,ResizeBorderThickness=new Thickness(6),CornerRadius=new CornerRadius(0),GlassFrameThickness=new Thickness(0)});
         bearingRing.RenderTransform=bearingRotation;var view=new Viewbox{Stretch=Stretch.Uniform,Child=face};Content=view;Build();
         MouseLeftButtonDown+=(_,e)=>{if(e.LeftButton==MouseButtonState.Pressed)DragMove();};
@@ -28,7 +28,7 @@ public sealed class CompassWindow:Window
     public void ApplyTheme(ThemeSettings value){theme=value;Build();}
     void Build()
     {
-        face.Children.Clear();face.Background=B(C("CompassBackgroundBrush","#000000"));
+        face.Children.Clear();face.Background=Brushes.Transparent;
         bearingRing.Children.Clear();face.Children.Add(bearingRing);
         var primary=B(C("CompassPrimaryBrush","#A68A6A"));var secondary=B(C("CompassSecondaryBrush","#6E5947"));var star=B(C("CompassStarBrush","#E8D9B5"));var accent=B(C("CompassAccentBrush","#D7FF00"));var degrees=B(C("CompassDegreeTextBrush","#A68A6A"));var ticks=B(C("CompassTickBrush","#A68A6A"));var card=B(C("CompassCardinalBrush","#A68A6A"));
         Ring(bearingRing,300,300,266,primary,2);Ring(bearingRing,300,300,244,primary,2);
