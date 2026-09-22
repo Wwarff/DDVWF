@@ -7,6 +7,11 @@ public enum ZoneEntityKind
 
 public readonly record struct EqPosition(float X, float Y, float Z, float Heading = 0);
 
+public abstract record ZoneEntityData;
+public sealed record SpawnEntityData(long SpawnGroupId,int RespawnTime,int Variance,int PathGrid) : ZoneEntityData;
+public sealed record NpcEntityData(long NpcTypeId,long SpawnGroupId,int Chance,int Race,int Gender) : ZoneEntityData;
+public sealed record DoorEntityData(int DoorId,int OpenType) : ZoneEntityData;
+
 public sealed record ZoneEntity(
     Guid Id,
     ZoneEntityKind Kind,
@@ -14,7 +19,8 @@ public sealed record ZoneEntity(
     EqPosition Position,
     float Scale = 1.0f,
     long? ServerId = null,
-    string? ClientAsset = null);
+    string? ClientAsset = null,
+    ZoneEntityData? Data = null);
 
 public sealed class CompleteZone
 {
