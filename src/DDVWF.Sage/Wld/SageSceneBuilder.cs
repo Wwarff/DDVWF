@@ -29,6 +29,6 @@ public static class SageSceneBuilder
    }
    meshes.Add(new(f.Name,prims));
   }
-  return new(materials,meshes,true);
+  return new(materials,meshes,false);
  }
 }
