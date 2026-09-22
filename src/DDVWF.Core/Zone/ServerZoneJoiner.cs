@@ -9,18 +9,29 @@ public static class ServerZoneJoiner
 
         foreach (var spawn in snapshot.Spawn2.Where(x => string.Equals(x.Zone, zone.ShortName, StringComparison.OrdinalIgnoreCase)))
         {
+            zone.Add(new ZoneEntity(
+                DeterministicId("spawn", spawn.Id, spawn.SpawnGroupId),
+                ZoneEntityKind.Spawn,
+                $"Spawn {spawn.Id}",
+                new EqPosition(spawn.X, spawn.Y, spawn.Z, spawn.Heading),
+                1f,
+                spawn.Id,
+                null,
+                new SpawnEntityData(spawn.SpawnGroupId,spawn.RespawnTime,spawn.Variance,spawn.PathGrid)));
+
             if (!entriesByGroup.TryGetValue(spawn.SpawnGroupId, out var entries)) continue;
             foreach (var entry in entries)
             {
                 if (!npcs.TryGetValue(entry.NpcId, out var npc)) continue;
                 zone.Add(new ZoneEntity(
-                    DeterministicId("spawn", spawn.Id, npc.Id),
+                    DeterministicId("npc", spawn.Id, npc.Id),
                     ZoneEntityKind.Npc,
                     npc.Name,
                     new EqPosition(spawn.X, spawn.Y, spawn.Z, spawn.Heading),
                     npc.Size <= 0 ? 1f : npc.Size,
                     spawn.Id,
-                    ClientAsset: null));
+                    null,
+                    new NpcEntityData(npc.Id,spawn.SpawnGroupId,entry.Chance,npc.Race,npc.Gender)));
             }
         }
 
@@ -32,7 +43,8 @@ public static class ServerZoneJoiner
                 new EqPosition(door.X, door.Y, door.Z, door.Heading),
                 door.Size <= 0 ? 1f : door.Size / 100f,
                 door.Id,
-                door.Model));
+                door.Model,
+                new DoorEntityData(door.DoorId,door.OpenType)));
     }
 
     private static Guid DeterministicId(string kind, long a, long b)
