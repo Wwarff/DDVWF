@@ -14,10 +14,10 @@ public sealed class VwfColorPicker : Window
     readonly Slider r=new(){Minimum=0,Maximum=255},g=new(){Minimum=0,Maximum=255},b=new(){Minimum=0,Maximum=255},i=new(){Minimum=0,Maximum=100,Value=100},a=new(){Minimum=0,Maximum=255,Value=255};
     readonly TextBox rn=new(),gn=new(),bn=new(),inn=new(),an=new(); readonly Ellipse svCursor=new(){Width=12,Height=12,Stroke=Brushes.White,StrokeThickness=2,IsHitTestVisible=false}; readonly Rectangle hueCursor=new(){Height=4,Stroke=Brushes.White,StrokeThickness=1,Fill=new SolidColorBrush(Color.FromArgb(128,0,0,0)),IsHitTestVisible=false};
     readonly Action<Color> preview; bool updating; double h,s,v=1; public Color SelectedColor{get;private set;}
-    public VwfColorPicker(Color initial,Action<Color> live)
+    public VwfColorPicker(Color initial,Action<Color> live,DDVWF.Core.Workspace.ThemeSettings? theme=null)
     {
-        SelectedColor=initial;preview=live;Title="Color";Width=300;Height=610;MinWidth=300;ResizeMode=ResizeMode.CanResizeWithGrip;WindowStartupLocation=WindowStartupLocation.CenterOwner;FontFamily=new FontFamily("Verdana");FontSize=12;Background=B("#030706");Foreground=B("#70B93B");
-        var root=new DockPanel{Margin=new Thickness(7)};Content=root;
+        SelectedColor=initial;preview=live;Title="Color";Width=300;Height=610;MinWidth=300;ResizeMode=ResizeMode.CanResize;WindowStartupLocation=WindowStartupLocation.CenterOwner;FontFamily=new FontFamily("Verdana");FontSize=12;Background=B("#030706");Foreground=B("#70B93B");
+        var root=new DockPanel{Margin=new Thickness(7)};Content=theme is null?root:DdvwfChrome.Wrap(this,"COLOR",root,theme);
         var close=new Button{Content="X",Width=25,Height=22,HorizontalAlignment=HorizontalAlignment.Right};close.Click+=(_,_)=>{DialogResult=true;Close();};DockPanel.SetDock(close,Dock.Top);root.Children.Add(close);
         var stack=new StackPanel();root.Children.Add(stack);
         var top=new Grid{Height=260};top.ColumnDefinitions.Add(new ColumnDefinition());top.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(27)});stack.Children.Add(top);
