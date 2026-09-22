@@ -1,6 +1,6 @@
 using System.Security.Cryptography;using System.Text;using DDVWF.Core.Zone;using DDVWF.Sage.Pfs;using DDVWF.Sage.Wld;
 namespace DDVWF.Sage;
-public sealed class SageClientZoneProvider:IClientRenderAssetProvider,IClientAssetResolver
+public sealed class SageClientZoneProvider:IClientRenderAssetProvider,IClientAssetResolver,INpcClientAssetResolver
 {
  readonly Dictionary<string,RenderMesh> _renderMeshes=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,byte[]> _textureFiles=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,byte[]> _rawTextures=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,string> _nativeAssets=new(StringComparer.OrdinalIgnoreCase);
  public IReadOnlyDictionary<string,RenderMesh> RenderMeshes=>_renderMeshes;public IReadOnlyDictionary<string,byte[]> TextureFiles=>_textureFiles;
@@ -31,6 +31,12 @@ public sealed class SageClientZoneProvider:IClientRenderAssetProvider,IClientAss
  }
  RenderMesh ProcessSkinnedTextures(RenderMesh mesh){var prims=mesh.Primitives.Select(p=>{if(p.Material is not{} m||!Enum.TryParse<SageShaderType>(m.Shader,out var shader))return p;var nativeFrames=m.TextureFrames??Array.Empty<string>();var frames=nativeFrames.Select(x=>ProcessedTexture(x,shader)).Where(x=>x is not null).Cast<string>().ToArray();var tex=frames.FirstOrDefault();return p with{TextureName=tex,Material=m with{TextureName=tex,TextureFrames=frames}};}).ToArray();return mesh with{Primitives=prims};}
   string? ProcessedTexture(string native,SageShaderType shader){if(!_rawTextures.TryGetValue(native,out var bytes))return null;var key=$"{Path.GetFileNameWithoutExtension(native).ToLowerInvariant()}-{(int)shader}.png";if(!_textureFiles.ContainsKey(key))_textureFiles[key]=SageTextureProcessor.Process(native,bytes,shader);return key;}
+  static readonly Lazy<Dictionary<int,Dictionary<int,string>>> RaceModels=new(()=>{
+   using var stream=typeof(SageClientZoneProvider).Assembly.GetManifestResourceStream("DDVWF.Sage.Authority.raceData.json")??throw new InvalidDataException("Pinned Sage raceData.json resource is missing.");
+   using var doc=System.Text.Json.JsonDocument.Parse(stream);var result=new Dictionary<int,Dictionary<int,string>>();
+   foreach(var row in doc.RootElement.EnumerateArray()){if(!row.TryGetProperty("id",out var idNode)||!idNode.TryGetInt32(out var id))continue;var genders=new Dictionary<int,string>();for(var g=0;g<=2;g++)if(row.TryGetProperty(g.ToString(),out var value)){var model=value.GetString();if(!string.IsNullOrWhiteSpace(model))genders[g]=model.ToLowerInvariant();}result[id]=genders;}return result;
+  });
   public string? ResolveClientAsset(string nativeReference){var key=Path.GetFileNameWithoutExtension(nativeReference).Replace("_ACTORDEF","",StringComparison.OrdinalIgnoreCase).ToLowerInvariant();return _nativeAssets.TryGetValue(key,out var asset)?asset:null;}
+  public string? ResolveNpcAsset(int race,int gender){if(!RaceModels.Value.TryGetValue(race,out var models))return _nativeAssets.TryGetValue("hum",out var hum)?hum:null;var model=models.TryGetValue(gender,out var exact)?exact:models.TryGetValue(2,out var neutral)?neutral:"hum";return _nativeAssets.TryGetValue(model,out var asset)?asset:null;}
   public static Guid Stable(params object[] parts){var text=string.Join("|",parts.Select(x=>x?.ToString()??""));return new Guid(MD5.HashData(Encoding.UTF8.GetBytes(text)));}
 }
