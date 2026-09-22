@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Markup;
 using System.Windows.Shell;
 using DDVWF.Core.Workspace;
 
@@ -41,6 +42,8 @@ internal static class DdvwfChrome
     {
         foreach(var p in ThemeSettings.DefaultPalette()){var v=theme.Palette.TryGetValue(p.Key,out var x)?x:p.Value;root.Resources[p.Key]=B(v);}
         var scroll=new Style(typeof(ScrollBar));scroll.Setters.Add(new Setter(ScrollBar.WidthProperty,5d));scroll.Setters.Add(new Setter(Control.BackgroundProperty,root.Resources["ScrollTrackBrush"]));scroll.Setters.Add(new Setter(Control.ForegroundProperty,root.Resources["ScrollThumbBrush"]));
+        var scrollTemplate=(ControlTemplate)XamlReader.Parse("<ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml' TargetType='{x:Type ScrollBar}'><Grid Background='{TemplateBinding Background}'><Track x:Name='PART_Track' IsDirectionReversed='True'><Track.DecreaseRepeatButton><RepeatButton Command='{x:Static ScrollBar.PageUpCommand}' Background='Transparent' BorderThickness='0' Opacity='0'/></Track.DecreaseRepeatButton><Track.Thumb><Thumb><Thumb.Template><ControlTemplate TargetType='{x:Type Thumb}'><Border Background='{DynamicResource ScrollThumbBrush}' BorderThickness='0'/></ControlTemplate></Thumb.Template></Thumb></Track.Thumb><Track.IncreaseRepeatButton><RepeatButton Command='{x:Static ScrollBar.PageDownCommand}' Background='Transparent' BorderThickness='0' Opacity='0'/></Track.IncreaseRepeatButton></Track></Grid></ControlTemplate>");
+        scroll.Setters.Add(new Setter(Control.TemplateProperty,scrollTemplate));
         var horizontal=new Trigger{Property=ScrollBar.OrientationProperty,Value=Orientation.Horizontal};horizontal.Setters.Add(new Setter(ScrollBar.WidthProperty,double.NaN));horizontal.Setters.Add(new Setter(ScrollBar.HeightProperty,5d));scroll.Triggers.Add(horizontal);root.Resources[typeof(ScrollBar)]=scroll;
         var text=new Style(typeof(TextBox));text.Setters.Add(new Setter(Control.BackgroundProperty,root.Resources["InputBrush"]));text.Setters.Add(new Setter(Control.ForegroundProperty,root.Resources["TextBrush"]));text.Setters.Add(new Setter(Control.BorderBrushProperty,root.Resources["ControlBorderBrush"]));text.Setters.Add(new Setter(Control.BorderThicknessProperty,new Thickness(1)));text.Setters.Add(new Setter(TextBox.CaretBrushProperty,root.Resources["AccentBrush"]));text.Setters.Add(new Setter(TextBox.SelectionBrushProperty,root.Resources["SelectionBrush"]));root.Resources[typeof(TextBox)]=text;
         var button=new Style(typeof(Button));button.Setters.Add(new Setter(Control.BackgroundProperty,root.Resources["ButtonBrush"]));button.Setters.Add(new Setter(Control.ForegroundProperty,root.Resources["TextBrush"]));button.Setters.Add(new Setter(Control.BorderBrushProperty,root.Resources["ControlBorderBrush"]));button.Setters.Add(new Setter(Control.BorderThicknessProperty,new Thickness(1)));root.Resources[typeof(Button)]=button;
