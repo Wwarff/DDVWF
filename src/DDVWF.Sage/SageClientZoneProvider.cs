@@ -14,5 +14,5 @@ public sealed class SageClientZoneProvider:IClientZoneProvider
    }
   }
  }
- internal static Guid Stable(params object[] parts){var text=string.Join("|",parts.Select(x=>x?.ToString()??""));var hash=MD5.HashData(Encoding.UTF8.GetBytes(text));return new Guid(hash);}
+ public static Guid Stable(params object[] parts){var text=string.Join("|",parts.Select(x=>x?.ToString()??""));var hash=MD5.HashData(Encoding.UTF8.GetBytes(text));return new Guid(hash);}
 }
