@@ -25,9 +25,9 @@ internal static class DdvwfChrome
         var caption=new TextBlock{Text=title,Margin=new Thickness(6,0,6,0),VerticalAlignment=VerticalAlignment.Center,Foreground=B(C(theme,"TitleBarTextBrush","#D7FF00")),FontFamily=new FontFamily("Verdana"),FontSize=12};
         bar.Children.Add(caption);
         var controls=new StackPanel{Orientation=Orientation.Horizontal};Grid.SetColumn(controls,1);bar.Children.Add(controls);
-        if(allowMaximize)controls.Children.Add(CaptionButton(w,"□",()=>w.WindowState=w.WindowState==WindowState.Maximized?WindowState.Normal:WindowState.Maximized,theme));
+        if(allowMaximize)controls.Children.Add(CaptionButton(w,"□",()=>w.WindowState=w.WindowState==System.Windows.WindowState.Maximized?System.Windows.WindowState.Normal:System.Windows.WindowState.Maximized,theme));
         controls.Children.Add(CaptionButton(w,"X",w.Close,theme));
-        bar.MouseLeftButtonDown+=(_,e)=>{if(e.OriginalSource is TextBlock tb&&tb.Tag as string=="captionButton")return;if(allowMaximize&&e.ClickCount==2)w.WindowState=w.WindowState==WindowState.Maximized?WindowState.Normal:WindowState.Maximized;else if(e.LeftButton==MouseButtonState.Pressed)w.DragMove();};
+        bar.MouseLeftButtonDown+=(_,e)=>{if(e.OriginalSource is TextBlock tb&&tb.Tag as string=="captionButton")return;if(allowMaximize&&e.ClickCount==2)w.WindowState=w.WindowState==System.Windows.WindowState.Maximized?System.Windows.WindowState.Normal:System.Windows.WindowState.Maximized;else if(e.LeftButton==MouseButtonState.Pressed)w.DragMove();};
         DockPanel.SetDock(bar,Dock.Top);root.Children.Add(bar);root.Children.Add(body);return root;
     }
 
