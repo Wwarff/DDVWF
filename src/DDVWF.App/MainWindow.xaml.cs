@@ -5,13 +5,14 @@ using DDVWF.Core.Workspace;
 using DDVWF.Core.Zone;
 using DDVWF.Sage;
 using DDVWF.Server;
+using DDVWF.Renderer.Babylon;
 
 namespace DDVWF.App;
 public partial class MainWindow:Window
 {
  readonly CommandHistory _history=new();readonly JsonWorkspaceStore _workspace;WorkspaceSettings _settings=new();ZoneSession? _session;
- public MainWindow(){InitializeComponent();var root=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DragonsDen","DDVWF");_workspace=new(Path.Combine(root,"workspace.json"));Loaded+=async(_,_)=>await RestoreAsync();Closing+=async(_,_)=>await PersistAsync();}
- async Task RestoreAsync(){_settings=await _workspace.LoadAsync();StatusText.Text=string.IsNullOrWhiteSpace(_settings.EqRoot)?"Choose EverQuest directory":_settings.EqRoot;if(!string.IsNullOrWhiteSpace(_settings.EqRoot)&&Directory.Exists(_settings.EqRoot)){DiscoverZones();if(!string.IsNullOrWhiteSpace(_settings.LastZone))await OpenZoneAsync(_settings.LastZone);}}
+ public MainWindow(){InitializeComponent();Viewport.CoreWebView2InitializationCompleted+=(_,e)=>{if(!e.IsSuccess)StatusText.Text=$"Renderer failed: {e.InitializationException?.Message}";};var root=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DragonsDen","DDVWF");_workspace=new(Path.Combine(root,"workspace.json"));Loaded+=async(_,_)=>await RestoreAsync();Closing+=async(_,_)=>await PersistAsync();}
+ async Task RestoreAsync(){await Viewport.EnsureCoreWebView2Async();var html=Path.Combine(AppContext.BaseDirectory,"Renderer","babylon.html");if(File.Exists(html))Viewport.Source=new Uri(html);_settings=await _workspace.LoadAsync();StatusText.Text=string.IsNullOrWhiteSpace(_settings.EqRoot)?"Choose EverQuest directory":_settings.EqRoot;if(!string.IsNullOrWhiteSpace(_settings.EqRoot)&&Directory.Exists(_settings.EqRoot)){DiscoverZones();if(!string.IsNullOrWhiteSpace(_settings.LastZone))await OpenZoneAsync(_settings.LastZone);}}
  void DiscoverZones(){AssetTree.Items.Clear();foreach(var p in Directory.EnumerateFiles(_settings.EqRoot!,"*.s3d",SearchOption.TopDirectoryOnly).Where(x=>!Path.GetFileNameWithoutExtension(x).EndsWith("_obj",StringComparison.OrdinalIgnoreCase)&&!Path.GetFileNameWithoutExtension(x).EndsWith("_obj2",StringComparison.OrdinalIgnoreCase)).OrderBy(Path.GetFileName)){var z=Path.GetFileNameWithoutExtension(p);var item=new System.Windows.Controls.TreeViewItem{Header=z,Tag=z};item.MouseDoubleClick+=async(_,_)=>await OpenZoneAsync(z);AssetTree.Items.Add(item);}}
  async Task OpenZoneAsync(string zone){try{StatusText.Text=$"Loading {zone}...";_session=new(new SageClientZoneProvider(),new NoServerDataProvider(),new SceneTreeViewport(SceneTree));var loaded=await _session.OpenAsync(_settings.EqRoot!,zone);_settings=_settings with{LastZone=zone};ZoneText.Text=$"{zone}  |  {loaded.Entities.Count} entities";StatusText.Text=$"Loaded {zone}";await PersistAsync();}catch(Exception ex){StatusText.Text=$"Load failed: {ex.Message}";}}
  Task PersistAsync()=>_workspace.SaveAsync(_settings);
