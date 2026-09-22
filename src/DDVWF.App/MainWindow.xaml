@@ -1,4 +1,18 @@
-<Window x:Class="DDVWF.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" Title="Dragon's Den Visual WorldForge — INTEGRATION" Width="1600" Height="1000" Background="#111318" Foreground="#9CFF80">
+<Window x:Class="DDVWF.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" Title="Dragon's Den Visual WorldForge | INTEGRATION" Width="1600" Height="1000" Background="#080B0A" Foreground="#00FF33" FontFamily="Verdana" FontSize="12">
+  <Window.Resources>
+    <SolidColorBrush x:Key="PanelBrush" Color="#101311"/><SolidColorBrush x:Key="ControlBrush" Color="#171A18"/><SolidColorBrush x:Key="AccentBrush" Color="#00FF33"/><SolidColorBrush x:Key="SeparatorBrush" Color="#6A00A8"/>
+    <Style TargetType="Menu"><Setter Property="Background" Value="{StaticResource PanelBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/></Style>
+    <Style TargetType="MenuItem"><Setter Property="Background" Value="{StaticResource PanelBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/></Style>
+    <Style TargetType="ToolBar"><Setter Property="Background" Value="{StaticResource PanelBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/></Style>
+    <Style TargetType="Button"><Setter Property="Background" Value="{StaticResource ControlBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/><Setter Property="BorderBrush" Value="{StaticResource SeparatorBrush}"/><Setter Property="Padding" Value="5,2"/><Setter Property="Margin" Value="1"/></Style>
+    <Style TargetType="TabControl"><Setter Property="Background" Value="{StaticResource PanelBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/><Setter Property="BorderBrush" Value="{StaticResource SeparatorBrush}"/></Style>
+    <Style TargetType="TabItem"><Setter Property="Background" Value="{StaticResource ControlBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/></Style>
+    <Style TargetType="TreeView"><Setter Property="Background" Value="{StaticResource PanelBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/><Setter Property="BorderBrush" Value="{StaticResource SeparatorBrush}"/></Style>
+    <Style TargetType="ListBox"><Setter Property="Background" Value="{StaticResource PanelBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/><Setter Property="BorderBrush" Value="{StaticResource SeparatorBrush}"/></Style>
+    <Style TargetType="GroupBox"><Setter Property="Background" Value="{StaticResource PanelBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/><Setter Property="BorderBrush" Value="{StaticResource SeparatorBrush}"/></Style>
+    <Style TargetType="StatusBar"><Setter Property="Background" Value="{StaticResource PanelBrush}"/><Setter Property="Foreground" Value="{StaticResource AccentBrush}"/></Style>
+    <Style TargetType="GridSplitter"><Setter Property="Background" Value="{StaticResource SeparatorBrush}"/></Style>
+  </Window.Resources>
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="_File"><MenuItem Header="_Open Zone..." Click="OpenZone_Click"/><MenuItem Header="_Close Zone" Click="CloseZone_Click"/><Separator/><MenuItem Header="EQEmu _SQL..." Click="ServerSettings_Click"/><Separator/><MenuItem Header="E_xit" Click="Exit_Click"/></MenuItem>
@@ -12,15 +26,19 @@
       <Button Content="Focus" Click="Focus_Click"/><Button Content="Undo" Click="Undo_Click"/><Button Content="Redo" Click="Redo_Click"/>
     </ToolBar>
     <StatusBar DockPanel.Dock="Bottom"><TextBlock x:Name="StatusText" Text="Ready"/><Separator/><TextBlock x:Name="CoordText" Text="EQ X 0.00  Y 0.00  Z 0.00"/></StatusBar>
-    <Grid>
-      <Grid.ColumnDefinitions><ColumnDefinition Width="300"/><ColumnDefinition Width="5"/><ColumnDefinition Width="*"/><ColumnDefinition Width="5"/><ColumnDefinition Width="340"/></Grid.ColumnDefinitions>
-      <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="5"/><RowDefinition Height="220"/></Grid.RowDefinitions>
-      <TabControl Grid.Column="0" Grid.RowSpan="3"><TabItem Header="Scene / Zone"><DockPanel><StackPanel DockPanel.Dock="Top"><Button Content="EverQuest Folder..." Click="ChooseEqRoot_Click"/><Button Content="Refresh Zones" Click="OpenZone_Click"/><TextBlock x:Name="ZoneText" Margin="6" Text="No zone loaded"/></StackPanel><TreeView x:Name="SceneTree"/></DockPanel></TabItem><TabItem Header="EQ Asset Browser"><TreeView x:Name="AssetTree"/></TabItem></TabControl>
-      <GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="5" HorizontalAlignment="Stretch"/>
-      <Border Grid.Column="2" Background="#080A0D" BorderBrush="#6930A8" BorderThickness="1"><wv2:WebView2 x:Name="Viewport"/></Border>
-      <GridSplitter Grid.Column="3" Grid.RowSpan="3" Width="5" HorizontalAlignment="Stretch"/>
-      <Grid Grid.Column="4"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="5"/><RowDefinition Height="*"/></Grid.RowDefinitions><GroupBox Header="Inspector"><ScrollViewer><StackPanel x:Name="InspectorPanel"/></ScrollViewer></GroupBox><GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch"/><TabControl Grid.Row="2"><TabItem Header="Model"><wv2:WebView2 x:Name="ModelViewer"/></TabItem><TabItem Header="Object"><ListBox x:Name="ObjectList" SelectionChanged="ObjectList_SelectionChanged"/></TabItem><TabItem Header="Texture"><ListBox x:Name="TextureList"/></TabItem><TabItem Header="Material"><ListBox x:Name="MaterialList"/></TabItem></TabControl></Grid>
-      <GridSplitter Grid.Column="2" Grid.Row="1" Height="5" HorizontalAlignment="Stretch"/>
+    <Grid Background="{StaticResource PanelBrush}">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="300"/><ColumnDefinition Width="2"/><ColumnDefinition Width="*"/><ColumnDefinition Width="2"/><ColumnDefinition Width="340"/></Grid.ColumnDefinitions>
+      <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="2"/><RowDefinition Height="220"/></Grid.RowDefinitions>
+      <Grid Grid.Column="0" Grid.RowSpan="3"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="2"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <GroupBox Header="SCENE / ZONE"><DockPanel><StackPanel DockPanel.Dock="Top"><Button Content="EverQuest Folder..." Click="ChooseEqRoot_Click"/><Button Content="Refresh Zones" Click="OpenZone_Click"/><TextBlock x:Name="ZoneText" Margin="6" Text="No zone loaded"/></StackPanel><TreeView x:Name="SceneTree"/></DockPanel></GroupBox>
+        <GridSplitter Grid.Row="1" Height="2" HorizontalAlignment="Stretch"/>
+        <GroupBox Grid.Row="2" Header="EQ ASSET BROWSER"><TreeView x:Name="AssetTree"/></GroupBox>
+      </Grid>
+      <GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="2" HorizontalAlignment="Stretch"/>
+      <Border Grid.Column="2" Background="#080A0D" BorderBrush="{StaticResource SeparatorBrush}" BorderThickness="1"><wv2:WebView2 x:Name="Viewport"/></Border>
+      <GridSplitter Grid.Column="3" Grid.RowSpan="3" Width="2" HorizontalAlignment="Stretch"/>
+      <Grid Grid.Column="4" Grid.RowSpan="3"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="2"/><RowDefinition Height="*"/></Grid.RowDefinitions><GroupBox Header="INSPECTOR"><ScrollViewer><StackPanel x:Name="InspectorPanel"/></ScrollViewer></GroupBox><GridSplitter Grid.Row="1" Height="2" HorizontalAlignment="Stretch"/><GroupBox Grid.Row="2" Header="MODEL / OBJECT / TEXTURE / MATERIAL VIEWER"><TabControl><TabItem Header="MODEL"><wv2:WebView2 x:Name="ModelViewer"/></TabItem><TabItem Header="OBJECT"><ListBox x:Name="ObjectList" SelectionChanged="ObjectList_SelectionChanged"/></TabItem><TabItem Header="TEXTURE"><ListBox x:Name="TextureList"/></TabItem><TabItem Header="MATERIAL"><ListBox x:Name="MaterialList"/></TabItem></TabControl></GroupBox></Grid>
+      <GridSplitter Grid.Column="2" Grid.Row="1" Height="2" HorizontalAlignment="Stretch"/>
       <TabControl Grid.Column="2" Grid.Row="2"><TabItem Header="Status"/><TabItem Header="Difference"/><TabItem Header="Diagnostics"/><TabItem Header="Native Data"/><TabItem Header="Changes"/><TabItem Header="Console"/></TabControl>
     </Grid>
   </DockPanel>
