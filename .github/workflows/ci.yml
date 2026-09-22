@@ -17,6 +17,14 @@ jobs:
       - run: dotnet build DDVWF.slnx -c Release --no-restore
       - run: dotnet test DDVWF.slnx -c Release --no-build
       - run: dotnet publish src/DDVWF.App/DDVWF.App.csproj -c Release -r win-x64 --self-contained false -o artifacts/DDVWF
+      - name: Vendor pinned Babylon 7.2.1
+        shell: pwsh
+        run: |
+          npm install --prefix .renderer-deps babylonjs@7.2.1 --no-save
+          $source = Join-Path $PWD ".renderer-deps/node_modules/babylonjs/babylon.js"
+          if (!(Test-Path -LiteralPath $source)) { throw "Pinned Babylon runtime was not produced." }
+          New-Item -ItemType Directory -Force -Path "artifacts/DDVWF/Renderer" | Out-Null
+          Copy-Item -LiteralPath $source -Destination "artifacts/DDVWF/Renderer/babylon.js"
       - uses: actions/upload-artifact@v4
         with:
           name: DDVWF-win-x64
