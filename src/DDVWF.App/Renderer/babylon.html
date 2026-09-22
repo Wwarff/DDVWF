@@ -10,7 +10,7 @@ function commit(){if(!selected)return;notify({type:'transform',id:selected.metad
 function focus(){if(!selected)return;const b=selected.getHierarchyBoundingVectors(true),center=b.min.add(b.max).scale(.5),radius=Math.max(1,b.max.subtract(b.min).length());camera.position=center.add(new BABYLON.Vector3(0,radius*.3,-radius*1.2));camera.setTarget(center)}
 function remove(id){const r=byId.get(id);if(!r)return;if(selected===r)select(null);r.dispose();byId.delete(id)}
 scene.onPointerObservable.add(pi=>{if(pi.type!==BABYLON.PointerEventTypes.POINTERPICK)return;const root=pi.pickInfo?.pickedMesh?.metadata?.root;if(root){select(root);notify({type:'select',id:root.metadata.id})}});
-scene.onKeyboardObservable.add(k=>{if(k.type===BABYLON.KeyboardEventTypes.KEYUP&&k.event.key.toLowerCase()==='f')focus()});
+scene.onKeyboardObservable.add(k=>{if(k.type===BABYLON.KeyboardEventTypes.KEYUP&&k.event.key.toLowerCase()==='f')focus()});canvas.addEventListener('pointerup',()=>{if(mode!=='select')commit()});
 engine.runRenderLoop(()=>scene.render());addEventListener('resize',()=>engine.resize());setInterval(()=>notify({type:'camera',x:camera.position.x,y:camera.position.z,z:camera.position.y}),100);
 window.ddvwf={loadScene,setMode,focus,remove,selectId:id=>select(byId.get(id)||null),commit};
 </script></body></html>
