@@ -1,4 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net8.0-windows</TargetFramework><UseWPF>true</UseWPF><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><AssemblyName>DragonDenVisualWorldForge</AssemblyName></PropertyGroup>
-  <ItemGroup><ProjectReference Include="../DDVWF.Core/DDVWF.Core.csproj" /><ProjectReference Include="../DDVWF.Server/DDVWF.Server.csproj" /><ProjectReference Include="../DDVWF.Sage/DDVWF.Sage.csproj" /></ItemGroup>
+  <ItemGroup><ProjectReference Include="../DDVWF.Core/DDVWF.Core.csproj" /><ProjectReference Include="../DDVWF.Server/DDVWF.Server.csproj" /><ProjectReference Include="../DDVWF.Sage/DDVWF.Sage.csproj" /><ProjectReference Include="../DDVWF.Renderer.Babylon/DDVWF.Renderer.Babylon.csproj" /><PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3485.44" /></ItemGroup>
 </Project>
