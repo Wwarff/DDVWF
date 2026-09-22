@@ -18,6 +18,7 @@ public sealed class DuplicateEntityCommand : IEditorCommand
     public Guid NewId=>_copy.Id;
     public DuplicateEntityCommand(CompleteZone zone,Guid sourceId,EqPosition position)
     {
+        _zone=zone;
         var source=zone.Get(sourceId);
         _copy=source with { Id=Guid.NewGuid(), Position=position, ServerId=null };
     }
