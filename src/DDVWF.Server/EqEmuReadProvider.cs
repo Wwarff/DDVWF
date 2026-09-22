@@ -16,7 +16,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider
     {
         await using var connection=await _open(cancellationToken);
         var spawn2=new List<Spawn2Record>(); var entries=new List<SpawnEntryRecord>();
-        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>();
+        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>();
 
         await using(var cmd=connection.CreateCommand())
         {
@@ -55,7 +55,16 @@ public sealed class EqEmuReadProvider : IServerDataProvider
                 doors.Add(new(r.GetInt64(0),r.GetInt32(1),r.GetString(2),r.GetString(3),F(r,4),F(r,5),F(r,6),F(r,7),r.GetInt32(8),r.GetInt32(9)));
         }
 
-        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors));
+        await using(var cmd=connection.CreateCommand())
+        {
+            cmd.CommandText="SELECT id, zone, version, number, x, y, z, heading, target_x, target_y, target_z, target_heading, target_zone_id, target_instance FROM zone_points WHERE zone = @zone";
+            Add(cmd,"@zone",zone.ShortName);
+            await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
+            while(await r.ReadAsync(cancellationToken))
+                zonePoints.Add(new(r.GetInt64(0),r.GetString(1),r.GetInt32(2),r.GetInt32(3),F(r,4),F(r,5),F(r,6),F(r,7),F(r,8),F(r,9),F(r,10),F(r,11),Convert.ToUInt32(r.GetValue(12),System.Globalization.CultureInfo.InvariantCulture),Convert.ToUInt32(r.GetValue(13),System.Globalization.CultureInfo.InvariantCulture)));
+        }
+
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints));
     }
 
     private static float F(DbDataReader r,int i)=>Convert.ToSingle(r.GetValue(i),System.Globalization.CultureInfo.InvariantCulture);
