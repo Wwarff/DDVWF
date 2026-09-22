@@ -2,17 +2,17 @@ using System.Security.Cryptography;using System.Text;using DDVWF.Core.Zone;using
 namespace DDVWF.Sage;
 public sealed class SageClientZoneProvider:IClientRenderAssetProvider
 {
- readonly Dictionary<string,RenderMesh> _renderMeshes=new(StringComparer.OrdinalIgnoreCase);
- public IReadOnlyDictionary<string,RenderMesh> RenderMeshes=>_renderMeshes;
+ readonly Dictionary<string,RenderMesh> _renderMeshes=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,byte[]> _textureFiles=new(StringComparer.OrdinalIgnoreCase);
+ public IReadOnlyDictionary<string,RenderMesh> RenderMeshes=>_renderMeshes;public IReadOnlyDictionary<string,byte[]> TextureFiles=>_textureFiles;
  public async Task PopulateAsync(CompleteZone zone,string eqRoot,CancellationToken ct)
  {
   if(string.IsNullOrWhiteSpace(eqRoot)||!Directory.Exists(eqRoot))throw new DirectoryNotFoundException(eqRoot);
-  _renderMeshes.Clear();
+  _renderMeshes.Clear();_textureFiles.Clear();
   var paths=new[]{Path.Combine(eqRoot,zone.ShortName+".s3d"),Path.Combine(eqRoot,zone.ShortName+"_obj.s3d"),Path.Combine(eqRoot,zone.ShortName+"_obj2.s3d")};
   var archives=paths.Where(File.Exists).ToArray();if(archives.Length==0)throw new FileNotFoundException($"No native S3D archive was found for zone '{zone.ShortName}' in the configured EQ root.");
   var objectAssets=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
   var placements=new List<(string Wld,SageActorInstance Actor,int Ordinal)>();
-  foreach(var archivePath in archives){ct.ThrowIfCancellationRequested();var archive=PfsArchive.Open(await File.ReadAllBytesAsync(archivePath,ct));
+  foreach(var archivePath in archives){ct.ThrowIfCancellationRequested();var archive=PfsArchive.Open(await File.ReadAllBytesAsync(archivePath,ct));foreach(var tf in archive.Files.Where(x=>x.Key.EndsWith(".dds",StringComparison.OrdinalIgnoreCase)||x.Key.EndsWith(".bmp",StringComparison.OrdinalIgnoreCase)))_textureFiles.TryAdd(tf.Key,tf.Value);
    foreach(var pair in archive.Files.Where(x=>x.Key.EndsWith(".wld",StringComparison.OrdinalIgnoreCase))){var doc=WldDocument.Parse(pair.Value,pair.Key);
     if(doc.Kind==WldKind.Zone){var scene=SageSceneBuilder.Build(doc,pair.Value);RegisterScene(pair.Key,scene);var ordinal=0;foreach(var mesh in scene.Meshes.Where(x=>x.Primitives.Count>0)){var key=$"{pair.Key}#{mesh.Name}";zone.Add(new(Stable(zone.ShortName,pair.Key,"world",mesh.Name,ordinal++),ZoneEntityKind.WorldGeometry,mesh.Name,new(0,0,0),1,null,key));}}
     if(doc.Kind==WldKind.Objects){var scene=SageSceneBuilder.Build(doc,pair.Value);RegisterScene(pair.Key,scene,"object");foreach(var af in doc.Fragments.Where(x=>x.KnownType==WldFragmentType.ActorDefinition)){var ad=WldActorDefinitionReader.Read(doc,af,pair.Value);if(ad.Type!=SageActorType.Static||ad.ResolvedModelFragment is not int mi||mi<0||mi>=doc.Fragments.Count)continue;var meshName=doc.Fragments[mi].Name;var key=$"{pair.Key}#object#{meshName}";if(_renderMeshes.ContainsKey(key)){var actorName=ad.Name.Replace("_ACTORDEF","",StringComparison.OrdinalIgnoreCase).ToLowerInvariant();if(!string.IsNullOrWhiteSpace(actorName))objectAssets[actorName]=key;}}}
