@@ -20,7 +20,7 @@ public sealed class SageClientZoneProvider:IClientRenderAssetProvider,IClientAss
     if(doc.Kind==WldKind.ZoneObjects){var ordinal=0;foreach(var fragment in doc.Fragments.Where(x=>x.KnownType==WldFragmentType.ActorInstance)){var actor=WldActorReader.ReadActorInstance(doc,fragment,pair.Value);if(actor.Location is not null)placements.Add((pair.Key,actor,ordinal++));}}
    }
   }
-  foreach(var p in placements){var loc=p.Actor.Location!.Value;objectAssets.TryGetValue(p.Actor.ObjectName,out var asset);var kind=objectKinds.TryGetValue(p.Actor.ObjectName,out var k)?k:ZoneEntityKind.StaticObject;zone.Add(new(Stable(zone.ShortName,p.Wld,"actor",p.Actor.ObjectName,p.Ordinal),kind,p.Actor.ObjectName,new(loc.X,loc.Y,loc.Z,loc.RotateY+180f),p.Actor.ScaleFactor==0?1:p.Actor.ScaleFactor,null,asset));}
+  foreach(var p in placements){var loc=p.Actor.Location!.Value;objectAssets.TryGetValue(p.Actor.ObjectName,out var asset);var kind=objectKinds.TryGetValue(p.Actor.ObjectName,out var k)?k:ZoneEntityKind.StaticObject;zone.Add(new(Stable(zone.ShortName,p.Wld,"actor",p.Actor.ObjectName,p.Ordinal),kind,p.Actor.ObjectName,new(loc.X,loc.Y,loc.Z,loc.RotateY+180f),p.Actor.ScaleFactor==0?1:p.Actor.ScaleFactor,null,asset,null,new EqRotation(loc.RotateX,loc.RotateY+180f,loc.RotateZ)));}
  }
  void RegisterScene(string wld,SageSceneDocument scene,string? scope=null)
  {
