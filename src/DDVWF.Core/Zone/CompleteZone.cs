@@ -12,6 +12,7 @@ public abstract record ZoneEntityData;
 public sealed record SpawnEntityData(long SpawnGroupId,int RespawnTime,int Variance,int PathGrid) : ZoneEntityData;
 public sealed record NpcEntityData(long NpcTypeId,long SpawnGroupId,int Chance,int Race,int Gender) : ZoneEntityData;
 public sealed record DoorEntityData(int DoorId,int OpenType) : ZoneEntityData;
+public sealed record ZonePointEntityData(int Version,int Number,float TargetX,float TargetY,float TargetZ,float TargetHeading,uint TargetZoneId,uint TargetInstance) : ZoneEntityData;
 
 public sealed record ZoneEntity(
     Guid Id,
