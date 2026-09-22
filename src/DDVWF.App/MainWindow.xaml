@@ -7,9 +7,9 @@
       <MenuItem Header="_Tools"/><MenuItem Header="_World"/><MenuItem Header="_Navigation"/><MenuItem Header="_Help"/>
     </Menu>
     <ToolBar DockPanel.Dock="Top">
-      <Button Content="Select"/><Button Content="Move"/><Button Content="Rotate"/><Button Content="Scale"/><Separator/>
-      <Button Content="Duplicate"/><Button Content="Stamp"/><Button Content="Delete"/><Separator/>
-      <Button Content="Focus"/><Button Content="Undo" Click="Undo_Click"/><Button Content="Redo" Click="Redo_Click"/>
+      <Button Content="Select" Click="SelectMode_Click"/><Button Content="Move" Click="MoveMode_Click"/><Button Content="Rotate" Click="RotateMode_Click"/><Button Content="Scale" Click="ScaleMode_Click"/><Separator/>
+      <Button Content="Duplicate" Click="Duplicate_Click"/><Button Content="Stamp" Click="Stamp_Click"/><Button Content="Delete" Click="Delete_Click"/><Separator/>
+      <Button Content="Focus" Click="Focus_Click"/><Button Content="Undo" Click="Undo_Click"/><Button Content="Redo" Click="Redo_Click"/>
     </ToolBar>
     <StatusBar DockPanel.Dock="Bottom"><TextBlock x:Name="StatusText" Text="Ready"/><Separator/><TextBlock x:Name="CoordText" Text="EQ X 0.00  Y 0.00  Z 0.00"/></StatusBar>
     <Grid>
