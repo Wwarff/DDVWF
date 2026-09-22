@@ -13,10 +13,10 @@ public sealed class VwfColorPicker : Window
     readonly Canvas sv=new(), hue=new(); readonly Border sample=new(); readonly Rectangle svWhite=new(){IsHitTestVisible=false},svBlack=new(){IsHitTestVisible=false}; readonly TextBox hex=new();
     readonly Slider r=new(){Minimum=0,Maximum=255},g=new(){Minimum=0,Maximum=255},b=new(){Minimum=0,Maximum=255},i=new(){Minimum=0,Maximum=100,Value=100},a=new(){Minimum=0,Maximum=255,Value=255};
     readonly TextBox rn=new(),gn=new(),bn=new(),inn=new(),an=new(); readonly Ellipse svCursor=new(){Width=12,Height=12,Stroke=Brushes.White,StrokeThickness=2,IsHitTestVisible=false}; readonly Rectangle hueCursor=new(){Height=4,Stroke=Brushes.White,StrokeThickness=1,Fill=new SolidColorBrush(Color.FromArgb(128,0,0,0)),IsHitTestVisible=false};
-    readonly Action<Color> preview; bool updating; double h,s,v=1; public Color SelectedColor{get;private set;}
+    readonly Action<Color> preview; readonly DDVWF.Core.Workspace.ThemeSettings? activeTheme; bool updating; double h,s,v=1; public Color SelectedColor{get;private set;}
     public VwfColorPicker(Color initial,Action<Color> live,DDVWF.Core.Workspace.ThemeSettings? theme=null)
     {
-        SelectedColor=initial;preview=live;Title="Color";Width=300;Height=610;MinWidth=300;ResizeMode=ResizeMode.CanResize;WindowStartupLocation=WindowStartupLocation.CenterOwner;FontFamily=new FontFamily("Verdana");FontSize=12;Background=B("#030706");Foreground=B("#70B93B");
+        SelectedColor=initial;preview=live;activeTheme=theme;Title="Color";Width=300;Height=610;MinWidth=300;ResizeMode=ResizeMode.CanResize;WindowStartupLocation=WindowStartupLocation.CenterOwner;FontFamily=new FontFamily("Verdana");FontSize=12;Background=B("#030706");Foreground=B("#70B93B");
         var root=new DockPanel{Margin=new Thickness(7)};Content=theme is null?root:DdvwfChrome.Wrap(this,"COLOR",root,theme);
         var close=new Button{Content="X",Width=25,Height=22,HorizontalAlignment=HorizontalAlignment.Right};close.Click+=(_,_)=>{DialogResult=true;Close();};DockPanel.SetDock(close,Dock.Top);root.Children.Add(close);
         var stack=new StackPanel();root.Children.Add(stack);
@@ -31,7 +31,7 @@ public sealed class VwfColorPicker : Window
         var save=new Button{Content="SAVE COLOR",Height=26,Margin=new Thickness(0,4,0,0)};save.Click+=(_,_)=>{DialogResult=true;Close();};stack.Children.Add(save);
         foreach(var sl in new[]{r,g,b,i,a})sl.ValueChanged+=ChannelChanged;hex.LostKeyboardFocus+=(_,_)=>HexChanged();hex.KeyDown+=(_,e)=>{if(e.Key==Key.Enter)HexChanged();};
         PreviewKeyDown+=(_,e)=>{if(e.Key==Key.Escape){DialogResult=false;Close();}};
-        SetFromColor(initial);
+        SetFromColor(initial);RefreshChrome();
     }
     static SolidColorBrush B(string s)=>new((Color)ColorConverter.ConvertFromString(s));
     void AddChannel(Panel p,string label,Slider sl,TextBox n){var q=new Grid{Height=33};q.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(20)});q.ColumnDefinitions.Add(new ColumnDefinition());q.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(53)});q.Children.Add(new TextBlock{Text=label,VerticalAlignment=VerticalAlignment.Center});sl.Margin=new Thickness(3);Grid.SetColumn(sl,1);q.Children.Add(sl);n.Margin=new Thickness(3);Grid.SetColumn(n,2);q.Children.Add(n);p.Children.Add(q);}
@@ -39,7 +39,7 @@ public sealed class VwfColorPicker : Window
     void ChannelChanged(object? s0,RoutedPropertyChangedEventArgs<double> e){if(updating)return;var intensity=i.Value/100d;SetColor(Color.FromArgb((byte)a.Value,(byte)Math.Clamp(r.Value*intensity,0,255),(byte)Math.Clamp(g.Value*intensity,0,255),(byte)Math.Clamp(b.Value*intensity,0,255)),false);}
     void SetColor(Color c,bool sync){SelectedColor=c;if(sync){updating=true;r.Value=c.R;g.Value=c.G;b.Value=c.B;a.Value=c.A;updating=false;}Refresh();preview(c);}
     void Refresh(){sample.Background=new SolidColorBrush(SelectedColor);hex.Text=$"{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}";rn.Text=((int)r.Value).ToString();gn.Text=((int)g.Value).ToString();bn.Text=((int)b.Value).ToString();inn.Text=((int)i.Value).ToString();an.Text=((int)a.Value).ToString();sv.Background=new SolidColorBrush(Hsv(h,1,1,255));Canvas.SetLeft(svCursor,s*Math.Max(1,sv.ActualWidth)-6);Canvas.SetTop(svCursor,(1-v)*Math.Max(1,sv.ActualHeight)-6);Canvas.SetTop(hueCursor,h*Math.Max(1,hue.ActualHeight)-2);hueCursor.Width=Math.Max(1,hue.ActualWidth);}
-    public void RefreshChrome()=>Refresh();
+    public void RefreshChrome(){if(activeTheme is not null){string P(string k,string f)=>activeTheme.Palette.TryGetValue(k,out var v)?v:f;Background=B(P("PickerBackground","#1F2121"));Foreground=B(P("PickerFont","#EBEBEB"));var control=B(P("PickerControlBackground","#282B2B"));var font=B(P("PickerFont","#EBEBEB"));var border=B(P("PickerBorder","#464A4A"));foreach(var box in new[]{hex,rn,gn,bn,inn,an}){box.Background=control;box.Foreground=font;box.BorderBrush=border;}svCursor.Stroke=B(P("PickerSelectorArrow","#EBEBEB"));hueCursor.Stroke=B(P("PickerSelectorArrowOutline","#000000"));}Refresh();}
     void SvMouse(object sender,MouseEventArgs e){if(e.LeftButton!=MouseButtonState.Pressed)return;var p=e.GetPosition(sv);s=Math.Clamp(p.X/Math.Max(1,sv.ActualWidth),0,1);v=1-Math.Clamp(p.Y/Math.Max(1,sv.ActualHeight),0,1);var c=Hsv(h,s,v,(byte)a.Value);SetColor(c,true);}
     void HueMouse(object sender,MouseEventArgs e){if(e.LeftButton!=MouseButtonState.Pressed)return;var p=e.GetPosition(hue);h=Math.Clamp(p.Y/Math.Max(1,hue.ActualHeight),0,1);SetColor(Hsv(h,s,v,(byte)a.Value),true);}
     void HexChanged(){var t=hex.Text.Trim().TrimStart('#');if(t.Length!=6||!uint.TryParse(t,NumberStyles.HexNumber,CultureInfo.InvariantCulture,out var x))return;SetFromColor(Color.FromArgb((byte)a.Value,(byte)(x>>16),(byte)(x>>8),(byte)x));preview(SelectedColor);}
