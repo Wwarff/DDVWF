@@ -2,7 +2,7 @@ namespace DDVWF.Core.Workspace;
 
 public sealed record CameraState(float X, float Y, float Z, float Yaw, float Pitch, float Speed = 20f);
 
-public sealed record ServerConnectionSettings(string Host="127.0.0.1",int Port=3306,string Database="peq",string User="",bool Enabled=false);
+public sealed record ServerConnectionSettings(string Host="127.0.0.1",int Port=3306,string Database="peq",string User="trinity",string Password="trinity",bool Enabled=true);
 
 public sealed record WorkspaceSettings
 {
