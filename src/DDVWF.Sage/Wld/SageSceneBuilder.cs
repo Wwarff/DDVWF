@@ -22,8 +22,8 @@ public static class SageSceneBuilder
     {
      var polys=m.Polygons.Skip(po).Take(group.PolygonCount).ToArray();po+=group.PolygonCount;if(group.MaterialIndex>=list.MaterialIndices.Count)continue;
      if(!materialIndex.TryGetValue(list.MaterialIndices[group.MaterialIndex],out var mi))continue;
-     var pass=polys.Any(x=>!x.IsSolid);var name=materials[mi].Name+(pass?"-passthrough":"");var vertices=new List<SageSceneVertex>();var indices=new List<ushort>();var dedup=new Dictionary<(System.Numerics.Vector3,System.Numerics.Vector3,System.Numerics.Vector2),ushort>();
-     foreach(var poly in polys)foreach(var idx in new[]{poly.A,poly.B,poly.C}){if(idx>=m.Vertices.Count||idx>=m.Normals.Count||idx>=m.Uvs.Count)throw new InvalidDataException("Mesh polygon references a missing vertex attribute.");var v=new SageSceneVertex(SageExportTransform.Position(m.Vertices[idx],m.Center),SageExportTransform.Normal(m.Normals[idx]),m.Uvs[idx]);var key=(v.Position,v.Normal,v.Uv);if(!dedup.TryGetValue(key,out var di)){if(vertices.Count>=ushort.MaxValue)throw new InvalidDataException("Sage primitive exceeds UInt16 index range.");di=(ushort)vertices.Count;dedup[key]=di;vertices.Add(v);}indices.Add(di);}
+     var pass=polys.Any(x=>!x.IsSolid);var name=materials[mi].Name+(pass?"-passthrough":"");var vertices=new List<SageSceneVertex>();var indices=new List<ushort>();var dedup=new Dictionary<(System.Numerics.Vector3,System.Numerics.Vector3),ushort>();
+     foreach(var poly in polys)foreach(var idx in new[]{poly.A,poly.B,poly.C}){if(idx>=m.Vertices.Count||idx>=m.Normals.Count||idx>=m.Uvs.Count)throw new InvalidDataException("Mesh polygon references a missing vertex attribute.");var v=new SageSceneVertex(SageExportTransform.Position(m.Vertices[idx],m.Center),SageExportTransform.Normal(m.Normals[idx]),m.Uvs[idx]);var key=(v.Position,v.Normal);if(!dedup.TryGetValue(key,out var di)){if(vertices.Count>=ushort.MaxValue)throw new InvalidDataException("Sage primitive exceeds UInt16 index range.");di=(ushort)vertices.Count;dedup[key]=di;vertices.Add(v);}indices.Add(di);}
      prims.Add(new(name,mi,pass,vertices,indices));
     }
    }
