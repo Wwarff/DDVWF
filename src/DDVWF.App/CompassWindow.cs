@@ -30,7 +30,7 @@ public sealed class CompassWindow:Window
     {
         face.Children.Clear();face.Background=B(C("CompassBackgroundBrush","#00000000"));
         bearingRing.Children.Clear();face.Children.Add(bearingRing);
-        var primary=B(C("CompassPrimaryBrush","#A68A6A"));var secondary=B(C("CompassSecondaryBrush","#6E5947"));var star=B(C("CompassStarBrush","#E8D9B5"));var accent=B(C("CompassAccentBrush","#D7FF00"));var degrees=B(C("CompassDegreeTextBrush","#A68A6A"));var ticks=B(C("CompassTickBrush","#A68A6A"));var card=B(C("CompassCardinalBrush","#A68A6A"));
+        var bg=C("CompassBackgroundBrush","#00000000");var bgColor=(Color)ColorConverter.ConvertFromString(bg);Background=new SolidColorBrush(bgColor);var primary=B(C("CompassPrimaryBrush","#A68A6A"));var secondary=B(C("CompassSecondaryBrush","#6E5947"));var star=B(C("CompassStarBrush","#E8D9B5"));var accent=B(C("CompassAccentBrush","#D7FF00"));var degrees=B(C("CompassDegreeTextBrush","#A68A6A"));var ticks=B(C("CompassTickBrush","#A68A6A"));var card=B(C("CompassCardinalBrush","#A68A6A"));
         Ring(bearingRing,350,350,315,primary,2);Ring(bearingRing,350,350,260,primary,2);
         for(int d=0;d<360;d+=2){var major=d%10==0;double r1=major?265:272;double r2=282;bearingRing.Children.Add(LineAt(d,r1,r2,ticks,major?3:1));}
         for(int d=0;d<360;d+=10){var p=Polar(d,300);var t=new TextBlock{Text=d.ToString(),Foreground=degrees,FontFamily=new FontFamily("Georgia"),FontSize=22,FontWeight=FontWeights.SemiBold,RenderTransformOrigin=new Point(.5,.5),RenderTransform=new RotateTransform(d)};Place(t,p.X,p.Y,46,30,bearingRing);}
