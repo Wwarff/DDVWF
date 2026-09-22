@@ -2,7 +2,7 @@ namespace DDVWF.Core.Workspace;
 
 public sealed record CameraState(float X, float Y, float Z, float Yaw, float Pitch, float Speed = 20f);
 
-public sealed record ThemeSettings(string Accent="#9CFF80",string Separator="#6930A8",string Compass="#9CFF80",string ListText="#9CFF80");
+public sealed record ThemeSettings(string Accent="#00FF33",string Separator="#6A00A8",string Compass="#00FF33",string ListText="#00FF33",string WindowBackground="#080B0A",string PanelBackground="#101311",string ControlBackground="#171A18",string MutedText="#76947D");
 
 public sealed record ServerConnectionSettings(string Host="127.0.0.1",int Port=3306,string Database="eqemu_peq",string User="trinity",string Password="trinity",bool Enabled=true);
 
