@@ -17,6 +17,7 @@ public sealed record WorkspaceSettings
 {
     public string? EqRoot { get; init; }
     public string? LastZone { get; init; }
+    public bool LegacyThemeImported { get; init; }
     public ServerConnectionSettings Server { get; init; } = new();
     public ThemeSettings Theme { get; init; } = new();
     public Dictionary<string,string> Shortcuts { get; init; } = ShortcutDefaults();
