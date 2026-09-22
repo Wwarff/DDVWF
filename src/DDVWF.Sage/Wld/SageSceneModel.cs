@@ -3,8 +3,9 @@ namespace DDVWF.Sage.Wld;
 
 public sealed record SageTexture(string FileName);
 public sealed record SageSceneMaterial(string Name,SageShaderType Shader,float Brightness,float ScaledAmbient,IReadOnlyList<SageTexture> Frames,int AnimationDelayMs);
-public sealed record SageSceneVertex(Vector3 Position,Vector3 Normal,Vector2 Uv);
-public sealed record SageScenePrimitive(string Name,int MaterialIndex,bool PassThrough,IReadOnlyList<SageSceneVertex> Vertices,IReadOnlyList<ushort> Indices);
+public sealed record SageSceneVertex(Vector3 Position,Vector3 Normal,Vector2 Uv,int SourceIndex=-1);
+public sealed record SageSceneMorphFrame(IReadOnlyList<Vector3> PositionDeltas,int DelayMs);
+public sealed record SageScenePrimitive(string Name,int MaterialIndex,bool PassThrough,IReadOnlyList<SageSceneVertex> Vertices,IReadOnlyList<ushort> Indices,IReadOnlyList<SageSceneMorphFrame>? MorphFrames=null);
 public sealed record SageSceneMesh(string Name,IReadOnlyList<SageScenePrimitive> Primitives);
 public sealed record SageSceneDocument(IReadOnlyList<SageSceneMaterial> Materials,IReadOnlyList<SageSceneMesh> Meshes,bool FlipRootX=true);
 
