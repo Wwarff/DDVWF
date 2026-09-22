@@ -10,6 +10,11 @@ public interface IClientAssetResolver
     string? ResolveClientAsset(string nativeReference);
 }
 
+public interface INpcClientAssetResolver
+{
+    string? ResolveNpcAsset(int race, int gender);
+}
+
 public interface IServerDataProvider
 {
     bool CanWrite { get; }
