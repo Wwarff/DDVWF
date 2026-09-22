@@ -14,6 +14,7 @@ public sealed record WorkspaceSettings
     public ThemeSettings Theme { get; init; } = new();
     public Dictionary<string,string> Shortcuts { get; init; } = new(){{"Select","1"},{"Move","2"},{"Rotate","3"},{"Scale","4"},{"Focus","F"},{"Delete","Delete"},{"Duplicate","Ctrl+D"},{"Stamp","Ctrl+S"}};
     public CameraState Camera { get; init; } = new(0, 0, 0, 0, 0);
+    public Dictionary<string, CameraState> ModelCameras { get; init; } = new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string, double> Dividers { get; init; } = new();
     public Dictionary<string, WindowState> Windows { get; init; } = new();
     public Dictionary<string, string> ActiveTabs { get; init; } = new();
