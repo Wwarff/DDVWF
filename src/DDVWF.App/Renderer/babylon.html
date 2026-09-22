@@ -11,6 +11,6 @@ function focus(){if(!selected)return;const b=selected.getHierarchyBoundingVector
 function remove(id){const r=byId.get(id);if(!r)return;if(selected===r)select(null);r.dispose();byId.delete(id)}
 scene.onPointerObservable.add(pi=>{if(pi.type!==BABYLON.PointerEventTypes.POINTERPICK)return;const root=pi.pickInfo?.pickedMesh?.metadata?.root;if(root){select(root);notify({type:'select',id:root.metadata.id})}});
 scene.onKeyboardObservable.add(k=>{if(k.type===BABYLON.KeyboardEventTypes.KEYUP&&k.event.key.toLowerCase()==='f')focus()});canvas.addEventListener('pointerup',()=>{if(mode!=='select')commit()});
-canvas.addEventListener('wheel',e=>{camera.speed=Math.max(.25,Math.min(500,camera.speed*(e.deltaY<0?1.15:.87)));notify({type:'cameraSpeed',speed:camera.speed})},{passive:true});engine.runRenderLoop(()=>scene.render());addEventListener('resize',()=>engine.resize());setInterval(()=>notify({type:'camera',x:camera.position.x,y:camera.position.z,z:camera.position.y}),100);
+canvas.addEventListener('wheel',e=>{camera.speed=Math.max(.25,Math.min(500,camera.speed*(e.deltaY<0?1.15:.87)));notify({type:'cameraSpeed',speed:camera.speed})},{passive:true});engine.runRenderLoop(()=>scene.render());addEventListener('resize',()=>engine.resize());setInterval(()=>notify({type:'camera',x:camera.position.x,y:camera.position.z,z:camera.position.y,yaw:camera.rotation.y,pitch:camera.rotation.x,speed:camera.speed}),100);
 window.ddvwf={loadScene,setMode,focus,remove,selectId:id=>select(byId.get(id)||null),commit};
 </script></body></html>
