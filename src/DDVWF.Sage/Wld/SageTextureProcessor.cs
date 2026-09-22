@@ -4,6 +4,7 @@ public static class SageTextureProcessor
 {
  public static byte[] Process(string name,byte[] data,SageShaderType shader)
  {
+  if(!OperatingSystem.IsWindowsVersionAtLeast(6,1))throw new PlatformNotSupportedException("DDVWF native texture processing requires Windows.");
   if(data.Length<2)throw new InvalidDataException("Texture is truncated.");
   var bmp=data[0]==0x42&&data[1]==0x4d;
   using var image=bmp?new Bitmap(new MemoryStream(data,false)):DecodeDds(data);
@@ -24,5 +25,6 @@ public static class SageTextureProcessor
  }
  static Bitmap DecodeDds(byte[] data)
  {
+  if(!OperatingSystem.IsWindowsVersionAtLeast(6,1))throw new PlatformNotSupportedException("DDVWF native DDS processing requires Windows.");
   using var ms=new MemoryStream(data,false);using var image=Pfim.Pfimage.FromStream(ms);var format=image.Format switch{Pfim.ImageFormat.Rgba32=>PixelFormat.Format32bppArgb,Pfim.ImageFormat.Rgb24=>PixelFormat.Format24bppRgb,Pfim.ImageFormat.R5g5b5=>PixelFormat.Format16bppRgb555,Pfim.ImageFormat.R5g6b5=>PixelFormat.Format16bppRgb565,Pfim.ImageFormat.R5g5b5a1=>PixelFormat.Format16bppArgb1555,_=>throw new InvalidDataException($"Unsupported DDS pixel format {image.Format}.")};var handle=GCHandle.Alloc(image.Data,GCHandleType.Pinned);try{using var view=new Bitmap(image.Width,image.Height,image.Stride,format,handle.AddrOfPinnedObject());return new Bitmap(view);}finally{handle.Free();}}
 }
