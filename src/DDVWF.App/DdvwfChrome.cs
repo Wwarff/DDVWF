@@ -14,6 +14,15 @@ internal static class DdvwfChrome
     static SolidColorBrush B(string s)=>new((Color)ColorConverter.ConvertFromString(s));
     static string C(ThemeSettings t,string key,string fallback)=>t.Palette.TryGetValue(key,out var v)?v:fallback;
 
+
+    public static void AttachPersistentGeometry(Window w,string key)
+    {
+        var path=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DragonDenWorldForge",key+"-window.txt");
+        void Save(){try{Directory.CreateDirectory(Path.GetDirectoryName(path)!);File.WriteAllText(path,string.Join("|",new[]{w.Left,w.Top,w.Width,w.Height}.Select(v=>v.ToString("R",System.Globalization.CultureInfo.InvariantCulture))));}catch(Exception ex){System.Diagnostics.Debug.WriteLine("DDVWF window geometry save failed: "+ex.Message);}}
+        try{if(File.Exists(path)){var a=File.ReadAllText(path).Split('|');if(a.Length==4){var v=a.Select(s=>double.Parse(s,System.Globalization.CultureInfo.InvariantCulture)).ToArray();w.WindowStartupLocation=WindowStartupLocation.Manual;w.Width=Math.Max(w.MinWidth,v[2]);w.Height=Math.Max(w.MinHeight,v[3]);var l=SystemParameters.VirtualScreenLeft,t=SystemParameters.VirtualScreenTop,r=l+SystemParameters.VirtualScreenWidth,b=t+SystemParameters.VirtualScreenHeight;w.Left=Math.Min(Math.Max(l,v[0]),Math.Max(l,r-80));w.Top=Math.Min(Math.Max(t,v[1]),Math.Max(t,b-40));}}}catch(Exception ex){System.Diagnostics.Debug.WriteLine("DDVWF window geometry restore failed: "+ex.Message);}
+        w.LocationChanged+=(_,_)=>Save();w.SizeChanged+=(_,_)=>Save();w.Closed+=(_,_)=>Save();
+    }
+
     public static DockPanel Wrap(Window w,string title,UIElement body,ThemeSettings theme,bool allowMaximize=false)
     {
         w.WindowStyle=WindowStyle.None;w.ResizeMode=ResizeMode.CanResize;w.Background=B(C(theme,"PanelBrush","#100D18"));w.Foreground=B(C(theme,"TextBrush","#D7FF00"));
