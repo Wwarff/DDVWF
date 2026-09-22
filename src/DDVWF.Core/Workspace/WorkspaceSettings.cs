@@ -4,7 +4,7 @@ public sealed record CameraState(float X, float Y, float Z, float Yaw, float Pit
 
 public sealed record ThemeSettings(string Accent="#9CFF80",string Separator="#6930A8",string Compass="#9CFF80",string ListText="#9CFF80");
 
-public sealed record ServerConnectionSettings(string Host="127.0.0.1",int Port=3306,string Database="peq",string User="trinity",string Password="trinity",bool Enabled=true);
+public sealed record ServerConnectionSettings(string Host="127.0.0.1",int Port=3306,string Database="eqemu_peq",string User="trinity",string Password="trinity",bool Enabled=true);
 
 public sealed record WorkspaceSettings
 {
