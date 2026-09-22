@@ -23,6 +23,15 @@ public sealed class ZoneSession
 
     private void ResolveServerClientAssets(CompleteZone zone)
     {
+        if (_client is INpcClientAssetResolver npcResolver)
+        {
+            foreach (var entity in zone.Entities.Where(x => x.Kind==ZoneEntityKind.Npc && x.Data is NpcEntityData).ToArray())
+            {
+                var npc=(NpcEntityData)entity.Data!;
+                var resolved=npcResolver.ResolveNpcAsset(npc.Race,npc.Gender);
+                if(!string.IsNullOrWhiteSpace(resolved)) zone.Replace(entity with { ClientAsset=resolved });
+            }
+        }
         if (_client is not IClientAssetResolver resolver) return;
         foreach (var entity in zone.Entities.Where(x => x.ServerId is not null && !string.IsNullOrWhiteSpace(x.ClientAsset)).ToArray())
         {
