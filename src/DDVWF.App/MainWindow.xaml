@@ -3,7 +3,7 @@
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="_File"><MenuItem Header="_Open Zone..." Click="OpenZone_Click"/><MenuItem Header="_Close Zone" Click="CloseZone_Click"/><Separator/><MenuItem Header="EQEmu _SQL..." Click="ServerSettings_Click"/><Separator/><MenuItem Header="E_xit" Click="Exit_Click"/></MenuItem>
       <MenuItem Header="_Edit"><MenuItem Header="_Undo" Click="Undo_Click"/><MenuItem Header="_Redo" Click="Redo_Click"/></MenuItem>
-      <MenuItem Header="_View"><MenuItem Header="_Theme Editor" Click="ThemeEditor_Click" IsEnabled="False"/><MenuItem Header="_Shortcuts" Click="Shortcuts_Click" IsEnabled="False"/></MenuItem>
+      <MenuItem Header="_View"><MenuItem Header="_Theme Editor" Click="ThemeEditor_Click"/><MenuItem Header="_Shortcuts" Click="Shortcuts_Click"/></MenuItem>
       <MenuItem Header="_Tools"><MenuItem Header="_Focus Selection" Click="Focus_Click"/></MenuItem><MenuItem Header="_World"><MenuItem Header="_Reload Active Zone" Click="ReloadZone_Click"/></MenuItem><MenuItem Header="_Navigation"><MenuItem Header="_Focus Selection" Click="Focus_Click"/></MenuItem><MenuItem Header="_Help"><MenuItem Header="_About" Click="About_Click"/></MenuItem>
     </Menu>
     <ToolBar DockPanel.Dock="Top">
