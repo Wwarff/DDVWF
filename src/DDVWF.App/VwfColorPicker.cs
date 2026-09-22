@@ -16,7 +16,7 @@ public sealed class VwfColorPicker : Window
     readonly Action<Color> preview; readonly DDVWF.Core.Workspace.ThemeSettings? activeTheme; bool updating; double h,s,v=1; public Color SelectedColor{get;private set;}
     public VwfColorPicker(Color initial,Action<Color> live,DDVWF.Core.Workspace.ThemeSettings? theme=null)
     {
-        SelectedColor=initial;preview=live;activeTheme=theme;Title="Color";Width=300;Height=610;MinWidth=300;ResizeMode=ResizeMode.CanResize;WindowStartupLocation=WindowStartupLocation.CenterOwner;FontFamily=new FontFamily("Verdana");FontSize=12;Background=B("#030706");Foreground=B("#70B93B");
+        SelectedColor=initial;preview=live;activeTheme=theme;Title="Color";Width=300;Height=610;MinWidth=300;ResizeMode=ResizeMode.CanResize;WindowStartupLocation=WindowStartupLocation.CenterOwner;FontFamily=new FontFamily("Verdana");FontSize=12;Background=B(theme?.Palette.TryGetValue("PickerBackground",out var pickerBg)==true?pickerBg:"#1F2121");Foreground=B(theme?.Palette.TryGetValue("PickerFont",out var pickerFg)==true?pickerFg:"#EBEBEB");
         var root=new DockPanel{Margin=new Thickness(7)};Content=theme is null?root:DdvwfChrome.Wrap(this,"COLOR",root,theme);DdvwfChrome.AttachPersistentGeometry(this,"color-picker");
         var close=new Button{Content="X",Width=25,Height=22,HorizontalAlignment=HorizontalAlignment.Right};close.Click+=(_,_)=>{DialogResult=true;Close();};DockPanel.SetDock(close,Dock.Top);root.Children.Add(close);
         var stack=new StackPanel();root.Children.Add(stack);
