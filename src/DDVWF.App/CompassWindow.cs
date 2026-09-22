@@ -50,5 +50,5 @@ public sealed class CompassWindow:Window
     static Line LineAt(double deg,double r1,double r2,Brush brush,double width){var a=Polar(deg,r1),b=Polar(deg,r2);return new Line{X1=a.X,Y1=a.Y,X2=b.X,Y2=b.Y,Stroke=brush,StrokeThickness=width};}
     static Point Polar(double deg,double radius){var a=(deg-90)*Math.PI/180;return new Point(300+Math.Cos(a)*radius,300+Math.Sin(a)*radius);}
     static void Ring(Canvas c,double x,double y,double r,Brush stroke,double width){var e=new Ellipse{Width=r*2,Height=r*2,Stroke=stroke,StrokeThickness=width};Canvas.SetLeft(e,x-r);Canvas.SetTop(e,y-r);c.Children.Add(e);}
-    static void Place(FrameworkElement e,double x,double y,double w,double h,Canvas c){e.Width=w;e.Height=h;e.TextAlignment=TextAlignment.Center;Canvas.SetLeft(e,x-w/2);Canvas.SetTop(e,y-h/2);c.Children.Add(e);}
+    static void Place(FrameworkElement e,double x,double y,double w,double h,Canvas c){e.Width=w;e.Height=h;if(e is TextBlock t)t.TextAlignment=TextAlignment.Center;Canvas.SetLeft(e,x-w/2);Canvas.SetTop(e,y-h/2);c.Children.Add(e);}
 }
