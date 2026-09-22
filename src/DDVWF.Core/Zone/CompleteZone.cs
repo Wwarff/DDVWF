@@ -24,4 +24,6 @@ public sealed class CompleteZone
     public void Add(ZoneEntity entity) => _entities.Add(entity.Id, entity);
     public ZoneEntity Get(Guid id) => _entities[id];
     public void Replace(ZoneEntity entity) => _entities[entity.Id] = entity;
+    public bool Remove(Guid id) => _entities.Remove(id);
+    public bool Contains(Guid id) => _entities.ContainsKey(id);
 }
