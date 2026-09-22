@@ -15,12 +15,12 @@ public sealed class TransformCommand : IEditorCommand
     private readonly ZoneEntity _before;
     private readonly ZoneEntity _after;
 
-    public TransformCommand(CompleteZone zone, Guid id, EqPosition position, float scale)
+    public TransformCommand(CompleteZone zone, Guid id, EqPosition position, float scale, EqRotation? rotation = null)
     {
         _zone = zone;
         _id = id;
         _before = zone.Get(id);
-        _after = _before with { Position = position, Scale = scale };
+        _after = _before with { Position = position, Scale = scale, Rotation = rotation ?? _before.Rotation };
     }
 
     public void Execute() => _zone.Replace(_after);
