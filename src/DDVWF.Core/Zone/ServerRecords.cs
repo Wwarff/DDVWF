@@ -1,6 +1,8 @@
 namespace DDVWF.Core.Zone;
 
-public sealed record GridRecord(int Id,uint ZoneId,int WanderType,int PauseType);\npublic sealed record GridEntryRecord(int GridId,uint ZoneId,int Number,float X,float Y,float Z,float Heading,int Pause,bool CenterPoint);\npublic sealed record Spawn2Record(long Id,long SpawnGroupId,string Zone,float X,float Y,float Z,float Heading,int RespawnTime,int Variance,int PathGrid,int Version=0,bool PathWhenZoneIdle=false,int Condition=0,int ConditionValue=0,int Animation=0,int MinExpansion=-1,int MaxExpansion=-1,string ContentFlags="",string ContentFlagsDisabled="");
+public sealed record GridRecord(int Id,uint ZoneId,int WanderType,int PauseType);
+public sealed record GridEntryRecord(int GridId,uint ZoneId,int Number,float X,float Y,float Z,float Heading,int Pause,bool CenterPoint);
+public sealed record Spawn2Record(long Id,long SpawnGroupId,string Zone,float X,float Y,float Z,float Heading,int RespawnTime,int Variance,int PathGrid,int Version=0,bool PathWhenZoneIdle=false,int Condition=0,int ConditionValue=0,int Animation=0,int MinExpansion=-1,int MaxExpansion=-1,string ContentFlags="",string ContentFlagsDisabled="");
 public sealed record SpawnGroupRecord(long Id,string Name,int SpawnLimit,float Distance,float MaxX,float MinX,float MaxY,float MinY,int Delay,int MinDelay,int Despawn,int DespawnTimer,bool WaypointSpawns);
 public sealed record SpawnEntryRecord(long SpawnGroupId,long NpcId,int Chance,int ConditionValueFilter=0,int MinTime=0,int MaxTime=0,int MinExpansion=-1,int MaxExpansion=-1,string ContentFlags="",string ContentFlagsDisabled="");
 public sealed record NpcTypeRecord(long Id,string Name,int Race,int Gender,float Size,int Model=0,int Texture=0,int HelmTexture=0,int HeroForgeModel=0,int Face=0,int HairStyle=0,int HairColor=0,int EyeColor1=0,int EyeColor2=0,int BeardColor=0,int Beard=0,int DrakkinHeritage=0,int DrakkinTattoo=0,int DrakkinDetails=0,int ArmTexture=0,int BracerTexture=0,int HandTexture=0,int LegTexture=0,int FeetTexture=0,int PrimaryWeaponTexture=0,int SecondaryWeaponTexture=0,int Light=0);
@@ -17,4 +19,6 @@ public sealed record ServerZoneSnapshot(
     IReadOnlyList<ZonePointRecord>? ZonePoints = null,
     IReadOnlyList<SpawnGroupRecord>? SpawnGroups = null,
     IReadOnlyList<ObjectRecord>? Objects = null,
-    IReadOnlyList<GroundSpawnRecord>? GroundSpawns = null,\n    IReadOnlyList<GridRecord>? Grids = null,\n    IReadOnlyList<GridEntryRecord>? GridEntries = null);
+    IReadOnlyList<GroundSpawnRecord>? GroundSpawns = null,
+    IReadOnlyList<GridRecord>? Grids = null,
+    IReadOnlyList<GridEntryRecord>? GridEntries = null);
