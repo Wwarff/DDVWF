@@ -90,6 +90,18 @@ jobs:
           $shortcutsGraphics.Dispose(); $shortcutsBmp.Dispose()
           Stop-Process -Id $shortcutsProcess.Id -Force -ErrorAction SilentlyContinue
           if (!(Test-Path $shortcutsOut) -or (Get-Item $shortcutsOut).Length -lt 1000) { throw "Shortcuts smoke screenshot was not captured." }
+          $env:DDVWF_SHORTCUTS_SMOKE = $null
+          $env:DDVWF_RENDERER_SMOKE = "1"
+          $rendererProcess = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 7
+          $rendererBmp = New-Object System.Drawing.Bitmap $bounds.Width,$bounds.Height
+          $rendererGraphics = [System.Drawing.Graphics]::FromImage($rendererBmp)
+          $rendererGraphics.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size)
+          $rendererOut = Join-Path $PWD "artifacts/DDVWF-Renderer-smoke.png"
+          $rendererBmp.Save($rendererOut,[System.Drawing.Imaging.ImageFormat]::Png)
+          $rendererGraphics.Dispose(); $rendererBmp.Dispose()
+          Stop-Process -Id $rendererProcess.Id -Force -ErrorAction SilentlyContinue
+          if (!(Test-Path $rendererOut) -or (Get-Item $rendererOut).Length -lt 1000) { throw "Renderer smoke screenshot was not captured." }
           $diag = Get-Content -Raw "artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt"
           if ($diag -notmatch 'TextBlock text=Select fg=#FFFFFF00') { throw "Rendered toolbar Select glyph did not resolve the yellow sentinel theme color." }
       - uses: actions/upload-artifact@v4
@@ -100,6 +112,7 @@ jobs:
             artifacts/DDVWF-ThemeEditor-smoke.png
             artifacts/DDVWF-Compass-smoke.png
             artifacts/DDVWF-Shortcuts-smoke.png
+            artifacts/DDVWF-Renderer-smoke.png
             artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt
       - name: Vendor pinned Babylon 7.2.1
         shell: pwsh
