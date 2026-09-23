@@ -13,7 +13,7 @@ public sealed record SageMaterialList(uint Flags,IReadOnlyList<int> MaterialIndi
 
 public static class WldMaterialReader
 {
- public static int ReadReference(WldFragment f,ReadOnlySpan<byte> s){var b=s.ToArray();Need(b,f.PayloadOffset,4);return checked((int)BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(f.PayloadOffset,4))-1);}
+ public static int ReadReference(WldFragment f,ReadOnlySpan<byte> s){var b=s.ToArray();Need(b,f.PayloadOffset,4);return unchecked((int)BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(f.PayloadOffset,4)))-1;}
  public static SageBitmapName ReadBitmapName(WldFragment f,ReadOnlySpan<byte> s)
  {
   var b=s.ToArray();var p=f.PayloadOffset;Need(b,p,6);var count=BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4));p+=4;if(count>1){}var len=BinaryPrimitives.ReadUInt16LittleEndian(b.AsSpan(p,2));p+=2;
@@ -27,11 +27,11 @@ public static class WldMaterialReader
  public static SageMaterialRecord ReadMaterial(WldFragment f,ReadOnlySpan<byte> s)
  {
   var b=s.ToArray();var p=f.PayloadOffset;uint U(){Need(b,p,4);var v=BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4));p+=4;return v;}float F()=>BitConverter.Int32BitsToSingle(unchecked((int)U()));
-  var flags=U();var parameters=U();var color=U();var bright=F();var ambient=F();var bitmap=checked((int)U()-1);return new(flags,parameters,color,bright,ambient,bitmap,SageMaterial.Map(parameters,bitmap));
+  var flags=U();var parameters=U();var color=U();var bright=F();var ambient=F();var bitmap=unchecked((int)U())-1;return new(flags,parameters,color,bright,ambient,bitmap,SageMaterial.Map(parameters,bitmap));
  }
  public static SageMaterialList ReadMaterialList(WldFragment f,ReadOnlySpan<byte> s)
  {
-  var b=s.ToArray();var p=f.PayloadOffset;Need(b,p,8);var flags=BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4));p+=4;var count=checked((int)BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4)));p+=4;var list=new List<int>(count);for(var i=0;i<count;i++){Need(b,p,4);list.Add(checked((int)BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4))-1));p+=4;}return new(flags,list);
+  var b=s.ToArray();var p=f.PayloadOffset;Need(b,p,8);var flags=BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4));p+=4;var count=checked((int)BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4)));p+=4;var list=new List<int>(count);for(var i=0;i<count;i++){Need(b,p,4);list.Add(unchecked((int)BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4)))-1);p+=4;}return new(flags,list);
  }
  private static void Need(byte[] b,int p,int n){if(p<0||n<0||p+n>b.Length)throw new InvalidDataException("Material fragment is truncated.");}
 }
