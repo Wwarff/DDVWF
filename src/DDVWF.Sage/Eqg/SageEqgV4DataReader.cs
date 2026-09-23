@@ -3,7 +3,7 @@ using System.Text;
 namespace DDVWF.Sage.Eqg;
 
 // Direct implementation of EQ Sage v1.8.15 ZoneData in src/lib/eqg/zone/v4-zone.js.
-public sealed record SageEqgV4Tile(float X,float Y,IReadOnlyList<float> Heights,IReadOnlyList<uint> Colors,IReadOnlyList<uint> Colors2,IReadOnlyList<byte> Flags,float BaseWaterLevel,string BaseMaterial,string Material);
+public sealed record SageEqgV4Tile(float X,float Y,IReadOnlyList<float> Heights,IReadOnlyList<uint> Colors,IReadOnlyList<uint> Colors2,IReadOnlyList<byte> Flags,float BaseWaterLevel,string BaseMaterial,string Material,bool AllFloatsSame);
 public sealed record SageEqgV4Placeable(string ModelName,float X,float Y,float Z,float RotateX,float RotateY,float RotateZ,float ScaleX,float ScaleY,float ScaleZ);
 public sealed record SageEqgV4Region(string Name,string AltName,int Type,float X,float Y,float Z,float RotateX,float RotateY,float RotateZ,float ScaleX,float ScaleY,float ScaleZ,float ExtX,float ExtY,float ExtZ);
 public sealed record SageEqgV4TogReference(string Name,float X,float Y,float Z,float RotateX,float RotateY,float RotateZ,float ScaleX,float ScaleY,float ScaleZ,float ZAdjust);
@@ -21,9 +21,9 @@ public static class SageEqgV4DataReader
   var tiles=new List<SageEqgV4Tile>(tileCount);var placeables=new List<SageEqgV4Placeable>();var regions=new List<SageEqgV4Region>();var togs=new List<SageEqgV4TogReference>();var lightEffects=new List<SageEqgV4LightFx>();
   for(var ti=0;ti<tileCount;ti++){
    var tileLng=U();var tileLat=U();_=U();var tileStartY=zoneMinY+((long)tileLng-100000-h.MinLng)*units*q;var tileStartX=zoneMinX+((long)tileLat-100000-h.MinLat)*units*q;
-   var heights=new float[vertCount];for(var i=0;i<vertCount;i++)heights[i]=F();var colors=new uint[vertCount];for(var i=0;i<vertCount;i++)colors[i]=U();var colors2=new uint[vertCount];for(var i=0;i<vertCount;i++)colors2[i]=U();var flags=new byte[quadCount];for(var i=0;i<quadCount;i++)flags[i]=B();var water=F();var unk1=I();if(unk1>0){var ub=B();if(ub>0)for(var i=0;i<4;i++)_=F();_=F();}
+   var heights=new float[vertCount];for(var i=0;i<vertCount;i++)heights[i]=F();var allFloatsSame=heights.Length==0||heights.All(x=>x==heights[0]);var colors=new uint[vertCount];for(var i=0;i<vertCount;i++)colors[i]=U();var colors2=new uint[vertCount];for(var i=0;i<vertCount;i++)colors2[i]=U();var flags=new byte[quadCount];for(var i=0;i<quadCount;i++)flags[i]=B();var water=F();var unk1=I();if(unk1>0){var ub=B();if(ub>0)for(var i=0;i<4;i++)_=F();_=F();}
    var layerCount=checked((int)U());var baseMaterial=S();var material="";for(var layer=1;layer<layerCount;layer++){material=S();var dim=checked((int)U());Need(checked(dim*dim));p+=dim*dim;}
-   tiles.Add(new(tileStartX,tileStartY,heights,colors,colors2,flags,water,baseMaterial,material));
+   tiles.Add(new(tileStartX,tileStartY,heights,colors,colors2,flags,water,baseMaterial,material,allFloatsSame));
    var single=checked((int)U());for(var i=0;i<single;i++){var model=S().ToLowerInvariant();_=S();_=U();_=U();var x=F();var y=F();var z=F();var rx=F();var ry=F();var rz=F();var sx=F();var sy=F();var sz=F();_=B();if((unk000&2)!=0)_=U();var th=Height(heights,q,units,x,y);placeables.Add(new(model,x+tileStartY,y+tileStartX,z+th,rx,ry,rz,sx,sy,sz));}
    var areas=checked((int)U());for(var i=0;i<areas;i++){var n=S();var type=I();var alt=S();_=U();_=U();var x=F();var y=F();var z=F();var rx=F();var ry=F();var rz=F();var sx=F();var sy=F();var sz=F();var sizeX=F();var sizeY=F();var sizeZ=F();var th=Height(heights,q,units,x,y);regions.Add(new(n,alt,type,x+tileStartY,y+tileStartX,z+th,rx,ry,rz,sx,sy,sz,sizeX/2,sizeY/2,sizeZ/2));}
    var lightFx=checked((int)U());for(var i=0;i<lightFx;i++){var ln=S();var la=S();var lu=B();_=U();_=U();var lx=F();var ly=F();var lz=F();var lrx=F();var lry=F();var lrz=F();var lsx=F();var lsy=F();var lsz=F();var lunk=F();lightEffects.Add(new(ln,la,lu,lx+tileStartY,ly+tileStartX,lz,lrx,lry,lrz,lsx,lsy,lsz,lunk));}
