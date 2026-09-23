@@ -48,11 +48,11 @@ public sealed class EqEmuReadProvider : IServerDataProvider
 
         await using(var cmd=connection.CreateCommand())
         {
-            cmd.CommandText="SELECT id, doorid, zone, name, pos_x, pos_y, pos_z, heading, opentype, size FROM doors WHERE zone = @zone";
+            cmd.CommandText="SELECT id,doorid,zone,name,pos_x,pos_y,pos_z,heading,opentype,size,version,lockpick,keyitem,triggerdoor,triggertype,doorisopen,dest_zone,dest_instance,dest_x,dest_y,dest_z,dest_heading,invert_state,incline FROM doors WHERE zone = @zone";
             Add(cmd,"@zone",zone.ShortName);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
-                doors.Add(new(r.GetInt64(0),r.GetInt32(1),r.GetString(2),r.GetString(3),F(r,4),F(r,5),F(r,6),F(r,7),r.GetInt32(8),r.GetInt32(9)));
+                doors.Add(new(r.GetInt64(0),I(r,1),r.GetString(2),r.GetString(3),F(r,4),F(r,5),F(r,6),F(r,7),I(r,8),I(r,9),I(r,10),I(r,11),I(r,12),I(r,13),I(r,14),I(r,15)!=0,r.IsDBNull(16)?"NONE":r.GetString(16),r.IsDBNull(17)?0:Convert.ToUInt32(r.GetValue(17),System.Globalization.CultureInfo.InvariantCulture),F(r,18),F(r,19),F(r,20),F(r,21),I(r,22),I(r,23)));
         }
 
         await using(var cmd=connection.CreateCommand())
