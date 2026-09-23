@@ -12,7 +12,7 @@ public interface IClientAssetResolver
 
 public interface INpcClientAssetResolver
 {
-    string? ResolveNpcAsset(int race, int gender);
+    string? ResolveNpcAsset(int race, int gender, int model = 0);
 }
 
 public interface IServerDataProvider
