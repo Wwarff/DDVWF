@@ -52,4 +52,15 @@ public sealed class ServerZoneJoinerTests
         Assert.Equal(1001,Assert.IsType<GroundSpawnEntityData>(gs.Data).ItemId);
     }
 
+    [Fact]
+    public void Joins_eqemu_object_contents_by_parent_object()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var obj=new ObjectRecord(7,202,0,1,2,3,0,0,0,"CHEST_ACTORDEF",1,0,100,0,0,0,0,0,0,0,100,0,0,0,0,"Chest");
+        var content=new ObjectContentRecord(202,7,2,1001,3,null,11,12,13,14,15,16);
+        var snapshot=new ServerZoneSnapshot(Array.Empty<Spawn2Record>(),Array.Empty<SpawnEntryRecord>(),Array.Empty<NpcTypeRecord>(),Array.Empty<DoorRecord>(),Objects:new[]{obj},ObjectContents:new[]{content});
+        ServerZoneJoiner.Join(zone,snapshot);
+        var data=Assert.IsType<ObjectEntityData>(Assert.Single(zone.Entities.Where(x=>x.Data is ObjectEntityData)).Data);
+        var item=Assert.Single(data.Contents!);Assert.Equal(2,item.BagIndex);Assert.Equal(1001,item.ItemId);Assert.Equal(16,item.AugSlot6);
+    }
 }
