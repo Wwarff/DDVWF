@@ -24,7 +24,8 @@ jobs:
         run: |
           $xaml = Get-Content -Raw "src/DDVWF.App/MainWindow.xaml"
           $code = Get-Content -Raw "src/DDVWF.App/MainWindow.xaml.cs"
-          if ($xaml -notmatch 'Text="\{TemplateBinding Content\}" Foreground="\{TemplateBinding Foreground\}"') { throw "Toolbar glyphs are not directly bound to themed foreground." }
+          if ($xaml -notmatch 'x:Name="Glyph"[^>]+Foreground="\{DynamicResource ToolBarTextBrush\}"') { throw "Toolbar glyph is not directly bound to ToolBarTextBrush." }
+          if ($xaml -notmatch 'TargetName="Glyph" Property="Foreground" Value="\{DynamicResource ToolBarDisabledTextBrush\}"') { throw "Disabled toolbar glyph is not directly bound to ToolBarDisabledTextBrush." }
           if ($xaml -notmatch 'ToolBarDisabledTextBrush') { throw "Toolbar disabled text semantic brush is not wired." }
           if ($xaml -match '<GridSplitter[^>]+BottomSplitter_Drag') { throw "Bottom workspace regressed to WPF GridSplitter behavior." }
           $thumbs = [regex]::Matches($xaml,'<Thumb Grid.Column="(?:1|3|5|7|9|11)"[^>]+DragDelta="BottomSplitter_DragDelta"').Count
