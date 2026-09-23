@@ -5,7 +5,7 @@ public static class ServerZoneJoiner
     public static void Join(CompleteZone zone, ServerZoneSnapshot snapshot)
     {
         var entriesByGroup = snapshot.SpawnEntries.GroupBy(x => x.SpawnGroupId).ToDictionary(x => x.Key, x => x.ToArray());
-        var npcs = snapshot.NpcTypes.ToDictionary(x => x.Id);
+        var npcs = snapshot.NpcTypes.ToDictionary(x => x.Id);\n        var groups = (snapshot.SpawnGroups ?? Array.Empty<SpawnGroupRecord>()).ToDictionary(x=>x.Id);
 
         foreach (var spawn in snapshot.Spawn2.Where(x => string.Equals(x.Zone, zone.ShortName, StringComparison.OrdinalIgnoreCase)))
         {
@@ -17,7 +17,7 @@ public static class ServerZoneJoiner
                 1f,
                 spawn.Id,
                 null,
-                new SpawnEntityData(spawn.SpawnGroupId,spawn.RespawnTime,spawn.Variance,spawn.PathGrid,spawn.Version,spawn.PathWhenZoneIdle,spawn.Condition,spawn.ConditionValue,spawn.Animation,spawn.MinExpansion,spawn.MaxExpansion,spawn.ContentFlags,spawn.ContentFlagsDisabled)));
+                new SpawnEntityData(spawn.SpawnGroupId,spawn.RespawnTime,spawn.Variance,spawn.PathGrid,spawn.Version,spawn.PathWhenZoneIdle,spawn.Condition,spawn.ConditionValue,spawn.Animation,spawn.MinExpansion,spawn.MaxExpansion,spawn.ContentFlags,spawn.ContentFlagsDisabled,groups.TryGetValue(spawn.SpawnGroupId,out var sg)?sg.Name:"",sg?.SpawnLimit??0,sg?.Distance??0,sg?.MaxX??0,sg?.MinX??0,sg?.MaxY??0,sg?.MinY??0,sg?.Delay??0,sg?.MinDelay??0,sg?.Despawn??0,sg?.DespawnTimer??0,sg?.WaypointSpawns??false)));
 
             if (!entriesByGroup.TryGetValue(spawn.SpawnGroupId, out var entries)) continue;
             foreach (var entry in entries)
