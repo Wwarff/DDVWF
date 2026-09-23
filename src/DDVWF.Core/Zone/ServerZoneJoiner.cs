@@ -31,7 +31,7 @@ public static class ServerZoneJoiner
                     npc.Size <= 0 ? 1f : npc.Size,
                     spawn.Id,
                     null,
-                    new NpcEntityData(npc.Id,spawn.SpawnGroupId,entry.Chance,npc.Race,npc.Gender,npc.Model,npc.Texture,npc.HelmTexture,npc.HeroForgeModel,npc.Face,npc.HairStyle,npc.HairColor,npc.EyeColor1,npc.EyeColor2,npc.BeardColor,npc.Beard,npc.DrakkinHeritage,npc.DrakkinTattoo,npc.DrakkinDetails,npc.ArmTexture,npc.BracerTexture,npc.HandTexture,npc.LegTexture,npc.FeetTexture,npc.PrimaryWeaponTexture,npc.SecondaryWeaponTexture,npc.Light)));
+                    new NpcEntityData(npc.Id,spawn.SpawnGroupId,entry.Chance,npc.Race,npc.Gender,npc.Model,npc.Texture,npc.HelmTexture,npc.HeroForgeModel,npc.Face,npc.HairStyle,npc.HairColor,npc.EyeColor1,npc.EyeColor2,npc.BeardColor,npc.Beard,npc.DrakkinHeritage,npc.DrakkinTattoo,npc.DrakkinDetails,npc.ArmTexture,npc.BracerTexture,npc.HandTexture,npc.LegTexture,npc.FeetTexture,npc.PrimaryWeaponTexture,npc.SecondaryWeaponTexture,npc.Light,entry.ConditionValueFilter,entry.MinTime,entry.MaxTime,entry.MinExpansion,entry.MaxExpansion,entry.ContentFlags,entry.ContentFlagsDisabled)));
             }
         }
 
