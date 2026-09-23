@@ -53,7 +53,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: DDVWF-UI-smoke
-          path: |\n            artifacts/DDVWF-UI-smoke.png\n            artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt
+          path: |
+            artifacts/DDVWF-UI-smoke.png
+            artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt
       - name: Vendor pinned Babylon 7.2.1
         shell: pwsh
         run: |
