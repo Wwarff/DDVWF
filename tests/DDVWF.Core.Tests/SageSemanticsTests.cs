@@ -36,5 +36,19 @@ public sealed class SageSemanticsTests
         Assert.Contains(RegionSemantic.Zoneline,data.Semantics);
         Assert.Equal(42,data.ZoneLineReference);
     }
+    [Fact] public void Light_source_preserves_Sage_frame_state_levels_and_colors()
+    {
+        using var ms=new MemoryStream();using var bw=new BinaryWriter(ms);
+        bw.Write((uint)0x17);bw.Write((uint)1);bw.Write((uint)0);bw.Write((uint)250);bw.Write(0.75f);bw.Write(0.1f);bw.Write(0.2f);bw.Write(0.3f);
+        var s=WldLightReader.ReadSource(new WldFragment(0,(uint)ms.Length,(uint)WldFragmentType.LightSource,"",0),ms.ToArray());
+        Assert.Equal((uint)250,s.Sleep);Assert.Equal(0.75f,s.Levels[0]);Assert.Equal(0.2f,s.Colors[0].Y);
+    }
+
+    [Fact] public void Global_ambient_preserves_Sage_bgra_byte_order()
+    {
+        var g=WldLightReader.ReadGlobalAmbient(new WldFragment(0,4,(uint)WldFragmentType.GlobalAmbientLight,"",0),new byte[]{3,2,1,4});
+        Assert.Equal((byte)1,g.Red);Assert.Equal((byte)2,g.Green);Assert.Equal((byte)3,g.Blue);Assert.Equal((byte)4,g.Alpha);
+    }
+
 }
 
