@@ -153,8 +153,9 @@ jobs:
           $tag = "DDVWF-Latest-Test"
           $asset = "artifacts/DDVWF-Latest-Test-win-x64.zip"
           $notes = "Latest successful DDVWF test build from integration/complete-zone-ir.`n`nCommit: $env:GITHUB_SHA`nWorkflow run: $env:GITHUB_RUN_ID"
-          $null = gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null
-          if ($LASTEXITCODE -ne 0) {
+          $releaseExists = $true
+          try { $null = gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null } catch { $releaseExists = $false }
+          if (-not $releaseExists -or $LASTEXITCODE -ne 0) {
             gh release create $tag $asset --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "DDVWF Latest Test" --notes $notes --prerelease
           } else {
             gh release upload $tag $asset --repo $env:GITHUB_REPOSITORY --clobber
