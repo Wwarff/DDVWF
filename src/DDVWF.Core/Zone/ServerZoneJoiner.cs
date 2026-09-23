@@ -17,7 +17,7 @@ public static class ServerZoneJoiner
                 1f,
                 spawn.Id,
                 null,
-                new SpawnEntityData(spawn.SpawnGroupId,spawn.RespawnTime,spawn.Variance,spawn.PathGrid)));
+                new SpawnEntityData(spawn.SpawnGroupId,spawn.RespawnTime,spawn.Variance,spawn.PathGrid,spawn.Version,spawn.PathWhenZoneIdle,spawn.Condition,spawn.ConditionValue,spawn.Animation,spawn.MinExpansion,spawn.MaxExpansion,spawn.ContentFlags,spawn.ContentFlagsDisabled)));
 
             if (!entriesByGroup.TryGetValue(spawn.SpawnGroupId, out var entries)) continue;
             foreach (var entry in entries)
