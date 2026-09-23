@@ -10,7 +10,7 @@ public readonly record struct EqRotation(float X, float Y, float Z);
 
 public abstract record ZoneEntityData;
 public sealed record SpawnEntityData(long SpawnGroupId,int RespawnTime,int Variance,int PathGrid) : ZoneEntityData;
-public sealed record NpcEntityData(long NpcTypeId,long SpawnGroupId,int Chance,int Race,int Gender,int Model,int Texture,int HelmTexture,int HeroForgeModel,int Face,int HairStyle,int HairColor,int EyeColor1,int EyeColor2,int BeardColor,int Beard,int DrakkinHeritage,int DrakkinTattoo,int DrakkinDetails,int ArmTexture,int BracerTexture,int HandTexture,int LegTexture,int FeetTexture,int PrimaryWeaponTexture,int SecondaryWeaponTexture,int Light) : ZoneEntityData;
+public sealed record NpcEntityData(long NpcTypeId,long SpawnGroupId,int Chance,int Race,int Gender,int Model=0,int Texture=0,int HelmTexture=0,int HeroForgeModel=0,int Face=0,int HairStyle=0,int HairColor=0,int EyeColor1=0,int EyeColor2=0,int BeardColor=0,int Beard=0,int DrakkinHeritage=0,int DrakkinTattoo=0,int DrakkinDetails=0,int ArmTexture=0,int BracerTexture=0,int HandTexture=0,int LegTexture=0,int FeetTexture=0,int PrimaryWeaponTexture=0,int SecondaryWeaponTexture=0,int Light=0) : ZoneEntityData;
 public sealed record DoorEntityData(int DoorId,int OpenType) : ZoneEntityData;
 public enum RegionSemantic { Normal, Water, Lava, Pvp, Zoneline, WaterBlockLos, FreezingWater, Slippery, Unknown }
 public sealed record LightFrame(float Level,float Red,float Green,float Blue);
