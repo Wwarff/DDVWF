@@ -144,20 +144,13 @@ jobs:
           name: DDVWF-win-x64
           path: artifacts/DDVWF
 
-      - name: Publish rolling test release
+      - name: Publish immutable test release
         if: github.event_name == 'push' && github.ref == 'refs/heads/integration/complete-zone-ir'
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "DDVWF-Latest-Test"
+          $tag = "DDVWF-Test-$env:GITHUB_RUN_NUMBER"
           $asset = "artifacts/DDVWF-Latest-Test-win-x64.zip"
-          $notes = "Latest successful DDVWF test build from integration/complete-zone-ir.`n`nCommit: $env:GITHUB_SHA`nWorkflow run: $env:GITHUB_RUN_ID"
-          $releaseExists = $true
-          try { $null = gh release view $tag --repo $env:GITHUB_REPOSITORY 2>$null } catch { $releaseExists = $false }
-          if (-not $releaseExists -or $LASTEXITCODE -ne 0) {
-            gh release create $tag $asset --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "DDVWF Latest Test" --notes $notes --prerelease
-          } else {
-            gh release upload $tag $asset --repo $env:GITHUB_REPOSITORY --clobber
-            gh release edit $tag --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "DDVWF Latest Test" --notes $notes --prerelease
-          }
+          $notes = "DDVWF test build from integration/complete-zone-ir.`n`nCommit: $env:GITHUB_SHA`nWorkflow run: $env:GITHUB_RUN_ID"
+          gh release create $tag $asset --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "DDVWF Test $env:GITHUB_RUN_NUMBER" --notes $notes --prerelease
