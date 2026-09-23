@@ -31,6 +31,28 @@ jobs:
           if ($thumbs -ne 6) { throw "Expected six deterministic bottom pane dividers; found $thumbs." }
           if ($code -notmatch 'AdjacentPaneResize\.Apply') { throw "Bottom divider does not use tested adjacent-pair resize math." }
       - run: dotnet publish src/DDVWF.App/DDVWF.App.csproj -c Release -r win-x64 --self-contained false -o artifacts/DDVWF
+      - name: Capture DDVWF UI smoke visual
+        shell: pwsh
+        run: |
+          $env:DDVWF_UI_SMOKE = "1"
+          $exe = Join-Path $PWD "artifacts/DDVWF/DragonDenVisualWorldForge.exe"
+          $p = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 5
+          Add-Type -AssemblyName System.Windows.Forms
+          Add-Type -AssemblyName System.Drawing
+          $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+          $bmp = New-Object System.Drawing.Bitmap $bounds.Width,$bounds.Height
+          $g = [System.Drawing.Graphics]::FromImage($bmp)
+          $g.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size)
+          $out = Join-Path $PWD "artifacts/DDVWF-UI-smoke.png"
+          $bmp.Save($out,[System.Drawing.Imaging.ImageFormat]::Png)
+          $g.Dispose(); $bmp.Dispose()
+          Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+          if (!(Test-Path $out) -or (Get-Item $out).Length -lt 1000) { throw "UI smoke screenshot was not captured." }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DDVWF-UI-smoke
+          path: artifacts/DDVWF-UI-smoke.png
       - name: Vendor pinned Babylon 7.2.1
         shell: pwsh
         run: |
