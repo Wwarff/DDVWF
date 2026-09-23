@@ -1,4 +1,4 @@
-using System.Windows;using System.Windows.Controls;using DDVWF.Core.Workspace;
+using System.Windows;using System.Windows.Controls;using DDVWF.Core.Workspace;using DDVWF.Server;
 namespace DDVWF.App;
 public sealed class ServerSettingsWindow:Window
 {
@@ -7,8 +7,9 @@ public sealed class ServerSettingsWindow:Window
  public ServerSettingsWindow(ServerConnectionSettings value,ThemeSettings theme){Settings=value;Title="EQEmu SQL Connection";Width=440;Height=430;MinWidth=400;MinHeight=390;ResizeMode=ResizeMode.CanResize;WindowStartupLocation=WindowStartupLocation.CenterOwner;FontFamily=new System.Windows.Media.FontFamily("Verdana");FontSize=12;
   var panel=new StackPanel{Margin=new Thickness(14)};Content=DdvwfChrome.Wrap(this,"EQEmu SQL Connection",panel,theme);
   Add("Host",host,value.Host);Add("Port",port,value.Port.ToString());Add("Database",database,value.Database);Add("User",user,value.User);Add("Password",password,value.Password);Add("Zone content version",zoneVersion,value.ZoneVersion.ToString());enabled.IsChecked=value.Enabled;panel.Children.Add(enabled);
-  var buttons=new StackPanel{Orientation=Orientation.Horizontal,HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,16,0,0)};var save=new Button{Content="Save",MinWidth=90,Margin=new Thickness(4)};var cancel=new Button{Content="Cancel",MinWidth=90,Margin=new Thickness(4)};save.Click+=Save;cancel.Click+=(_,_)=>{DialogResult=false;Close();};buttons.Children.Add(save);buttons.Children.Add(cancel);panel.Children.Add(buttons);
+  var buttons=new StackPanel{Orientation=Orientation.Horizontal,HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,16,0,0)};var test=new Button{Content="Test Connection",MinWidth=120,Margin=new Thickness(4)};var save=new Button{Content="Save",MinWidth=90,Margin=new Thickness(4)};var cancel=new Button{Content="Cancel",MinWidth=90,Margin=new Thickness(4)};test.Click+=TestConnection;save.Click+=Save;cancel.Click+=(_,_)=>{DialogResult=false;Close();};buttons.Children.Add(test);buttons.Children.Add(save);buttons.Children.Add(cancel);panel.Children.Add(buttons);
   void Add(string label,TextBox box,string text){panel.Children.Add(new TextBlock{Text=label,Margin=new Thickness(0,7,0,2)});box.Text=text;panel.Children.Add(box);}
  }
+ async void TestConnection(object sender,RoutedEventArgs e){if(!int.TryParse(port.Text,out var p)||p<1||p>65535){MessageBox.Show(this,"Port must be between 1 and 65535.","DDVWF");return;}try{var result=await EqEmuMySqlConnection.ProbeAsync(new(host.Text.Trim(),p,database.Text.Trim(),user.Text.Trim(),password.Text));MessageBox.Show(this,$"Connected: {result}","DDVWF SQL");}catch(Exception ex){MessageBox.Show(this,$"Connection failed: {ex.Message}","DDVWF SQL");}}
  void Save(object sender,RoutedEventArgs e){if(!int.TryParse(port.Text,out var p)||p<1||p>65535){MessageBox.Show(this,"Port must be between 1 and 65535.","DDVWF");return;}if(!int.TryParse(zoneVersion.Text,out var zv)){MessageBox.Show(this,"Zone content version must be an integer.","DDVWF");return;}Settings=new(host.Text.Trim(),p,database.Text.Trim(),user.Text.Trim(),password.Text,enabled.IsChecked==true,zv);DialogResult=true;Close();}
 }
