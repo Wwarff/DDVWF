@@ -56,7 +56,7 @@ public static class ServerZoneJoiner
                 1f,
                 point.Id,
                 null,
-                new ZonePointEntityData(point.Version,point.Number,point.TargetX,point.TargetY,point.TargetZ,point.TargetHeading,point.TargetZoneId,point.TargetInstance)));
+                new ZonePointEntityData(point.Version,point.Number,point.TargetX,point.TargetY,point.TargetZ,point.TargetHeading,point.TargetZoneId,point.TargetInstance,point.ZoneInstance,point.Buffer,point.ClientVersionMask,point.MinExpansion,point.MaxExpansion,point.ContentFlags,point.ContentFlagsDisabled,point.IsVirtual,point.Height,point.Width)));
         }
     }
 
