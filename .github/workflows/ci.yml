@@ -57,7 +57,7 @@ jobs:
           $env:DDVWF_UI_SMOKE = $null
           $env:DDVWF_THEME_SMOKE = "1"
           $themeProcess = Start-Process -FilePath $exe -PassThru
-          Start-Sleep -Seconds 4
+          Start-Sleep -Seconds 6
           $themeBmp = New-Object System.Drawing.Bitmap $bounds.Width,$bounds.Height
           $themeGraphics = [System.Drawing.Graphics]::FromImage($themeBmp)
           $themeGraphics.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size)
@@ -69,7 +69,7 @@ jobs:
           $env:DDVWF_THEME_SMOKE = $null
           $env:DDVWF_COMPASS_SMOKE = "1"
           $compassProcess = Start-Process -FilePath $exe -PassThru
-          Start-Sleep -Seconds 4
+          Start-Sleep -Seconds 6
           $compassBmp = New-Object System.Drawing.Bitmap $bounds.Width,$bounds.Height
           $compassGraphics = [System.Drawing.Graphics]::FromImage($compassBmp)
           $compassGraphics.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size)
@@ -81,7 +81,7 @@ jobs:
           $env:DDVWF_COMPASS_SMOKE = $null
           $env:DDVWF_SHORTCUTS_SMOKE = "1"
           $shortcutsProcess = Start-Process -FilePath $exe -PassThru
-          Start-Sleep -Seconds 4
+          Start-Sleep -Seconds 6
           $shortcutsBmp = New-Object System.Drawing.Bitmap $bounds.Width,$bounds.Height
           $shortcutsGraphics = [System.Drawing.Graphics]::FromImage($shortcutsBmp)
           $shortcutsGraphics.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size)
