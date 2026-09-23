@@ -8,7 +8,7 @@ public sealed class WldMeshTests
     [Fact]
     public void MeshReader_UsesSageReferenceAndExponentSemantics()
     {
-        var payload=new byte[96]; var p=0;
+        var payload=new byte[160]; var p=0;
         void U32(uint v){System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(payload.AsSpan(p,4),v);p+=4;}
         void I16(short v){System.Buffers.Binary.BinaryPrimitives.WriteInt16LittleEndian(payload.AsSpan(p,2),v);p+=2;}
         void F(float v){U32(unchecked((uint)BitConverter.SingleToInt32Bits(v)));}
