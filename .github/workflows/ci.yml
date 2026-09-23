@@ -66,6 +66,18 @@ jobs:
           $themeGraphics.Dispose(); $themeBmp.Dispose()
           Stop-Process -Id $themeProcess.Id -Force -ErrorAction SilentlyContinue
           if (!(Test-Path $themeOut) -or (Get-Item $themeOut).Length -lt 1000) { throw "Theme Editor smoke screenshot was not captured." }
+          $env:DDVWF_THEME_SMOKE = $null
+          $env:DDVWF_COMPASS_SMOKE = "1"
+          $compassProcess = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 4
+          $compassBmp = New-Object System.Drawing.Bitmap $bounds.Width,$bounds.Height
+          $compassGraphics = [System.Drawing.Graphics]::FromImage($compassBmp)
+          $compassGraphics.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size)
+          $compassOut = Join-Path $PWD "artifacts/DDVWF-Compass-smoke.png"
+          $compassBmp.Save($compassOut,[System.Drawing.Imaging.ImageFormat]::Png)
+          $compassGraphics.Dispose(); $compassBmp.Dispose()
+          Stop-Process -Id $compassProcess.Id -Force -ErrorAction SilentlyContinue
+          if (!(Test-Path $compassOut) -or (Get-Item $compassOut).Length -lt 1000) { throw "Compass smoke screenshot was not captured." }
           $diag = Get-Content -Raw "artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt"
           if ($diag -notmatch 'TextBlock text=Select fg=#FFFFFF00') { throw "Rendered toolbar Select glyph did not resolve the yellow sentinel theme color." }
       - uses: actions/upload-artifact@v4
@@ -74,6 +86,7 @@ jobs:
           path: |
             artifacts/DDVWF-UI-smoke.png
             artifacts/DDVWF-ThemeEditor-smoke.png
+            artifacts/DDVWF-Compass-smoke.png
             artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt
       - name: Vendor pinned Babylon 7.2.1
         shell: pwsh
