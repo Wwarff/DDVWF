@@ -16,7 +16,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider
     {
         await using var connection=await _open(cancellationToken);
         var spawn2=new List<Spawn2Record>(); var entries=new List<SpawnEntryRecord>();
-        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>();
+        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>();
 
         await using(var cmd=connection.CreateCommand())
         {
@@ -28,6 +28,15 @@ public sealed class EqEmuReadProvider : IServerDataProvider
         }
 
         var groups=spawn2.Select(x=>x.SpawnGroupId).Distinct().ToArray();
+        foreach(var group in groups)
+        {
+            await using var groupCmd=connection.CreateCommand();
+            groupCmd.CommandText="SELECT id,name,spawn_limit,dist,max_x,min_x,max_y,min_y,delay,mindelay,despawn,despawn_timer,wp_spawns FROM spawngroup WHERE id = @group";
+            Add(groupCmd,"@group",group);
+            await using var gr=await groupCmd.ExecuteReaderAsync(cancellationToken);
+            if(await gr.ReadAsync(cancellationToken))spawnGroups.Add(new(gr.GetInt64(0),gr.IsDBNull(1)?"":gr.GetString(1),I(gr,2),F(gr,3),F(gr,4),F(gr,5),F(gr,6),F(gr,7),I(gr,8),I(gr,9),I(gr,10),I(gr,11),I(gr,12)!=0));
+        }
+
         foreach(var group in groups)
         {
             await using var cmd=connection.CreateCommand();
@@ -64,7 +73,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider
                 zonePoints.Add(new(r.GetInt64(0),r.GetString(1),I(r,2),I(r,3),F(r,4),F(r,5),F(r,6),F(r,7),F(r,8),F(r,9),F(r,10),F(r,11),Convert.ToUInt32(r.GetValue(12),System.Globalization.CultureInfo.InvariantCulture),Convert.ToUInt32(r.GetValue(13),System.Globalization.CultureInfo.InvariantCulture),I(r,14),F(r,15),r.IsDBNull(16)?0xFFFFFFFF:Convert.ToUInt32(r.GetValue(16),System.Globalization.CultureInfo.InvariantCulture),I(r,17),I(r,18),r.IsDBNull(19)?"":r.GetString(19),r.IsDBNull(20)?"":r.GetString(20),I(r,21)!=0,I(r,22),I(r,23)));
         }
 
-        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints));
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints,spawnGroups));
     }
 
     private static float F(DbDataReader r,int i)=>Convert.ToSingle(r.GetValue(i),System.Globalization.CultureInfo.InvariantCulture);
