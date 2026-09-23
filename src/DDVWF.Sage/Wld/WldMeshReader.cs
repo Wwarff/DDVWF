@@ -22,7 +22,7 @@ public static class WldMeshReader
   uint U32(){Need(4);var v=BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4));p+=4;return v;}
   float F32(){Need(4);var v=BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(b.AsSpan(p,4)));p+=4;return v;}
   Vector3 V3()=>new(F32(),F32(),F32());
-  _=U32();var materials=checked((int)U32()-1);var animated=checked((int)U32()-1);Need(8);p+=8;var center=V3();Need(12);p+=12;
+  _=U32();var materials=unchecked((int)U32())-1;var animated=unchecked((int)U32())-1;Need(8);p+=8;var center=V3();Need(12);p+=12;
   var maxDistance=F32();var min=V3();var max=V3();
   var vertexCount=I16();var uvCount=I16();var normalCount=I16();var colorCount=I16();var polygonCount=I16();var vertexPieceCount=I16();var groupCount=I16();var vertexTextureCount=I16();var size9=I16();var exponent=I16();
   var scale=1f/(1<<exponent);var vertices=new List<Vector3>(Math.Max(0,vertexCount));
