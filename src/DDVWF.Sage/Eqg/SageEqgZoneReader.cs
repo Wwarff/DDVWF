@@ -16,7 +16,7 @@ public static class SageEqgZoneReader
   var b=source.ToArray();var p=0;void Need(int n){if(n<0||p+n>b.Length)throw new InvalidDataException($"EQG zone '{name}' is truncated.");}
   uint U32(){Need(4);var v=BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4));p+=4;return v;}int I32()=>unchecked((int)U32());float F32()=>BitConverter.Int32BitsToSingle(I32());
   string Str(int at){if(at<0||at>=b.Length)throw new InvalidDataException($"EQG zone '{name}' string offset is invalid.");var e=at;while(e<b.Length&&b[e]!=0)e++;return Encoding.UTF8.GetString(b,at,e-at);}
-  Need(4);var magic=Encoding.ASCII.GetString(b,p,4);p+=4;if(magic!="EQGZ"&&magic!="EQG "&&magic!="EQTZ")throw new InvalidDataException($"EQG zone '{name}' has invalid magic '{magic}'.");if(magic=="EQTZ")throw new NotSupportedException($"EQG zone '{name}' uses Sage ZoneV4 text/data terrain semantics, which require the V4 terrain decoder before production use.");
+  Need(4);var magic=Encoding.ASCII.GetString(b,p,4);p+=4;if(magic=="EQTZ")throw new NotSupportedException($"EQG zone '{name}' uses Sage ZoneV4 text/data terrain semantics, which require the V4 terrain decoder before production use.");
   var version=U32();var listLength=checked((int)U32());var modelCount=checked((int)U32());var objectCount=checked((int)U32());var regionCount=checked((int)U32());var lightCount=checked((int)U32());var list=p;Need(listLength);p+=listLength;
   var modelNames=new List<string>(modelCount);for(var i=0;i<modelCount;i++){var off=checked((int)U32());modelNames.Add(Str(checked(list+off)).Replace(")","_"));}
   var objects=new List<SageEqgPlaceable>(objectCount);const float radToDeg=180f/MathF.PI;float zoneRotation=0,zoneOffsetX=0,zoneOffsetY=0,zoneOffsetZ=0;
