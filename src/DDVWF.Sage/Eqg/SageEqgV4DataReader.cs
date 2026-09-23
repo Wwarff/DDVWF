@@ -19,7 +19,7 @@ public static class SageEqgV4DataReader
   var unk000=U();_=U();_=U();_=S();var tileCount=checked((int)U());var q=h.QuadsPerTile;var units=h.UnitsPerVert;var quadCount=checked(q*q);var vertCount=checked((q+1)*(q+1));var zoneMinX=h.MinLat*q*units;var zoneMinY=h.MinLng*q*units;
   var tiles=new List<SageEqgV4Tile>(tileCount);var placeables=new List<SageEqgV4Placeable>();var regions=new List<SageEqgV4Region>();var togs=new List<SageEqgV4TogReference>();
   for(var ti=0;ti<tileCount;ti++){
-   var tileLng=U();var tileLat=U();_=U();var tileStartY=zoneMinY+(tileLng-100000-h.MinLng)*units*q;var tileStartX=zoneMinX+(tileLat-100000-h.MinLat)*units*q;
+   var tileLng=U();var tileLat=U();_=U();var tileStartY=zoneMinY+((long)tileLng-100000-h.MinLng)*units*q;var tileStartX=zoneMinX+((long)tileLat-100000-h.MinLat)*units*q;
    var heights=new float[vertCount];for(var i=0;i<vertCount;i++)heights[i]=F();var colors=new uint[vertCount];for(var i=0;i<vertCount;i++)colors[i]=U();var colors2=new uint[vertCount];for(var i=0;i<vertCount;i++)colors2[i]=U();var flags=new byte[quadCount];for(var i=0;i<quadCount;i++)flags[i]=B();var water=F();var unk1=I();if(unk1>0){var ub=B();if(ub>0)for(var i=0;i<4;i++)_=F();_=F();}
    var layerCount=checked((int)U());var baseMaterial=S();var material="";for(var layer=1;layer<layerCount;layer++){material=S();var dim=checked((int)U());Need(checked(dim*dim));p+=dim*dim;}
    tiles.Add(new(tileStartX,tileStartY,heights,colors,colors2,flags,water,baseMaterial,material));
