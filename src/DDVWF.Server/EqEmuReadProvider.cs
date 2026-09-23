@@ -17,7 +17,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
     {
         await using var connection=await _open(cancellationToken);
         var spawn2=new List<Spawn2Record>(); var entries=new List<SpawnEntryRecord>();
-        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>();
+        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>(); var objectContents=new List<ObjectContentRecord>();
 
         await using(var cmd=connection.CreateCommand())
         {
@@ -99,6 +99,15 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
 
         await using(var cmd=connection.CreateCommand())
         {
+            cmd.CommandText="SELECT zoneid,parentid,bagidx,itemid,charges,droptime,augslot1,augslot2,augslot3,augslot4,augslot5,augslot6 FROM object_contents WHERE zoneid = @zoneid";
+            Add(cmd,"@zoneid",zoneId);
+            await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
+            while(await r.ReadAsync(cancellationToken))
+                objectContents.Add(new(Convert.ToUInt32(r.GetValue(0),System.Globalization.CultureInfo.InvariantCulture),r.GetInt64(1),I(r,2),I(r,3),I(r,4),r.IsDBNull(5)?null:Convert.ToDateTime(r.GetValue(5),System.Globalization.CultureInfo.InvariantCulture),I(r,6),I(r,7),I(r,8),I(r,9),I(r,10),I(r,11)));
+        }
+
+        await using(var cmd=connection.CreateCommand())
+        {
             cmd.CommandText="SELECT id,doorid,zone,name,pos_x,pos_y,pos_z,heading,opentype,size,version,lockpick,keyitem,triggerdoor,triggertype,doorisopen,dest_zone,dest_instance,dest_x,dest_y,dest_z,dest_heading,invert_state,incline FROM doors WHERE zone = @zone";
             Add(cmd,"@zone",zone.ShortName);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
@@ -115,8 +124,8 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
                 zonePoints.Add(new(r.GetInt64(0),r.GetString(1),I(r,2),I(r,3),F(r,4),F(r,5),F(r,6),F(r,7),F(r,8),F(r,9),F(r,10),F(r,11),Convert.ToUInt32(r.GetValue(12),System.Globalization.CultureInfo.InvariantCulture),Convert.ToUInt32(r.GetValue(13),System.Globalization.CultureInfo.InvariantCulture),I(r,14),F(r,15),r.IsDBNull(16)?0xFFFFFFFF:Convert.ToUInt32(r.GetValue(16),System.Globalization.CultureInfo.InvariantCulture),I(r,17),I(r,18),r.IsDBNull(19)?"":r.GetString(19),r.IsDBNull(20)?"":r.GetString(20),I(r,21)!=0,I(r,22),I(r,23)));
         }
 
-        LastReadDiagnostics=new(spawn2.Count,entries.Count,npcs.Count,spawnGroups.Count,doors.Count,zonePoints.Count,objects.Count,groundSpawns.Count,grids.Count,gridEntries.Count);
-        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints,spawnGroups,objects,groundSpawns,grids,gridEntries));
+        LastReadDiagnostics=new(spawn2.Count,entries.Count,npcs.Count,spawnGroups.Count,doors.Count,zonePoints.Count,objects.Count,groundSpawns.Count,grids.Count,gridEntries.Count,objectContents.Count);
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints,spawnGroups,objects,groundSpawns,grids,gridEntries,objectContents));
     }
 
     private static float F(DbDataReader r,int i)=>Convert.ToSingle(r.GetValue(i),System.Globalization.CultureInfo.InvariantCulture);
