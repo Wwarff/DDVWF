@@ -32,8 +32,8 @@ public sealed class CompassWindow:Window
         bearingRing.Children.Clear();face.Children.Add(bearingRing);
         var bg=C("CompassBackgroundBrush","#00000000");var bgColor=(Color)ColorConverter.ConvertFromString(bg);Background=new SolidColorBrush(bgColor);var primary=B(C("CompassPrimaryBrush","#A68A6A"));var secondary=B(C("CompassSecondaryBrush","#6E5947"));var star=B(C("CompassStarBrush","#E8D9B5"));var accent=B(C("CompassAccentBrush","#D7FF00"));var degrees=B(C("CompassDegreeTextBrush","#A68A6A"));var ticks=B(C("CompassTickBrush","#A68A6A"));var card=B(C("CompassCardinalBrush","#A68A6A"));
         Ring(bearingRing,350,350,330,primary,2);Ring(bearingRing,350,350,260,primary,2);
-        for(int d=0;d<360;d+=2){var major=d%10==0;double r1=major?278:286;double r2=300;bearingRing.Children.Add(LineAt(d,r1,r2,ticks,major?3:1));}
-        for(int d=0;d<360;d+=10){var p=Polar(d,316);var t=new TextBlock{Text=d.ToString(),Foreground=degrees,FontFamily=new FontFamily("Georgia"),FontSize=22,FontWeight=FontWeights.SemiBold,RenderTransformOrigin=new Point(.5,.5),RenderTransform=new RotateTransform(d)};Place(t,p.X,p.Y,46,30,bearingRing);}
+        for(int d=0;d<360;d+=2){var major=d%10==0;double r1=major?276:284;double r2=296;bearingRing.Children.Add(LineAt(d,r1,r2,ticks,major?3:1));}
+        for(int d=0;d<360;d+=10){var p=Polar(d,312);var t=new TextBlock{Text=d.ToString(),Foreground=degrees,FontFamily=new FontFamily("Georgia"),FontSize=22,FontWeight=FontWeights.SemiBold,RenderTransformOrigin=new Point(.5,.5),RenderTransform=new RotateTransform(d)};Place(t,p.X,p.Y,46,30,bearingRing);}
         Ring(face,350,350,220,primary,2);Ring(face,350,350,166,secondary,2);Ring(face,350,350,122,secondary,2);
         for(int d=0;d<360;d+=45){face.Children.Add(LineAt(d,122,166,secondary,2));}
         var cardinals=new[]{("N",0),("E",90),("S",180),("W",270)};foreach(var (s,d) in cardinals){var p=Polar(d,226);var t=new TextBlock{Text=s,Foreground=card,FontFamily=new FontFamily("Georgia"),FontSize=42,FontWeight=FontWeights.Bold};Place(t,p.X,p.Y,48,50,face);}
