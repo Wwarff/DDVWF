@@ -1,6 +1,6 @@
 using System.Numerics;
 namespace DDVWF.Core.Zone;
-public sealed record RenderVertex(Vector3 Position,Vector3 Normal,Vector2 Uv,int SourceIndex=-1,int BoneIndex=0);
+public sealed record RenderVertex(Vector3 Position,Vector3 Normal,Vector2 Uv,int SourceIndex=-1,int BoneIndex=0,uint Color=0xFFFFFFFF);
 public sealed record RenderMorphFrame(IReadOnlyList<Vector3> PositionDeltas,int DelayMs);
 public sealed record RenderMaterial(string Name,string? TextureName,string Shader,float Alpha=1f,bool AlphaTest=false,bool Additive=false,bool Unlit=false,IReadOnlyList<string>? TextureFrames=null,int AnimationDelayMs=0);
 public sealed record RenderPrimitive(string Name,IReadOnlyList<RenderVertex> Vertices,IReadOnlyList<ushort> Indices,string? TextureName,bool PassThrough,RenderMaterial? Material=null,IReadOnlyList<RenderMorphFrame>? MorphFrames=null);
