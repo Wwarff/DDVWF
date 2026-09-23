@@ -8,6 +8,19 @@ public static class ServerZoneJoiner
         var npcs = snapshot.NpcTypes.ToDictionary(x => x.Id);
         var groups = (snapshot.SpawnGroups ?? Array.Empty<SpawnGroupRecord>()).ToDictionary(x=>x.Id);
 
+        var gridTypes=(snapshot.Grids??Array.Empty<GridRecord>()).ToDictionary(x=>x.Id);
+        foreach(var wp in snapshot.GridEntries??Array.Empty<GridEntryRecord>())
+        {
+            gridTypes.TryGetValue(wp.GridId,out var grid);
+            zone.Add(new ZoneEntity(
+                DeterministicId("waypoint",wp.GridId,wp.Number),
+                ZoneEntityKind.Spawn,
+                $"Grid {wp.GridId} waypoint {wp.Number}",
+                new EqPosition(wp.X,wp.Y,wp.Z,wp.Heading),
+                1f,null,null,
+                new WaypointEntityData(wp.GridId,wp.Number,wp.Pause,wp.CenterPoint,grid?.WanderType??0,grid?.PauseType??0)));
+        }
+
         foreach (var spawn in snapshot.Spawn2.Where(x => string.Equals(x.Zone, zone.ShortName, StringComparison.OrdinalIgnoreCase)))
         {
             zone.Add(new ZoneEntity(
