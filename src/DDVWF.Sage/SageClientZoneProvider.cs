@@ -69,7 +69,7 @@ public sealed class SageClientZoneProvider:IClientRenderAssetProvider,IClientAss
   return output;
  }
  RenderMesh ProcessSkinnedTextures(RenderMesh mesh){var prims=mesh.Primitives.Select(p=>{if(p.Material is not{} m||!Enum.TryParse<SageShaderType>(m.Shader,out var shader))return p;var nativeFrames=m.TextureFrames??Array.Empty<string>();var frames=nativeFrames.Select(x=>ProcessedTexture(x,shader)).Where(x=>x is not null).Cast<string>().ToArray();var tex=frames.FirstOrDefault();return p with{TextureName=tex,Material=m with{TextureName=tex,TextureFrames=frames}};}).ToArray();return mesh with{Primitives=prims};}
-  string? ProcessedTexture(string native,SageShaderType shader){if(!_rawTextures.TryGetValue(native,out var bytes))return null;var key=$"{Path.GetFileNameWithoutExtension(native).ToLowerInvariant()}-{(int)shader}.png";if(!_textureFiles.ContainsKey(key))_textureFiles[key]=SageTextureProcessor.Process(native,bytes,shader);return key;}
+  string? ProcessedTexture(string native,SageShaderType shader){if(!TryRawEqgTexture(native,out var bytes))return null;var key=$"{Path.GetFileNameWithoutExtension(native).ToLowerInvariant()}-{(int)shader}.png";if(!_textureFiles.ContainsKey(key))_textureFiles[key]=SageTextureProcessor.Process(native,bytes,shader);return key;}
   static readonly Lazy<Dictionary<int,Dictionary<int,string>>> RaceModels=new(()=>{
    using var stream=typeof(SageClientZoneProvider).Assembly.GetManifestResourceStream("DDVWF.Sage.Authority.raceData.json")??throw new InvalidDataException("Pinned Sage raceData.json resource is missing.");
    using var doc=System.Text.Json.JsonDocument.Parse(stream);var result=new Dictionary<int,Dictionary<int,string>>();
