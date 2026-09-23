@@ -7,9 +7,11 @@ namespace DDVWF.Sage.Eqg;
 // Keeps Sage's coordinate transforms so EQG object models enter the same canonical render path as S3D assets.
 public sealed record SageEqgMaterialProperty(string Name,uint Type,float FloatValue,uint IntValue,string StringValue);
 public sealed record SageEqgMaterial(string Name,string Shader,IReadOnlyList<SageEqgMaterialProperty> Properties);
-public sealed record SageEqgVertex(Vector3 Position,Vector3 Normal,Vector2 Uv,uint Color);
+public sealed record SageEqgWeight(int Bone,float Weight);
+public sealed record SageEqgBone(string Name,int Next,uint ChildrenCount,int ChildrenIndex,Vector3 Translation,System.Numerics.Quaternion Rotation,Vector3 Scale);
+public sealed record SageEqgVertex(Vector3 Position,Vector3 Normal,Vector2 Uv,uint Color,IReadOnlyList<SageEqgWeight>? Weights=null);
 public sealed record SageEqgPolygon(uint A,uint B,uint C,int Material,uint Flags);
-public sealed record SageEqgModel(string Name,IReadOnlyList<SageEqgMaterial> Materials,IReadOnlyList<SageEqgVertex> Vertices,IReadOnlyList<SageEqgPolygon> Polygons);
+public sealed record SageEqgModel(string Name,IReadOnlyList<SageEqgMaterial> Materials,IReadOnlyList<SageEqgVertex> Vertices,IReadOnlyList<SageEqgPolygon> Polygons,IReadOnlyList<SageEqgBone> Bones);
 
 public static class SageEqgModelReader
 {
@@ -29,8 +31,9 @@ public static class SageEqgModelReader
   var verts=new List<SageEqgVertex>(vertexCount);
   for(var i=0;i<vertexCount;i++){if(version<3){var x=F32();var y=F32();var z=F32();var nx=F32();var ny=F32();var nz=F32();var u=F32();var v=F32();verts.Add(new(new(-x,-y,z),new(-nx,-ny,nz),new(-u,-v),0xffffffff));}else{var x=F32();var y=F32();var z=F32();var nx=F32();var ny=F32();var nz=F32();var color=U32();var uv1=F32();var uv2=F32();_=F32();_=F32();verts.Add(new(new(-x,-y,z),new(-nx,-ny,nz),new(uv1,uv2),color));}}
   var polys=new List<SageEqgPolygon>(triangleCount);for(var i=0;i<triangleCount;i++)polys.Add(new(U32(),U32(),U32(),I32(),U32()));
-  // The remaining bone and weight payload is deliberately not skipped silently. Static models have no bones.
-  if(boneCount!=0)throw new NotSupportedException($"EQG model '{name}' contains {boneCount} bones; the Sage EQG skeletal chain must be resolved before this model can enter production.");
-  return new(name,mats,verts,polys);
+  var bones=new List<SageEqgBone>(boneCount);
+  for(var i=0;i<boneCount;i++){var nameIdx=I32();var next=I32();var childrenCount=U32();var childrenIndex=I32();var x=F32();var y=F32();var z=F32();var rx=F32();var ry=F32();var rz=F32();var rw=F32();var sx=F32();var sy=F32();var sz=F32();bones.Add(new(Str(checked(list+nameIdx)),next,childrenCount,childrenIndex,new(-x,-y,z),new(-rx,-ry,rz,rw),new(sx,sy,sz)));}
+  if(boneCount>0){for(var i=0;i<verts.Count;i++){var count=checked((int)U32());var weights=new List<SageEqgWeight>(4);for(var j=0;j<4;j++)weights.Add(new(I32(),F32()));verts[i]=verts[i] with{Weights=weights.Take(Math.Min(count,4)).ToArray()};}}
+  return new(name,mats,verts,polys,bones);
  }
 }
