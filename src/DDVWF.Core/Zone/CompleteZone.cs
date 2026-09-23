@@ -15,7 +15,7 @@ public sealed record ActorEntityData(float BoundingRadius=0,string? SoundName=nu
 public sealed record DoorEntityData(int DoorId,int OpenType,int Version=-1,int Lockpick=0,int KeyItem=0,int TriggerDoor=0,int TriggerType=0,bool DoorIsOpen=false,string DestZone="NONE",uint DestInstance=0,float DestX=0,float DestY=0,float DestZ=0,float DestHeading=0,int InvertState=0,int Incline=0) : ZoneEntityData;
 public enum RegionSemantic { Normal, Water, Lava, Pvp, Zoneline, WaterBlockLos, FreezingWater, Slippery, Unknown }
 public sealed record LightFrame(float Level,float Red,float Green,float Blue);
-public sealed record LightEntityData(float Radius,uint Flags,uint CurrentFrame,uint Sleep,IReadOnlyList<LightFrame> Frames,bool GlobalAmbient=false) : ZoneEntityData;
+public sealed record LightEntityData(float Radius,uint Flags,uint CurrentFrame,uint Sleep,IReadOnlyList<LightFrame> Frames,bool GlobalAmbient=false,IReadOnlyList<int>? Regions=null) : ZoneEntityData;
 public sealed record RegionEntityData(IReadOnlyList<RegionSemantic> Semantics,int? ZoneLineReference=null,int? TargetZoneIndex=null,int? TargetX=null,int? TargetY=null,int? TargetZ=null,int? TargetRotation=null) : ZoneEntityData;
 public sealed record ZonePointEntityData(int Version,int Number,float TargetX,float TargetY,float TargetZ,float TargetHeading,uint TargetZoneId,uint TargetInstance,int ZoneInstance=0,float Buffer=0,uint ClientVersionMask=0xFFFFFFFF,int MinExpansion=-1,int MaxExpansion=-1,string ContentFlags="",string ContentFlagsDisabled="",bool IsVirtual=false,int Height=0,int Width=0) : ZoneEntityData;
 
