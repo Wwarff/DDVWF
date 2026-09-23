@@ -44,6 +44,14 @@ public sealed class SageSemanticsTests
         Assert.Equal((uint)250,s.Sleep);Assert.Equal(0.75f,s.Levels[0]);Assert.Equal(0.2f,s.Colors[0].Y);
     }
 
+    [Fact] public void Regional_ambient_matches_Sage_flags_count_regions_payload()
+    {
+        using var ms=new MemoryStream();using var bw=new BinaryWriter(ms);
+        bw.Write((uint)0x40);bw.Write((uint)3);bw.Write(2);bw.Write(7);bw.Write(11);
+        var a=WldLightReader.ReadAmbient(new WldFragment(0,(uint)ms.Length,(uint)WldFragmentType.AmbientLight,"",0),ms.ToArray());
+        Assert.Equal((uint)0x40,a.Flags);Assert.Equal(new[]{2,7,11},a.Regions);
+    }
+
     [Fact] public void Global_ambient_preserves_Sage_bgra_byte_order()
     {
         var g=WldLightReader.ReadGlobalAmbient(new WldFragment(0,4,(uint)WldFragmentType.GlobalAmbientLight,"",0),new byte[]{3,2,1,4});
