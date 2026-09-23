@@ -1,6 +1,7 @@
 using System.Buffers.Binary;using System.Numerics;
 namespace DDVWF.Sage.Wld;
-public sealed record SageLightSource(uint Flags,uint FrameCount,uint CurrentFrame,uint Sleep,IReadOnlyList<float> Levels,IReadOnlyList<Vector3> Colors);\npublic sealed record SageGlobalAmbient(byte Red,byte Green,byte Blue,byte Alpha);
+public sealed record SageLightSource(uint Flags,uint FrameCount,uint CurrentFrame,uint Sleep,IReadOnlyList<float> Levels,IReadOnlyList<Vector3> Colors);
+public sealed record SageGlobalAmbient(byte Red,byte Green,byte Blue,byte Alpha);
 public sealed record SageLightInstance(int ReferenceIndex,Vector3 Position,float Radius);
 public static class WldLightReader
 {
