@@ -26,6 +26,12 @@ public sealed class ZoneSessionTests
         Assert.Equal(door.ClientAsset, Assert.Single(viewport.Entities).ClientAsset);
     }
 
+    [Fact]
+    public async Task Ground_spawn_native_name_is_resolved_before_render()
+    {
+        var viewport=new CapturingViewport();var session=new ZoneSession(new GroundResolvingClient(),new GroundServer(),viewport);var zone=await session.OpenAsync("eq","poknowledge");var g=Assert.Single(zone.Entities);Assert.Equal("items.wld#object#IT66_DMSPRITEDEF",g.ClientAsset);Assert.Equal(g.ClientAsset,Assert.Single(viewport.Entities).ClientAsset);
+    }
+
     private sealed class Client(List<string> order) : IClientZoneProvider
     { public Task PopulateAsync(CompleteZone z,string r,CancellationToken c){order.Add("client");return Task.CompletedTask;} }
     private sealed class Server(List<string> order) : IServerDataProvider
@@ -49,6 +55,11 @@ public sealed class ZoneSessionTests
             return Task.CompletedTask;
         }
     }
+
+    private sealed class GroundResolvingClient : IClientZoneProvider, IClientAssetResolver
+    { public Task PopulateAsync(CompleteZone z,string r,CancellationToken c)=>Task.CompletedTask; public string? ResolveClientAsset(string n)=>string.Equals(n,"IT66_ACTORDEF",StringComparison.OrdinalIgnoreCase)?"items.wld#object#IT66_DMSPRITEDEF":null; }
+    private sealed class GroundServer : IServerDataProvider
+    { public bool CanWrite=>false; public Task PopulateAsync(CompleteZone z,CancellationToken c){z.Add(new(Guid.NewGuid(),ZoneEntityKind.GroundSpawn,"IT66_ACTORDEF",new(1,2,3),1,7,null,new GroundSpawnEntityData(0,0,2,0,2,3,1,1,"",300,false)));return Task.CompletedTask;} }
 
     private sealed class CapturingViewport : IRenderViewport
     {
