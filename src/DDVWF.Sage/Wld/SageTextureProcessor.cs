@@ -20,7 +20,7 @@ public static class SageTextureProcessor
   var mapped=shader switch{SageShaderType.Transparent25=>64,SageShaderType.Transparent50 or SageShaderType.TransparentSkydome=>128,SageShaderType.Transparent75 or SageShaderType.TransparentAdditive or SageShaderType.TransparentAdditiveUnlit=>192,_=>-1};
   if(mapped>=0)return mapped;
   if(!bmp)return p.A;
-  if(shader==SageShaderType.Diffuse)return 255;
+  if(shader==SageShaderType.Diffuse||shader==SageShaderType.Diffuse2||shader==SageShaderType.Diffuse3||shader==SageShaderType.Diffuse4||shader==SageShaderType.Diffuse5||shader==SageShaderType.Diffuse6||shader==SageShaderType.Diffuse7||shader==SageShaderType.Diffuse8||shader==SageShaderType.CompleteUnknown||shader==SageShaderType.TransparentMaskedPassable)return 255;
   var max=Math.Max(p.R,Math.Max(p.G,p.B));return max<=64?max:Math.Min(max+(max-64)*2,255);
  }
  static Bitmap DecodeDds(byte[] data)
