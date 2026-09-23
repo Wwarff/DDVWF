@@ -36,6 +36,19 @@ public static class ServerZoneJoiner
             }
         }
 
+        foreach (var ground in snapshot.GroundSpawns ?? Array.Empty<GroundSpawnRecord>())
+        {
+            zone.Add(new ZoneEntity(
+                DeterministicId("groundspawn",ground.Id,ground.ZoneId),
+                ZoneEntityKind.GroundSpawn,
+                ground.Name,
+                new EqPosition((ground.MinX+ground.MaxX)/2f,(ground.MinY+ground.MaxY)/2f,ground.MaxZ,ground.Heading),
+                1f,
+                ground.Id,
+                null,
+                new GroundSpawnEntityData(ground.Version,ground.MinX,ground.MaxX,ground.MinY,ground.MaxY,ground.MaxZ,ground.ItemId,ground.MaxAllowed,ground.Comment,ground.RespawnTimer,ground.FixZ,ground.MinExpansion,ground.MaxExpansion,ground.ContentFlags,ground.ContentFlagsDisabled)));
+        }
+
         foreach (var obj in snapshot.Objects ?? Array.Empty<ObjectRecord>())
         {
             var native=obj.ObjectName.Replace("_ACTORDEF","",StringComparison.OrdinalIgnoreCase);
