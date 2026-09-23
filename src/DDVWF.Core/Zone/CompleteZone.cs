@@ -11,7 +11,7 @@ public readonly record struct EqRotation(float X, float Y, float Z);
 public abstract record ZoneEntityData;
 public sealed record SpawnEntityData(long SpawnGroupId,int RespawnTime,int Variance,int PathGrid) : ZoneEntityData;
 public sealed record NpcEntityData(long NpcTypeId,long SpawnGroupId,int Chance,int Race,int Gender,int Model=0,int Texture=0,int HelmTexture=0,int HeroForgeModel=0,int Face=0,int HairStyle=0,int HairColor=0,int EyeColor1=0,int EyeColor2=0,int BeardColor=0,int Beard=0,int DrakkinHeritage=0,int DrakkinTattoo=0,int DrakkinDetails=0,int ArmTexture=0,int BracerTexture=0,int HandTexture=0,int LegTexture=0,int FeetTexture=0,int PrimaryWeaponTexture=0,int SecondaryWeaponTexture=0,int Light=0) : ZoneEntityData;
-public sealed record DoorEntityData(int DoorId,int OpenType) : ZoneEntityData;
+public sealed record DoorEntityData(int DoorId,int OpenType,int Version=-1,int Lockpick=0,int KeyItem=0,int TriggerDoor=0,int TriggerType=0,bool DoorIsOpen=false,string DestZone="NONE",uint DestInstance=0,float DestX=0,float DestY=0,float DestZ=0,float DestHeading=0,int InvertState=0,int Incline=0) : ZoneEntityData;
 public enum RegionSemantic { Normal, Water, Lava, Pvp, Zoneline, WaterBlockLos, FreezingWater, Slippery, Unknown }
 public sealed record LightFrame(float Level,float Red,float Green,float Blue);
 public sealed record LightEntityData(float Radius,uint Flags,uint CurrentFrame,uint Sleep,IReadOnlyList<LightFrame> Frames,bool GlobalAmbient=false) : ZoneEntityData;
