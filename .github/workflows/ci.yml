@@ -32,6 +32,9 @@ jobs:
           $thumbs = [regex]::Matches($xaml,'<Thumb[^>]+Grid.Column="(?:1|3|5|7|9|11)"[^>]+DragDelta="BottomSplitter_DragDelta"').Count
           if ($thumbs -ne 6) { throw "Expected six deterministic bottom pane dividers; found $thumbs." }
           if ($code -notmatch 'AdjacentPaneResize\.Apply') { throw "Bottom divider does not use tested adjacent-pair resize math." }
+          $renderer = Get-Content -Raw "src/DDVWF.App/Renderer/babylon.html"
+          if ($renderer -notmatch 'camera\.angularSensibility=1000') { throw "Accepted RMB camera sensitivity regressed." }
+          if ($renderer -notmatch 'if\(arrowLeft\)camera\.rotation\.y-=1\.35\*dt' -or $renderer -notmatch 'if\(arrowRight\)camera\.rotation\.y\+=1\.35\*dt' -or $renderer -notmatch "type:'heading',yaw:camera.rotation.y") { throw "Keyboard yaw/compass heading contract regressed." }
       - run: dotnet publish src/DDVWF.App/DDVWF.App.csproj -c Release -r win-x64 --self-contained false -o artifacts/DDVWF
       - name: Capture DDVWF UI smoke visual
         shell: pwsh
