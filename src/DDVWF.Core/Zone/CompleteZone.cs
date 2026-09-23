@@ -12,6 +12,8 @@ public abstract record ZoneEntityData;
 public sealed record SpawnEntityData(long SpawnGroupId,int RespawnTime,int Variance,int PathGrid) : ZoneEntityData;
 public sealed record NpcEntityData(long NpcTypeId,long SpawnGroupId,int Chance,int Race,int Gender) : ZoneEntityData;
 public sealed record DoorEntityData(int DoorId,int OpenType) : ZoneEntityData;
+public enum RegionSemantic { Normal, Water, Lava, Pvp, Zoneline, WaterBlockLos, FreezingWater, Slippery, Unknown }
+public sealed record RegionEntityData(IReadOnlyList<RegionSemantic> Semantics,int? ZoneLineReference=null,int? TargetZoneIndex=null,int? TargetX=null,int? TargetY=null,int? TargetZ=null,int? TargetRotation=null) : ZoneEntityData;
 public sealed record ZonePointEntityData(int Version,int Number,float TargetX,float TargetY,float TargetZ,float TargetHeading,uint TargetZoneId,uint TargetInstance) : ZoneEntityData;
 
 public sealed record ZoneEntity(
