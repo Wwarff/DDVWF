@@ -6,7 +6,7 @@ namespace DDVWF.Sage.Wld;
 public sealed record SageBitmapName(string FileName);
 public sealed record SageBitmapInfo(int Flags,int CurrentFrame,int AnimationDelayMs,IReadOnlyList<int> BitmapNameIndices)
 {
- public bool IsAnimated=>(Flags&0x08)!=0; public bool HasSleep=>(Flags&0x10)!=0; public bool HasCurrentFrame=>(Flags&0x20)!=0;
+ public bool SkipFrames=>(Flags&0x02)!=0; public bool IsAnimated=>(Flags&0x08)!=0; public bool HasSleep=>(Flags&0x10)!=0; public bool HasCurrentFrame=>(Flags&0x20)!=0;
 }
 public sealed record SageMaterialRecord(uint Flags,uint Parameters,uint Color,float Brightness,float ScaledAmbient,int BitmapInfoReferenceIndex,SageShaderType Shader);
 public sealed record SageMaterialList(uint Flags,IReadOnlyList<int> MaterialIndices);
