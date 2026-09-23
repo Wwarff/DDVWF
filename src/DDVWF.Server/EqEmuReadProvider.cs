@@ -103,7 +103,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
             Add(cmd,"@zoneid",zoneId);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
-                objectContents.Add(new(Convert.ToUInt32(r.GetValue(0),System.Globalization.CultureInfo.InvariantCulture),r.GetInt64(1),I(r,2),I(r,3),I(r,4),r.IsDBNull(5)?null:Convert.ToDateTime(r.GetValue(5),System.Globalization.CultureInfo.InvariantCulture),I(r,6),I(r,7),I(r,8),I(r,9),I(r,10),I(r,11)));
+                objectContents.Add(new(Convert.ToUInt32(r.GetValue(0),System.Globalization.CultureInfo.InvariantCulture),Convert.ToInt64(r.GetValue(1),System.Globalization.CultureInfo.InvariantCulture),I(r,2),I(r,3),I(r,4),r.IsDBNull(5)?null:Convert.ToDateTime(r.GetValue(5),System.Globalization.CultureInfo.InvariantCulture),I(r,6),I(r,7),I(r,8),I(r,9),I(r,10),I(r,11)));
         }
 
         await using(var cmd=connection.CreateCommand())
