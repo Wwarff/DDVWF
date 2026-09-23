@@ -69,13 +69,13 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
         await using(var cmd=connection.CreateCommand())
         {
             cmd.CommandText="SELECT id,zoneid,type,type2 FROM grid WHERE zoneid=@zoneid";
-            Add(cmd,"@zoneid",zoneId);Add(cmd,"@version",_zoneVersion);await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
+            Add(cmd,"@zoneid",zoneId);await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))grids.Add(new(I(r,0),Convert.ToUInt32(r.GetValue(1),System.Globalization.CultureInfo.InvariantCulture),I(r,2),I(r,3)));
         }
         await using(var cmd=connection.CreateCommand())
         {
             cmd.CommandText="SELECT gridid,zoneid,number,x,y,z,heading,pause,centerpoint FROM grid_entries WHERE zoneid=@zoneid";
-            Add(cmd,"@zoneid",zoneId);Add(cmd,"@version",_zoneVersion);await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
+            Add(cmd,"@zoneid",zoneId);await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))gridEntries.Add(new(I(r,0),Convert.ToUInt32(r.GetValue(1),System.Globalization.CultureInfo.InvariantCulture),I(r,2),F(r,3),F(r,4),F(r,5),F(r,6),I(r,7),I(r,8)!=0));
         }
 
@@ -100,7 +100,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
         await using(var cmd=connection.CreateCommand())
         {
             cmd.CommandText="SELECT zoneid,parentid,bagidx,itemid,charges,droptime,augslot1,augslot2,augslot3,augslot4,augslot5,augslot6 FROM object_contents WHERE zoneid = @zoneid";
-            Add(cmd,"@zoneid",zoneId);Add(cmd,"@version",_zoneVersion);
+            Add(cmd,"@zoneid",zoneId);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
                 objectContents.Add(new(Convert.ToUInt32(r.GetValue(0),System.Globalization.CultureInfo.InvariantCulture),Convert.ToInt64(r.GetValue(1),System.Globalization.CultureInfo.InvariantCulture),I(r,2),I(r,3),I(r,4),r.IsDBNull(5)?null:Convert.ToDateTime(r.GetValue(5),System.Globalization.CultureInfo.InvariantCulture),I(r,6),I(r,7),I(r,8),I(r,9),I(r,10),I(r,11)));
