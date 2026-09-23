@@ -16,7 +16,7 @@ public sealed class CompassWindow:Window
     ThemeSettings theme;
     public CompassWindow(ThemeSettings value)
     {
-        theme=value;Title="Compass";Width=520;Height=520;MinWidth=180;MinHeight=180;WindowStyle=WindowStyle.None;ResizeMode=ResizeMode.CanResize;ShowInTaskbar=false;Background=Brushes.Transparent;AllowsTransparency=true;
+        theme=value;Title="Compass";Width=520;Height=520;MinWidth=180;MinHeight=180;WindowStyle=WindowStyle.None;ResizeMode=ResizeMode.CanResize;ShowInTaskbar=false;Topmost=true;Background=Brushes.Transparent;AllowsTransparency=true;
         WindowChrome.SetWindowChrome(this,new WindowChrome{CaptionHeight=0,ResizeBorderThickness=new Thickness(6),CornerRadius=new CornerRadius(0),GlassFrameThickness=new Thickness(0)});
         bearingRing.RenderTransform=bearingRotation;var view=new Viewbox{Stretch=Stretch.Uniform,Child=face};Content=view;Build();
         MouseLeftButtonDown+=(_,e)=>{if(e.LeftButton==MouseButtonState.Pressed)DragMove();};
