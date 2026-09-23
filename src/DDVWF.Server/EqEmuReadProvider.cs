@@ -20,11 +20,11 @@ public sealed class EqEmuReadProvider : IServerDataProvider
 
         await using(var cmd=connection.CreateCommand())
         {
-            cmd.CommandText="SELECT id, spawngroupID, zone, x, y, z, heading, respawntime, variance, pathgrid FROM spawn2 WHERE zone = @zone";
+            cmd.CommandText="SELECT id,spawngroupID,zone,x,y,z,heading,respawntime,variance,pathgrid,version,path_when_zone_idle,_condition,cond_value,animation,min_expansion,max_expansion,content_flags,content_flags_disabled FROM spawn2 WHERE zone = @zone";
             Add(cmd,"@zone",zone.ShortName);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
-                spawn2.Add(new(r.GetInt64(0),r.GetInt64(1),r.GetString(2),F(r,3),F(r,4),F(r,5),F(r,6),r.GetInt32(7),r.GetInt32(8),r.GetInt32(9)));
+                spawn2.Add(new(r.GetInt64(0),r.GetInt64(1),r.GetString(2),F(r,3),F(r,4),F(r,5),F(r,6),I(r,7),I(r,8),I(r,9),I(r,10),I(r,11)!=0,I(r,12),I(r,13),I(r,14),I(r,15),I(r,16),r.IsDBNull(17)?"":r.GetString(17),r.IsDBNull(18)?"":r.GetString(18)));
         }
 
         var groups=spawn2.Select(x=>x.SpawnGroupId).Distinct().ToArray();
