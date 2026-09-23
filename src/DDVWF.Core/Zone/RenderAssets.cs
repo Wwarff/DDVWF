@@ -4,7 +4,10 @@ public sealed record RenderVertex(Vector3 Position,Vector3 Normal,Vector2 Uv,int
 public sealed record RenderMorphFrame(IReadOnlyList<Vector3> PositionDeltas,int DelayMs);
 public sealed record RenderMaterial(string Name,string? TextureName,string Shader,float Alpha=1f,bool AlphaTest=false,bool Additive=false,bool Unlit=false,IReadOnlyList<string>? TextureFrames=null,int AnimationDelayMs=0,int CurrentFrame=0,float Brightness=0,float ScaledAmbient=0,bool SkipFrames=false,bool AlphaBlend=false);
 public sealed record RenderPrimitive(string Name,IReadOnlyList<RenderVertex> Vertices,IReadOnlyList<ushort> Indices,string? TextureName,bool PassThrough,RenderMaterial? Material=null,IReadOnlyList<RenderMorphFrame>? MorphFrames=null);
-public sealed record RenderBone(string Name,int ParentIndex,Vector3 Translation,Quaternion Rotation,float Scale);\npublic sealed record RenderBoneAnimationFrame(float TimeSeconds,Vector3 Translation,Quaternion Rotation,Vector3 Scale);\npublic sealed record RenderBoneAnimation(string BoneName,IReadOnlyList<RenderBoneAnimationFrame> Frames);\npublic sealed record RenderAnimation(string Name,bool NoOffset,IReadOnlyList<RenderBoneAnimation> Bones);
+public sealed record RenderBone(string Name,int ParentIndex,Vector3 Translation,Quaternion Rotation,float Scale);
+public sealed record RenderBoneAnimationFrame(float TimeSeconds,Vector3 Translation,Quaternion Rotation,Vector3 Scale);
+public sealed record RenderBoneAnimation(string BoneName,IReadOnlyList<RenderBoneAnimationFrame> Frames);
+public sealed record RenderAnimation(string Name,bool NoOffset,IReadOnlyList<RenderBoneAnimation> Bones);
 public sealed record RenderSkeleton(IReadOnlyList<RenderBone> Bones);
 public sealed record RenderMesh(string Name,IReadOnlyList<RenderPrimitive> Primitives,bool FlipRootX,RenderSkeleton? Skeleton=null,IReadOnlyList<RenderAnimation>? Animations=null);
 public interface IClientRenderAssetProvider:IClientZoneProvider{IReadOnlyDictionary<string,RenderMesh> RenderMeshes{get;} IReadOnlyDictionary<string,byte[]> TextureFiles{get;}}
