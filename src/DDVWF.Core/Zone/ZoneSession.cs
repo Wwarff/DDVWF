@@ -36,6 +36,11 @@ public sealed class ZoneSession
             }
         }
         if (_client is not IClientAssetResolver resolver) return;
+        foreach (var entity in zone.Entities.Where(x => x.Kind==ZoneEntityKind.GroundSpawn && x.ServerId is not null && string.IsNullOrWhiteSpace(x.ClientAsset)).ToArray())
+        {
+            var resolved=resolver.ResolveClientAsset(entity.Name);
+            if(!string.IsNullOrWhiteSpace(resolved)) zone.Replace(entity with { ClientAsset=resolved });
+        }
         foreach (var entity in zone.Entities.Where(x => x.ServerId is not null && !string.IsNullOrWhiteSpace(x.ClientAsset)).ToArray())
         {
             var resolved = resolver.ResolveClientAsset(entity.ClientAsset!);
