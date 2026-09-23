@@ -1,4 +1,5 @@
 using DDVWF.Sage.Wld;
+using DDVWF.Core.Zone;
 namespace DDVWF.Core.Tests;
 
 public sealed class SageSemanticsTests
@@ -20,4 +21,20 @@ public sealed class SageSemanticsTests
     [InlineData(0x17,SageShaderType.TransparentAdditive)]
     [InlineData(0x53,SageShaderType.Invisible)]
     public void Material_map_matches_Sage(uint value,SageShaderType expected)=>Assert.Equal(expected,SageMaterial.Map(value,1));
+    [Theory]
+    [InlineData("wt_water",RegionSemantic.Water)]
+    [InlineData("lan_lava",RegionSemantic.Lava)]
+    [InlineData("drp_pvp",RegionSemantic.Pvp)]
+    [InlineData("sln_block",RegionSemantic.WaterBlockLos)]
+    [InlineData("vwn_cold",RegionSemantic.FreezingWater)]
+    public void Region_tags_match_Sage_semantics(string tag,RegionSemantic expected)
+        => Assert.Contains(expected,WldBspReader.ClassifyTag(tag).Semantics);
+
+    [Fact] public void Referenced_zoneline_matches_Sage_encoding()
+    {
+        var data=WldBspReader.ClassifyTag("drntp00255000042");
+        Assert.Contains(RegionSemantic.Zoneline,data.Semantics);
+        Assert.Equal(42,data.ZoneLineReference);
+    }
 }
+
