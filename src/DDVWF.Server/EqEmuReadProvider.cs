@@ -31,10 +31,10 @@ public sealed class EqEmuReadProvider : IServerDataProvider
         foreach(var group in groups)
         {
             await using var cmd=connection.CreateCommand();
-            cmd.CommandText="SELECT spawngroupID, npcID, chance FROM spawnentry WHERE spawngroupID = @group";
+            cmd.CommandText="SELECT spawngroupID,npcID,chance,condition_value_filter,min_time,max_time,min_expansion,max_expansion,content_flags,content_flags_disabled FROM spawnentry WHERE spawngroupID = @group";
             Add(cmd,"@group",group);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
-            while(await r.ReadAsync(cancellationToken)) entries.Add(new(r.GetInt64(0),r.GetInt64(1),r.GetInt32(2)));
+            while(await r.ReadAsync(cancellationToken)) entries.Add(new(r.GetInt64(0),r.GetInt64(1),I(r,2),I(r,3),I(r,4),I(r,5),I(r,6),I(r,7),r.IsDBNull(8)?"":r.GetString(8),r.IsDBNull(9)?"":r.GetString(9)));
         }
 
         foreach(var id in entries.Select(x=>x.NpcId).Distinct())
