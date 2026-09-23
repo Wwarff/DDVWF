@@ -52,6 +52,19 @@ public static class ServerZoneJoiner
         foreach (var obj in snapshot.Objects ?? Array.Empty<ObjectRecord>())
         {
             var native=obj.ObjectName.Replace("_ACTORDEF","",StringComparison.OrdinalIgnoreCase);
+            if(obj.Type==0)
+            {
+                var openType=obj.SolidType switch{0=>31,1=>9,_=>obj.SolidType};
+                zone.Add(new ZoneEntity(
+                    DeterministicId("object-door",1000000000L+obj.Id,-1),
+                    ZoneEntityKind.Door,
+                    native,
+                    new EqPosition(obj.X,obj.Y,obj.Z,obj.Heading),
+                    1f,
+                    1000000000L+obj.Id,
+                    native,
+                    new DoorEntityData(-1,openType,obj.Version,Incline:obj.Incline)));
+            }
             zone.Add(new ZoneEntity(
                 DeterministicId("object", obj.Id, obj.ZoneId),
                 ZoneEntityKind.StaticObject,
