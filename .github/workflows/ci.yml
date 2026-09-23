@@ -25,6 +25,7 @@ jobs:
           $xaml = Get-Content -Raw "src/DDVWF.App/MainWindow.xaml"
           $code = Get-Content -Raw "src/DDVWF.App/MainWindow.xaml.cs"
           if ($xaml -notmatch 'x:Name="Glyph"[^>]+Foreground="\{DynamicResource ToolBarTextBrush\}"') { throw "Toolbar glyph is not directly bound to ToolBarTextBrush." }
+          if ($xaml -notmatch 'x:Key="\{x:Static ToolBar.ButtonStyleKey\}"') { throw "DDVWF toolbar style is not wired through ToolBar.ButtonStyleKey." }
           if ($xaml -notmatch 'TargetName="Glyph" Property="Foreground" Value="\{DynamicResource ToolBarDisabledTextBrush\}"') { throw "Disabled toolbar glyph is not directly bound to ToolBarDisabledTextBrush." }
           if ($xaml -notmatch 'ToolBarDisabledTextBrush') { throw "Toolbar disabled text semantic brush is not wired." }
           if ($xaml -match '<GridSplitter[^>]+BottomSplitter_Drag') { throw "Bottom workspace regressed to WPF GridSplitter behavior." }
@@ -50,6 +51,8 @@ jobs:
           $g.Dispose(); $bmp.Dispose()
           Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
           if (!(Test-Path $out) -or (Get-Item $out).Length -lt 1000) { throw "UI smoke screenshot was not captured." }
+          $diag = Get-Content -Raw "artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt"
+          if ($diag -notmatch 'TextBlock text=Select fg=#FFFFFF00') { throw "Rendered toolbar Select glyph did not resolve the yellow sentinel theme color." }
       - uses: actions/upload-artifact@v4
         with:
           name: DDVWF-UI-smoke
