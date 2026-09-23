@@ -2,7 +2,8 @@ using System.Security.Cryptography;using System.Text;using DDVWF.Core.Zone;using
 namespace DDVWF.Sage;
 public sealed class SageClientZoneProvider:IClientRenderAssetProvider,IClientAssetResolver,INpcClientAssetResolver
 {
- readonly List<string> _loadWarnings=new();\n readonly Dictionary<string,RenderMesh> _renderMeshes=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,byte[]> _textureFiles=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,byte[]> _rawTextures=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,string> _nativeAssets=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,SageEqgAnimation> _eqgAnimations=new(StringComparer.OrdinalIgnoreCase);
+ readonly List<string> _loadWarnings=new();
+ readonly Dictionary<string,RenderMesh> _renderMeshes=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,byte[]> _textureFiles=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,byte[]> _rawTextures=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,string> _nativeAssets=new(StringComparer.OrdinalIgnoreCase);readonly Dictionary<string,SageEqgAnimation> _eqgAnimations=new(StringComparer.OrdinalIgnoreCase);
  public IReadOnlyDictionary<string,RenderMesh> RenderMeshes=>_renderMeshes;public IReadOnlyDictionary<string,byte[]> TextureFiles=>_textureFiles;public IReadOnlyList<string> LoadWarnings=>_loadWarnings;
  public async Task PopulateAsync(CompleteZone zone,string eqRoot,CancellationToken ct)
  {
