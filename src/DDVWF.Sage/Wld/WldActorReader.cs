@@ -16,7 +16,7 @@ public static class WldActorReader
         if((flags&2)!=0){var x=F32();var y=F32();var z=F32();var rx=F32();var ry=F32();var rz=F32();location=SageLocation.FromSource(x,y,z,rx,ry,rz);_=U32();}
         var radius=(flags&4)!=0?F32():0f; var scale=(flags&8)!=0?F32():0f;
         string? sound=(flags&0x10)!=0?doc.ResolveString(I32()):null;
-        int? vertex=(flags&0x100)!=0?checked((int)U32()-1):null;
+        int? vertex=(flags&0x100)!=0?unchecked((int)U32())-1:null;
         var len=checked((int)U32()); if(p+len>bytes.Length) throw new InvalidDataException("ActorInstance user data exceeds fragment/file bounds.");
         var user=System.Text.Encoding.Latin1.GetString(bytes.AsSpan(p,len));
         return new(objectName,location,radius,scale,sound,vertex,user);
