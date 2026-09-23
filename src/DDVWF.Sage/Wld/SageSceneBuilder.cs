@@ -7,9 +7,9 @@ public static class SageSceneBuilder
   var materials=new List<SageSceneMaterial>();var materialIndex=new Dictionary<int,int>();
   for(var i=0;i<doc.Fragments.Count;i++)
   {
-   var f=doc.Fragments[i];if(f.KnownType!=WldFragmentType.Material)continue;SageMaterialRecord m;try{m=WldMaterialReader.ReadMaterial(f,source);}catch(Exception ex){throw FragmentFailure(doc,f,ex);}var frames=new List<SageTexture>();var delay=0;var currentFrame=0;
-   if(m.BitmapInfoReferenceIndex>=0&&m.BitmapInfoReferenceIndex<doc.Fragments.Count){var reference=doc.Fragments[m.BitmapInfoReferenceIndex];if(reference.KnownType==WldFragmentType.FragmentReference){var ii=WldMaterialReader.ReadReference(reference,source);if(ii>=0&&ii<doc.Fragments.Count&&doc.Fragments[ii].KnownType==WldFragmentType.BitmapInfo){var info=WldMaterialReader.ReadBitmapInfo(doc.Fragments[ii],source);delay=info.AnimationDelayMs;currentFrame=info.CurrentFrame;foreach(var bi in info.BitmapNameIndices)if(bi>=0&&bi<doc.Fragments.Count&&doc.Fragments[bi].KnownType==WldFragmentType.BitmapName)frames.Add(new(WldMaterialReader.ReadBitmapName(doc.Fragments[bi],source).FileName));}}}
-   materialIndex[i]=materials.Count;materials.Add(new(f.Name,m.Shader,m.Brightness,m.ScaledAmbient,frames,delay,currentFrame));
+   var f=doc.Fragments[i];if(f.KnownType!=WldFragmentType.Material)continue;SageMaterialRecord m;try{m=WldMaterialReader.ReadMaterial(f,source);}catch(Exception ex){throw FragmentFailure(doc,f,ex);}var frames=new List<SageTexture>();var delay=0;var currentFrame=0;var skipFrames=false;
+   if(m.BitmapInfoReferenceIndex>=0&&m.BitmapInfoReferenceIndex<doc.Fragments.Count){var reference=doc.Fragments[m.BitmapInfoReferenceIndex];if(reference.KnownType==WldFragmentType.FragmentReference){var ii=WldMaterialReader.ReadReference(reference,source);if(ii>=0&&ii<doc.Fragments.Count&&doc.Fragments[ii].KnownType==WldFragmentType.BitmapInfo){var info=WldMaterialReader.ReadBitmapInfo(doc.Fragments[ii],source);delay=info.AnimationDelayMs;currentFrame=info.CurrentFrame;skipFrames=info.SkipFrames;foreach(var bi in info.BitmapNameIndices)if(bi>=0&&bi<doc.Fragments.Count&&doc.Fragments[bi].KnownType==WldFragmentType.BitmapName)frames.Add(new(WldMaterialReader.ReadBitmapName(doc.Fragments[bi],source).FileName));}}}
+   materialIndex[i]=materials.Count;materials.Add(new(f.Name,m.Shader,m.Brightness,m.ScaledAmbient,frames,delay,currentFrame,skipFrames));
   }
   var meshes=new List<SageSceneMesh>();
   foreach(var f in doc.Fragments.Where(x=>x.KnownType==WldFragmentType.Mesh))
