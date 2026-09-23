@@ -67,6 +67,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider
         ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints));
     }
 
-    private static float F(DbDataReader r,int i)=>Convert.ToSingle(r.GetValue(i),System.Globalization.CultureInfo.InvariantCulture);\n    private static int I(DbDataReader r,int i)=>r.IsDBNull(i)?0:Convert.ToInt32(r.GetValue(i),System.Globalization.CultureInfo.InvariantCulture);
+    private static float F(DbDataReader r,int i)=>Convert.ToSingle(r.GetValue(i),System.Globalization.CultureInfo.InvariantCulture);
+    private static int I(DbDataReader r,int i)=>r.IsDBNull(i)?0:Convert.ToInt32(r.GetValue(i),System.Globalization.CultureInfo.InvariantCulture);
     private static void Add(DbCommand command,string name,object value){var p=command.CreateParameter();p.ParameterName=name;p.Value=value;command.Parameters.Add(p);}
 }
