@@ -26,4 +26,30 @@ public sealed class ServerZoneJoinerTests
         Assert.Equal(new DoorEntityData(5,2),door.Data);
         Assert.DoesNotContain(zone.Entities,x=>x.Name=="Elsewhere");
     }
+    [Fact]
+    public void Preserves_eqemu_world_objects_static_locked_doors_and_ground_spawn_bounds()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var obj=new ObjectRecord(7,202,0,10,20,30,64,0,0,"POKDOOR_ACTORDEF",0,66,150,1,2,3,4,5,6,7,125,1,9,11,12,"Portal",-1,-1,"era","off");
+        var ground=new GroundSpawnRecord(8,202,0,100,200,30,50,150,128,"IT63_ACTORDEF",1001,2,"test",60,true,-1,-1,"era","");
+        var snapshot=new ServerZoneSnapshot(Array.Empty<Spawn2Record>(),Array.Empty<SpawnEntryRecord>(),Array.Empty<NpcTypeRecord>(),Array.Empty<DoorRecord>(),Objects:new[]{obj},GroundSpawns:new[]{ground});
+
+        ServerZoneJoiner.Join(zone,snapshot);
+
+        var world=Assert.Single(zone.Entities.Where(x=>x.Data is ObjectEntityData));
+        Assert.Equal("POKDOOR",world.ClientAsset);
+        Assert.Equal(1.25f,world.Scale);
+        var data=Assert.IsType<ObjectEntityData>(world.Data);
+        Assert.Equal(125,data.NativeSize);
+        Assert.Equal(7,data.Unknown84);
+        var synthetic=Assert.Single(zone.Entities.Where(x=>x.Kind==ZoneEntityKind.Door));
+        Assert.Equal(1000000007L,synthetic.ServerId);
+        Assert.Equal(new DoorEntityData(-1,9,0,Incline:9),synthetic.Data);
+        var gs=Assert.Single(zone.Entities.Where(x=>x.Kind==ZoneEntityKind.GroundSpawn));
+        Assert.Equal(75,gs.Position.X);
+        Assert.Equal(175,gs.Position.Y);
+        Assert.Equal(30,gs.Position.Z);
+        Assert.Equal(1001,Assert.IsType<GroundSpawnEntityData>(gs.Data).ItemId);
+    }
+
 }
