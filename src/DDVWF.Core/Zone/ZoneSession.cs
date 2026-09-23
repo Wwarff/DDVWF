@@ -13,10 +13,13 @@ public sealed class ZoneSession
     public async Task<CompleteZone> OpenAsync(string eqRoot, string shortName, CancellationToken cancellationToken = default)
     {
         var next = new CompleteZone { ShortName = shortName };
-        await _client.PopulateAsync(next, eqRoot, cancellationToken);
-        await _server.PopulateAsync(next, cancellationToken);
+        try { await _client.PopulateAsync(next, eqRoot, cancellationToken); }
+        catch (Exception ex) { throw new InvalidDataException($"Client/Sage population failed for {shortName}: {ex.Message}", ex); }
+        try { await _server.PopulateAsync(next, cancellationToken); }
+        catch (Exception ex) { throw new InvalidDataException($"EQEmu server population failed for {shortName}: {ex.Message}", ex); }
         ResolveServerClientAssets(next);
-        await _viewport.LoadAsync(next, cancellationToken);
+        try { await _viewport.LoadAsync(next, cancellationToken); }
+        catch (Exception ex) { throw new InvalidDataException($"Viewport scene-tree load failed for {shortName}: {ex.Message}", ex); }
         ActiveZone = next;
         return next;
     }
