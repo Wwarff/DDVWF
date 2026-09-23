@@ -47,7 +47,7 @@ public static class ServerZoneJoiner
                 obj.SizePercentage>0?obj.SizePercentage/100f:(obj.Size>0?obj.Size/100f:1f),
                 obj.Id,
                 native,
-                new ObjectEntityData(obj.Version,obj.ItemId,obj.Charges,obj.Type,obj.Icon,obj.SizePercentage,obj.Unknown24,obj.Unknown60,obj.Unknown64,obj.Unknown68,obj.Unknown72,obj.Unknown76,obj.Unknown84,obj.SolidType,obj.Incline,obj.TiltX,obj.TiltY,obj.DisplayName,obj.MinExpansion,obj.MaxExpansion,obj.ContentFlags,obj.ContentFlagsDisabled),
+                new ObjectEntityData(obj.Version,obj.ItemId,obj.Charges,obj.Type,obj.Icon,obj.SizePercentage,obj.Unknown24,obj.Unknown60,obj.Unknown64,obj.Unknown68,obj.Unknown72,obj.Unknown76,obj.Unknown84,obj.Size,obj.SolidType,obj.Incline,obj.TiltX,obj.TiltY,obj.DisplayName,obj.MinExpansion,obj.MaxExpansion,obj.ContentFlags,obj.ContentFlagsDisabled),
                 new EqRotation(obj.TiltX,obj.Heading,obj.TiltY)));
         }
 
