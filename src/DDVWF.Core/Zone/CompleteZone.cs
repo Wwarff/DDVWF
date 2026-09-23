@@ -16,7 +16,7 @@ public enum RegionSemantic { Normal, Water, Lava, Pvp, Zoneline, WaterBlockLos, 
 public sealed record LightFrame(float Level,float Red,float Green,float Blue);
 public sealed record LightEntityData(float Radius,uint Flags,uint CurrentFrame,uint Sleep,IReadOnlyList<LightFrame> Frames,bool GlobalAmbient=false) : ZoneEntityData;
 public sealed record RegionEntityData(IReadOnlyList<RegionSemantic> Semantics,int? ZoneLineReference=null,int? TargetZoneIndex=null,int? TargetX=null,int? TargetY=null,int? TargetZ=null,int? TargetRotation=null) : ZoneEntityData;
-public sealed record ZonePointEntityData(int Version,int Number,float TargetX,float TargetY,float TargetZ,float TargetHeading,uint TargetZoneId,uint TargetInstance) : ZoneEntityData;
+public sealed record ZonePointEntityData(int Version,int Number,float TargetX,float TargetY,float TargetZ,float TargetHeading,uint TargetZoneId,uint TargetInstance,int ZoneInstance=0,float Buffer=0,uint ClientVersionMask=0xFFFFFFFF,int MinExpansion=-1,int MaxExpansion=-1,string ContentFlags="",string ContentFlagsDisabled="",bool IsVirtual=false,int Height=0,int Width=0) : ZoneEntityData;
 
 public sealed record ZoneEntity(
     Guid Id,
