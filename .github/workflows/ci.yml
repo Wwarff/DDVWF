@@ -54,6 +54,18 @@ jobs:
           $g.Dispose(); $bmp.Dispose()
           Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
           if (!(Test-Path $out) -or (Get-Item $out).Length -lt 1000) { throw "UI smoke screenshot was not captured." }
+          $env:DDVWF_UI_SMOKE = $null
+          $env:DDVWF_THEME_SMOKE = "1"
+          $themeProcess = Start-Process -FilePath $exe -PassThru
+          Start-Sleep -Seconds 4
+          $themeBmp = New-Object System.Drawing.Bitmap $bounds.Width,$bounds.Height
+          $themeGraphics = [System.Drawing.Graphics]::FromImage($themeBmp)
+          $themeGraphics.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size)
+          $themeOut = Join-Path $PWD "artifacts/DDVWF-ThemeEditor-smoke.png"
+          $themeBmp.Save($themeOut,[System.Drawing.Imaging.ImageFormat]::Png)
+          $themeGraphics.Dispose(); $themeBmp.Dispose()
+          Stop-Process -Id $themeProcess.Id -Force -ErrorAction SilentlyContinue
+          if (!(Test-Path $themeOut) -or (Get-Item $themeOut).Length -lt 1000) { throw "Theme Editor smoke screenshot was not captured." }
           $diag = Get-Content -Raw "artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt"
           if ($diag -notmatch 'TextBlock text=Select fg=#FFFFFF00') { throw "Rendered toolbar Select glyph did not resolve the yellow sentinel theme color." }
       - uses: actions/upload-artifact@v4
@@ -61,6 +73,7 @@ jobs:
           name: DDVWF-UI-smoke
           path: |
             artifacts/DDVWF-UI-smoke.png
+            artifacts/DDVWF-ThemeEditor-smoke.png
             artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt
       - name: Vendor pinned Babylon 7.2.1
         shell: pwsh
