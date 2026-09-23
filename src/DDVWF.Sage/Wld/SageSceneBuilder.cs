@@ -7,14 +7,14 @@ public static class SageSceneBuilder
   var materials=new List<SageSceneMaterial>();var materialIndex=new Dictionary<int,int>();
   for(var i=0;i<doc.Fragments.Count;i++)
   {
-   var f=doc.Fragments[i];if(f.KnownType!=WldFragmentType.Material)continue;var m=WldMaterialReader.ReadMaterial(f,source);var frames=new List<SageTexture>();var delay=0;
+   var f=doc.Fragments[i];if(f.KnownType!=WldFragmentType.Material)continue;SageMaterialRecord m;try{m=WldMaterialReader.ReadMaterial(f,source);}catch(Exception ex){throw FragmentFailure(doc,f,ex);}var frames=new List<SageTexture>();var delay=0;
    if(m.BitmapInfoReferenceIndex>=0&&m.BitmapInfoReferenceIndex<doc.Fragments.Count){var reference=doc.Fragments[m.BitmapInfoReferenceIndex];if(reference.KnownType==WldFragmentType.FragmentReference){var ii=WldMaterialReader.ReadReference(reference,source);if(ii>=0&&ii<doc.Fragments.Count&&doc.Fragments[ii].KnownType==WldFragmentType.BitmapInfo){var info=WldMaterialReader.ReadBitmapInfo(doc.Fragments[ii],source);delay=info.AnimationDelayMs;foreach(var bi in info.BitmapNameIndices)if(bi>=0&&bi<doc.Fragments.Count&&doc.Fragments[bi].KnownType==WldFragmentType.BitmapName)frames.Add(new(WldMaterialReader.ReadBitmapName(doc.Fragments[bi],source).FileName));}}}
    materialIndex[i]=materials.Count;materials.Add(new(f.Name,m.Shader,m.Brightness,m.ScaledAmbient,frames,delay));
   }
   var meshes=new List<SageSceneMesh>();
   foreach(var f in doc.Fragments.Where(x=>x.KnownType==WldFragmentType.Mesh))
   {
-   var m=WldMeshReader.Read(doc,f,source);SageAnimatedVertices? animated=null;if(m.AnimatedVerticesReferenceIndex>=0&&m.AnimatedVerticesReferenceIndex<doc.Fragments.Count){var ar=doc.Fragments[m.AnimatedVerticesReferenceIndex];var ai=ar.KnownType==WldFragmentType.AnimatedVertexReference?WldMaterialReader.ReadReference(ar,source):m.AnimatedVerticesReferenceIndex;if(ai>=0&&ai<doc.Fragments.Count&&doc.Fragments[ai].KnownType==WldFragmentType.AnimatedVertices)animated=WldAnimationReader.ReadAnimatedVertices(doc.Fragments[ai],source);}var prims=new List<SageScenePrimitive>();var po=0;
+   SageMesh m;try{m=WldMeshReader.Read(doc,f,source);}catch(Exception ex){throw FragmentFailure(doc,f,ex);}SageAnimatedVertices? animated=null;if(m.AnimatedVerticesReferenceIndex>=0&&m.AnimatedVerticesReferenceIndex<doc.Fragments.Count){var ar=doc.Fragments[m.AnimatedVerticesReferenceIndex];var ai=ar.KnownType==WldFragmentType.AnimatedVertexReference?WldMaterialReader.ReadReference(ar,source):m.AnimatedVerticesReferenceIndex;if(ai>=0&&ai<doc.Fragments.Count&&doc.Fragments[ai].KnownType==WldFragmentType.AnimatedVertices)animated=WldAnimationReader.ReadAnimatedVertices(doc.Fragments[ai],source);}var prims=new List<SageScenePrimitive>();var po=0;
    if(m.MaterialListIndex>=0&&m.MaterialListIndex<doc.Fragments.Count&&doc.Fragments[m.MaterialListIndex].KnownType==WldFragmentType.MaterialList)
    {
     var list=WldMaterialReader.ReadMaterialList(doc.Fragments[m.MaterialListIndex],source);
@@ -31,4 +31,5 @@ public static class SageSceneBuilder
   }
   return new(materials,meshes,false);
  }
+ static InvalidDataException FragmentFailure(WldDocument doc,WldFragment f,Exception ex)=>new($"WLD fragment {f.Index} type 0x{f.RawType:X} ({f.KnownType?.ToString()??"Unknown"}) name '{f.Name}' in {doc.Name}: {ex.Message}",ex);
 }
