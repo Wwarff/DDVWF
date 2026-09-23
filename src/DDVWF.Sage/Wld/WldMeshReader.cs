@@ -25,7 +25,7 @@ public static class WldMeshReader
   _=U32();var materials=unchecked((int)U32())-1;var animated=unchecked((int)U32())-1;Need(8);p+=8;var center=V3();Need(12);p+=12;
   var maxDistance=F32();var min=V3();var max=V3();
   var vertexCount=I16();var uvCount=I16();var normalCount=I16();var colorCount=I16();var polygonCount=I16();var vertexPieceCount=I16();var groupCount=I16();var vertexTextureCount=I16();var size9=I16();var exponent=I16();
-  var scale=1f/(1<<exponent);var vertices=new List<Vector3>(Math.Max(0,vertexCount));
+  var scale=MathF.Pow(2f,-exponent);var vertices=new List<Vector3>(Math.Max(0,vertexCount));
   for(var i=0;i<vertexCount;i++)vertices.Add(new(I16()*scale,I16()*scale,I16()*scale));
   var uvs=new List<Vector2>(Math.Max(0,uvCount));
   for(var i=0;i<uvCount;i++)uvs.Add(doc.IsNewFormat?new(F32(),F32()):new(I16()/256f,I16()/256f));
