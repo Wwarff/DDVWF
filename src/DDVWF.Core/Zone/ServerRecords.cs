@@ -12,4 +12,5 @@ public sealed record ServerZoneSnapshot(
     IReadOnlyList<SpawnEntryRecord> SpawnEntries,
     IReadOnlyList<NpcTypeRecord> NpcTypes,
     IReadOnlyList<DoorRecord> Doors,
-    IReadOnlyList<ZonePointRecord>? ZonePoints = null,\n    IReadOnlyList<SpawnGroupRecord>? SpawnGroups = null);
+    IReadOnlyList<ZonePointRecord>? ZonePoints = null,
+    IReadOnlyList<SpawnGroupRecord>? SpawnGroups = null);
