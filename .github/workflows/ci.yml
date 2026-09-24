@@ -36,6 +36,14 @@ jobs:
           if ($renderer -notmatch 'camera\.angularSensibility=1000') { throw "Accepted RMB camera sensitivity regressed." }
           if ($renderer -notmatch 'if\(arrowLeft\)camera\.rotation\.y-=1\.35\*dt' -or $renderer -notmatch 'if\(arrowRight\)camera\.rotation\.y\+=1\.35\*dt' -or $renderer -notmatch "type:'heading',yaw:camera.rotation.y") { throw "Keyboard yaw/compass heading contract regressed." }
       - run: dotnet publish src/DDVWF.App/DDVWF.App.csproj -c Release -r win-x64 --self-contained false -o artifacts/DDVWF
+      - name: Vendor pinned Babylon 7.2.1 for renderer smoke
+        shell: pwsh
+        run: |
+          npm install --prefix .renderer-deps babylonjs@7.2.1 --no-save
+          $source = Join-Path $PWD ".renderer-deps/node_modules/babylonjs/babylon.js"
+          if (!(Test-Path -LiteralPath $source)) { throw "Pinned Babylon runtime was not produced for renderer smoke." }
+          New-Item -ItemType Directory -Force -Path "artifacts/DDVWF/Renderer" | Out-Null
+          Copy-Item -LiteralPath $source -Destination "artifacts/DDVWF/Renderer/babylon.js"
       - name: Capture DDVWF UI smoke visual
         continue-on-error: true
         shell: pwsh
@@ -103,6 +111,10 @@ jobs:
           $rendererGraphics.Dispose(); $rendererBmp.Dispose()
           Stop-Process -Id $rendererProcess.Id -Force -ErrorAction SilentlyContinue
           if (!(Test-Path $rendererOut) -or (Get-Item $rendererOut).Length -lt 1000) { throw "Renderer smoke screenshot was not captured." }
+          $rendererDiagPath = "artifacts/DDVWF/DDVWF-RENDERER-DIAGNOSTICS.json"
+          if (!(Test-Path $rendererDiagPath)) { throw "Renderer smoke did not produce renderer diagnostics." }
+          $rendererDiag = Get-Content -Raw $rendererDiagPath | ConvertFrom-Json
+          if ($rendererDiag.boundsFailed -or $rendererDiag.vertices -lt 8 -or $rendererDiag.visible -lt 1 -or $rendererDiag.validBounds -lt 1) { throw "Renderer smoke did not create visible, bounded geometry: $($rendererDiag | ConvertTo-Json -Compress)" }
           $diag = Get-Content -Raw "artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt"
           if ($diag -notmatch 'TextBlock text=Select fg=#FFFFFF00') { throw "Rendered toolbar Select glyph did not resolve the yellow sentinel theme color." }
       - uses: actions/upload-artifact@v4
@@ -115,6 +127,7 @@ jobs:
             artifacts/DDVWF-Shortcuts-smoke.png
             artifacts/DDVWF-Renderer-smoke.png
             artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt
+            artifacts/DDVWF/DDVWF-RENDERER-DIAGNOSTICS.json
       - name: Vendor pinned Babylon 7.2.1
         shell: pwsh
         run: |
