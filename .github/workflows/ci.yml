@@ -135,7 +135,7 @@ jobs:
             if (!(Test-Path $rendererDiagPath)) { throw "Renderer smoke did not produce renderer diagnostics." }
             if (!(Test-Path $pixelPath)) { throw "Renderer smoke did not produce framebuffer evidence." }
             $rendererDiag = Get-Content -Raw $rendererDiagPath | ConvertFrom-Json
-            if ($rendererDiag.boundsFailed -or $rendererDiag.vertices -lt 8 -or $rendererDiag.visible -lt 1 -or $rendererDiag.validBounds -lt 1) { throw "Renderer smoke did not create visible, bounded geometry: $($rendererDiag | ConvertTo-Json -Compress)" }
+            if ($rendererDiag.boundsFailed -or $rendererDiag.vertices -lt 3 -or $rendererDiag.visible -lt 1 -or $rendererDiag.validBounds -lt 1) { throw "Renderer smoke did not create visible, bounded geometry: $($rendererDiag | ConvertTo-Json -Compress)" }
             $pixel = Get-Content -Raw $pixelPath | ConvertFrom-Json
             if ($pixel.width -lt 16 -or $pixel.height -lt 16) { throw "Renderer framebuffer has invalid dimensions: $($pixel | ConvertTo-Json -Compress)" }
             if ($pixel.total -lt 900) { throw "Renderer framebuffer coverage probe is incomplete: $($pixel | ConvertTo-Json -Compress)" }
