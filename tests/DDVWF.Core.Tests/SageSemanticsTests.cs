@@ -58,5 +58,14 @@ public sealed class SageSemanticsTests
         Assert.Equal((byte)1,g.Red);Assert.Equal((byte)2,g.Green);Assert.Equal((byte)3,g.Blue);Assert.Equal((byte)4,g.Alpha);
     }
 
+    [Theory]
+    [InlineData(0x09,SageShaderType.Transparent25)]
+    [InlineData(0x05,SageShaderType.Transparent50)]
+    [InlineData(0x0A,SageShaderType.Transparent75)]
+    [InlineData(0x17,SageShaderType.TransparentAdditive)]
+    [InlineData(0x0B,SageShaderType.TransparentAdditiveUnlit)]
+    public void Transparent_shader_kinds_remain_distinct_for_Babylon_consumption(uint value,SageShaderType expected)
+        => Assert.Equal(expected,SageMaterial.Map(value,1));
+
 }
 
