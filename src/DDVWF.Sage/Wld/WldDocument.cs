@@ -3,7 +3,7 @@ using System.Text;
 
 namespace DDVWF.Sage.Wld;
 
-public sealed record WldFragment(int Index, uint Size, uint RawType, string Name, int PayloadOffset, int EndOffset)
+public sealed record WldFragment(int Index, uint Size, uint RawType, string Name, int PayloadOffset, int EndOffset = int.MaxValue)
 {
     public WldFragmentType? KnownType => Enum.IsDefined(typeof(WldFragmentType), RawType) ? (WldFragmentType)RawType : null;
 }
