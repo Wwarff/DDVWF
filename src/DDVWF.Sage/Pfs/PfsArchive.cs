@@ -41,6 +41,7 @@ public sealed class PfsArchive
         var archive=new PfsArchive();
         foreach(var e in entries)
             if(byCrc.TryGetValue(e.Crc,out var name)) archive._files[name]=InflateFile(data,e.Offset,e.Size);
+        if(archive._files.Count==0 && entries.Count>0) throw new InvalidDataException($"PFS filename directory resolved 0 of {entries.Count} file entries.");
         return archive;
     }
 
