@@ -29,8 +29,11 @@ jobs:
           if ($xaml -notmatch 'TargetName="Glyph" Property="Foreground" Value="\{DynamicResource ToolBarDisabledTextBrush\}"') { throw "Disabled toolbar glyph is not directly bound to ToolBarDisabledTextBrush." }
           if ($xaml -notmatch 'ToolBarDisabledTextBrush') { throw "Toolbar disabled text semantic brush is not wired." }
           if ($xaml -match '<GridSplitter[^>]+BottomSplitter_Drag') { throw "Bottom workspace regressed to WPF GridSplitter behavior." }
-          $thumbs = [regex]::Matches($xaml,'<Thumb[^>]+Grid.Column="(?:1|3|5|7|9|11)"[^>]+DragDelta="BottomSplitter_DragDelta"').Count
-          if ($thumbs -ne 6) { throw "Expected six deterministic bottom pane dividers; found $thumbs." }
+          $thumbs = [regex]::Matches($xaml,'<Thumb[^>]+Grid.Column="(?:1|3|5)"[^>]+DragDelta="BottomSplitter_DragDelta"').Count
+          if ($thumbs -ne 3) { throw "Expected three deterministic bottom pane dividers for Status, Diagnostics, Native Data, and Inspector; found $thumbs." }
+          if ($xaml -match 'Text="Difference"' -or $xaml -match 'Text="Changes"' -or $xaml -match 'Text="Console"') { throw "Removed Difference/Changes/Console panes returned." }
+          if ($xaml -notmatch 'x:Name="AssetSearchBox"') { throw "Unified active-zone asset search is missing." }
+          if ($xaml -match 'Header="MODEL VIEWER"') { throw "Preview surface regressed to a redundant Model Viewer header." }
           if ($code -notmatch 'AdjacentPaneResize\.Apply') { throw "Bottom divider does not use tested adjacent-pair resize math." }
           $renderer = Get-Content -Raw "src/DDVWF.App/Renderer/babylon.html"
           if ($renderer -notmatch 'camera\.angularSensibility=1000') { throw "Accepted RMB camera sensitivity regressed." }
