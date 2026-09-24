@@ -103,30 +103,32 @@ jobs:
           Stop-Process -Id $shortcutsProcess.Id -Force -ErrorAction SilentlyContinue
           if (!(Test-Path $shortcutsOut) -or (Get-Item $shortcutsOut).Length -lt 1000) { throw "Shortcuts smoke screenshot was not captured." }
           $env:DDVWF_SHORTCUTS_SMOKE = $null
-          $env:DDVWF_RENDERER_SMOKE = "1"
-          $rendererProcess = Start-Process -FilePath $exe -PassThru
-          Start-Sleep -Seconds 7
-          $rendererBmp = New-Object System.Drawing.Bitmap $bounds.Width,$bounds.Height
-          $rendererGraphics = [System.Drawing.Graphics]::FromImage($rendererBmp)
-          $rendererGraphics.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size)
-          $rendererOut = Join-Path $PWD "artifacts/DDVWF-Renderer-smoke.png"
-          $rendererBmp.Save($rendererOut,[System.Drawing.Imaging.ImageFormat]::Png)
-          $rendererGraphics.Dispose(); $rendererBmp.Dispose()
-          Stop-Process -Id $rendererProcess.Id -Force -ErrorAction SilentlyContinue
-          if (!(Test-Path $rendererOut) -or (Get-Item $rendererOut).Length -lt 1000) { throw "Renderer smoke screenshot was not captured." }
-          $rendererDiagPath = "artifacts/DDVWF/DDVWF-RENDERER-DIAGNOSTICS.json"
-          if (!(Test-Path $rendererDiagPath)) { throw "Renderer smoke did not produce renderer diagnostics." }
-          $rendererDiag = Get-Content -Raw $rendererDiagPath | ConvertFrom-Json
-          if ($rendererDiag.boundsFailed -or $rendererDiag.vertices -lt 8 -or $rendererDiag.visible -lt 1 -or $rendererDiag.validBounds -lt 1) { throw "Renderer smoke did not create visible, bounded geometry: $($rendererDiag | ConvertTo-Json -Compress)" }
-          $pixelPath = "artifacts/DDVWF/DDVWF-RENDERER-PIXEL.json"
-          if (!(Test-Path $pixelPath)) { throw "Renderer smoke did not produce framebuffer evidence." }
-          $pixel = Get-Content -Raw $pixelPath | ConvertFrom-Json
-          if ($pixel.width -lt 16 -or $pixel.height -lt 16) { throw "Renderer framebuffer has invalid dimensions: $($pixel | ConvertTo-Json -Compress)" }
-          $clear = @(8,10,13)
-          $nonBackground = @($pixel.samples | Where-Object { ([Math]::Abs([int]$_[0]-$clear[0])+[Math]::Abs([int]$_[1]-$clear[1])+[Math]::Abs([int]$_[2]-$clear[2])) -ge 18 }).Count
-          if ($nonBackground -lt 1) { throw "Renderer framebuffer samples are all effectively the clear/background color: $($pixel | ConvertTo-Json -Compress)" }
           $diag = Get-Content -Raw "artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt"
           if ($diag -notmatch 'TextBlock text=Select fg=#FFFFFF00') { throw "Rendered toolbar Select glyph did not resolve the yellow sentinel theme color." }
+      - name: Verify Babylon geometry framebuffer
+        shell: pwsh
+        run: |
+          $env:DDVWF_RENDERER_SMOKE = "1"
+          $exe = Join-Path $PWD "artifacts/DDVWF/DragonDenVisualWorldForge.exe"
+          $rendererProcess = Start-Process -FilePath $exe -PassThru
+          try {
+            $deadline = [DateTime]::UtcNow.AddSeconds(20)
+            $rendererDiagPath = "artifacts/DDVWF/DDVWF-RENDERER-DIAGNOSTICS.json"
+            $pixelPath = "artifacts/DDVWF/DDVWF-RENDERER-PIXEL.json"
+            while ([DateTime]::UtcNow -lt $deadline -and (!(Test-Path $rendererDiagPath) -or !(Test-Path $pixelPath))) { Start-Sleep -Milliseconds 250 }
+            if (!(Test-Path $rendererDiagPath)) { throw "Renderer smoke did not produce renderer diagnostics." }
+            if (!(Test-Path $pixelPath)) { throw "Renderer smoke did not produce framebuffer evidence." }
+            $rendererDiag = Get-Content -Raw $rendererDiagPath | ConvertFrom-Json
+            if ($rendererDiag.boundsFailed -or $rendererDiag.vertices -lt 8 -or $rendererDiag.visible -lt 1 -or $rendererDiag.validBounds -lt 1) { throw "Renderer smoke did not create visible, bounded geometry: $($rendererDiag | ConvertTo-Json -Compress)" }
+            $pixel = Get-Content -Raw $pixelPath | ConvertFrom-Json
+            if ($pixel.width -lt 16 -or $pixel.height -lt 16) { throw "Renderer framebuffer has invalid dimensions: $($pixel | ConvertTo-Json -Compress)" }
+            $clear = @(8,10,13)
+            $nonBackground = @($pixel.samples | Where-Object { ([Math]::Abs([int]$_[0]-$clear[0])+[Math]::Abs([int]$_[1]-$clear[1])+[Math]::Abs([int]$_[2]-$clear[2])) -ge 18 }).Count
+            if ($nonBackground -lt 1) { throw "Renderer framebuffer samples are all effectively the clear/background color: $($pixel | ConvertTo-Json -Compress)" }
+          } finally {
+            Stop-Process -Id $rendererProcess.Id -Force -ErrorAction SilentlyContinue
+            $env:DDVWF_RENDERER_SMOKE = $null
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: DDVWF-UI-smoke
