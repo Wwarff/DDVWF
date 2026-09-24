@@ -7,10 +7,10 @@ public enum WldFragmentType : uint
     BitmapName = 0x03, BitmapInfo = 0x04, FragmentReference = 0x05,
     Sprite2D = 0x06, Sprite2DReference = 0x07, FragmentReference09 = 0x09, // Sage dispatches 0x09 as WldFragmentReference; 0x08 remains unknown.
     SkeletonHierarchy = 0x10, SkeletonHierarchyReference = 0x11, TrackDefinition = 0x12, TrackReference = 0x13,
-    ActorDefinition = 0x14, ActorInstance = 0x15, ZoneUnknown = 0x16,
+    ActorDefinition = 0x14, ActorInstance = 0x15,
     LightSource = 0x1B, LightSourceReference = 0x1C,
     BspTree = 0x21, BspRegion = 0x22, ParticleSprite = 0x26, ParticleSpriteReference = 0x27,
-    LightInstance = 0x28, RegionType = 0x29, AmbientLight = 0x2A, LegacyMesh = 0x2C,
+    LightInstance = 0x28, RegionType = 0x29, AmbientLight = 0x2A,
     MeshReference = 0x2D, AnimatedVertexReference = 0x2F, Material = 0x30, MaterialList = 0x31,
     VertexColor = 0x32, VertexColorReference = 0x33, ParticleCloud = 0x34, GlobalAmbientLight = 0x35,
     Mesh = 0x36, AnimatedVertices = 0x37
