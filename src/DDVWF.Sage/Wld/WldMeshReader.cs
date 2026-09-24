@@ -34,7 +34,7 @@ public static class WldMeshReader
   var colors=new List<uint>(Math.Max(0,colorCount));for(var i=0;i<colorCount;i++){Need(4);colors.Add(BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4)));p+=4;}
   var polygons=new List<SagePolygon>(Math.Max(0,polygonCount));for(var i=0;i<polygonCount;i++)polygons.Add(new(I16()==0,unchecked((ushort)I16()),unchecked((ushort)I16()),unchecked((ushort)I16())));
   var pieces=new List<SageMobPiece>(Math.Max(0,vertexPieceCount));var mobStart=0;for(var i=0;i<vertexPieceCount;i++){var count=I16();var bone=I16();pieces.Add(new(bone,mobStart,count));mobStart+=count;}
-  var groups=new List<SageRenderGroup>(Math.Max(0,groupCount));for(var i=0;i<groupCount;i++)groups.Add(new(I16(),U16()));
+  var groups=new List<SageRenderGroup>(Math.Max(0,groupCount));for(var i=0;i<groupCount;i++)groups.Add(new(unchecked((ushort)I16()),U16()));
   for(var n=0;n<vertexTextureCount;n++){Need(4);p+=4;}for(var n=0;n<size9;n++){Need(12);p+=12;}
   while(uvs.Count<vertices.Count)uvs.Add(Vector2.Zero);
   return new(materials,animated,center,maxDistance,min,max,vertices,uvs,normals,colors,polygons,groups,pieces);
