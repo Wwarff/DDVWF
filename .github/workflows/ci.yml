@@ -49,11 +49,20 @@ jobs:
       - name: Vendor pinned Babylon 7.2.1 for renderer smoke
         shell: pwsh
         run: |
-          npm install --prefix .renderer-deps babylonjs@7.2.1 --no-save
+          npm install --prefix .renderer-deps babylonjs@7.2.1 babylonjs-loaders@7.2.1 --no-save
           $source = Join-Path $PWD ".renderer-deps/node_modules/babylonjs/babylon.js"
+          $loaders = Join-Path $PWD ".renderer-deps/node_modules/babylonjs-loaders/babylonjs.loaders.js"
           if (!(Test-Path -LiteralPath $source)) { throw "Pinned Babylon runtime was not produced for renderer smoke." }
+          if (!(Test-Path -LiteralPath $loaders)) { throw "Pinned Babylon glTF loader was not produced for Sage GLB smoke." }
           New-Item -ItemType Directory -Force -Path "artifacts/DDVWF/Renderer" | Out-Null
           Copy-Item -LiteralPath $source -Destination "artifacts/DDVWF/Renderer/babylon.js"
+          Copy-Item -LiteralPath $loaders -Destination "artifacts/DDVWF/Renderer/babylonjs.loaders.js"
+      - name: Prove pinned Sage GLB loader path
+        shell: pwsh
+        run: |
+          $renderer = Get-Content -LiteralPath 'artifacts/DDVWF/Renderer/babylon.html' -Raw
+          if ($renderer -notmatch 'SceneLoader\.ImportMeshAsync\(' -or $renderer -notmatch "'/eq/zones/'" -or $renderer -notmatch "'\.glb'") { throw 'Sage GLB ImportMeshAsync contract missing.' }
+          if (!(Test-Path -LiteralPath 'artifacts/DDVWF/Renderer/babylonjs.loaders.js')) { throw 'Pinned glTF loader artifact missing.' }
       - name: Capture DDVWF UI smoke visual
         continue-on-error: true
         shell: pwsh
