@@ -17,7 +17,7 @@ public sealed class SageClientZoneProvider:IClientRenderAssetProvider,IClientAss
   var hasEqg=zoneFiles.Any(p=>Path.GetFileName(p).Equals(mainEqg,StringComparison.OrdinalIgnoreCase));var hasS3d=zoneFiles.Any(p=>Path.GetFileName(p).Equals(mainS3d,StringComparison.OrdinalIgnoreCase));if(!hasEqg&&!hasS3d)throw new FileNotFoundException($"Neither native zone archive '{mainS3d}' nor '{mainEqg}' was found for '{zone.ShortName}'.");
   var selectedType=hasEqg?".eqg":".s3d";
   // Sage EQFileHandle selects one decoder for the zone. Do not feed unrelated *_chr archives into that decoder.
-  var archives=zoneFiles.Where(p=>Path.GetExtension(p).Equals(selectedType,StringComparison.OrdinalIgnoreCase)).OrderBy(p=>Path.GetFileName(p).Equals(selectedType==".eqg"?mainEqg:mainS3d,StringComparison.OrdinalIgnoreCase)?1:0).ThenBy(p=>Path.GetFileName(p),StringComparer.OrdinalIgnoreCase).ToArray();
+  var archives=zoneFiles.Where(p=>Path.GetExtension(p).Equals(selectedType,StringComparison.OrdinalIgnoreCase)).ToArray();if(selectedType==".s3d")Array.Sort(archives,(a,b)=>Path.GetFileName(a).Equals(mainS3d,StringComparison.OrdinalIgnoreCase)?1:-1);
   var globalArchives=Array.Empty<string>();var characterArchives=Array.Empty<string>();var equipmentArchives=Array.Empty<string>();
   _loadWarnings.Add($"Sage processZone closure: {zoneFiles.Length} matching files; decoder {(hasEqg?"EQG":"S3D")}; {archives.Length} decoder archives.");
   var objectAssets=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);var objectKinds=new Dictionary<string,ZoneEntityKind>(StringComparer.OrdinalIgnoreCase);
