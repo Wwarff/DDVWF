@@ -7,7 +7,7 @@ namespace DDVWF.Sage.Pfs;
 // Read path derived from EQ Sage v1.8.15 src/lib/pfs/pfs.js.
 public sealed class PfsArchive
 {
-    private const int FilenameDirectoryCrc = 0x61580ac9;
+    private const int FilenameDirectoryCrc = unchecked((int)0x61580ac9);
     private readonly Dictionary<string, byte[]> _files = new(StringComparer.OrdinalIgnoreCase);
     public IReadOnlyDictionary<string, byte[]> Files => _files;
 
