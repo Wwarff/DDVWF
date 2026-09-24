@@ -39,6 +39,13 @@ jobs:
           if ($renderer -notmatch 'camera\.angularSensibility=1000') { throw "Accepted RMB camera sensitivity regressed." }
           if ($renderer -notmatch 'if\(arrowLeft\)camera\.rotation\.y-=1\.35\*dt' -or $renderer -notmatch 'if\(arrowRight\)camera\.rotation\.y\+=1\.35\*dt' -or $renderer -notmatch "type:'heading',yaw:camera.rotation.y") { throw "Keyboard yaw/compass heading contract regressed." }
       - run: dotnet publish src/DDVWF.App/DDVWF.App.csproj -c Release -r win-x64 --self-contained false -o artifacts/DDVWF
+      - name: Vendor pinned Sage viewer environment
+        shell: pwsh
+        run: |
+          $uri = 'https://raw.githubusercontent.com/knervous/eqsage/e85bb85a19670eb377d876521bb1adf130b4e83a/public/static/environment.env'
+          New-Item -ItemType Directory -Force -Path 'artifacts/DDVWF/Renderer' | Out-Null
+          Invoke-WebRequest -Uri $uri -OutFile 'artifacts/DDVWF/Renderer/environment.env'
+          if ((Get-Item 'artifacts/DDVWF/Renderer/environment.env').Length -ne 350766) { throw 'Pinned Sage environment.env length mismatch.' }
       - name: Vendor pinned Babylon 7.2.1 for renderer smoke
         shell: pwsh
         run: |
