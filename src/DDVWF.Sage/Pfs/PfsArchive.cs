@@ -19,26 +19,14 @@ public sealed class PfsArchive
         if(Encoding.ASCII.GetString(data,4,4)!="PFS ") throw new InvalidDataException("PFS magic mismatch.");
         if(dirOffset<0 || dirOffset+4>data.Length) throw new InvalidDataException("PFS directory offset is outside the archive.");
         var count=checked((int)U32(data,dirOffset));
-        var entries=new List<Entry>(count); var filenameEntries=new List<Entry>();
+        var entries=new List<Entry>(count); var filenameEntries=new List<(int Crc,string Name)>();
         for(var i=0;i<count;i++)
         {
             var p=checked(dirOffset+4+i*12); if(p+12>data.Length) throw new InvalidDataException("PFS directory is truncated.");
             var e=new Entry(I32(data,p),checked((int)U32(data,p+4)),checked((int)U32(data,p+8)));
-            if(e.Crc==FilenameDirectoryCrc) filenameEntries.Add(e); else entries.Add(e);
+            if(e.Crc!=FilenameDirectoryCrc){entries.Add(e);continue;}\n            var filenameData=InflateFile(data,e.Offset,e.Size); var fp=0; var filenameCount=checked((int)ReadU32(filenameData,ref fp));\n            for(var j=0;j<filenameCount;j++){var len=checked((int)ReadU32(filenameData,ref fp));if(len<1||fp+len>filenameData.Length)throw new InvalidDataException("PFS filename entry is invalid.");var name=Encoding.ASCII.GetString(filenameData,fp,len-1).ToLowerInvariant();fp+=len;filenameEntries.Add((PfsCrc.Get(name),name));}
         }
-        if(filenameEntries.Count==0) throw new InvalidDataException("PFS filename directory is absent.");
-        var names=filenameEntries[0];
-        var filenameData=InflateFile(data,names.Offset,names.Size);
-        var fp=0; var filenameCount=checked((int)ReadU32(filenameData,ref fp));
-        var byCrc=new Dictionary<int,string>();
-        for(var i=0;i<filenameCount;i++)
-        {
-            var len=checked((int)ReadU32(filenameData,ref fp));
-            if(len<1 || fp+len>filenameData.Length) throw new InvalidDataException("PFS filename entry is invalid.");
-            var name=Encoding.ASCII.GetString(filenameData,fp,len-1).ToLowerInvariant(); fp+=len;
-            byCrc[PfsCrc.Get(name)]=name;
-        }
-        var archive=new PfsArchive();
+        if(filenameEntries.Count==0) throw new InvalidDataException("PFS filename directory is absent.");\n        var byCrc=filenameEntries.GroupBy(x=>x.Crc).ToDictionary(g=>g.Key,g=>g.First().Name);\n        var archive=new PfsArchive();
         foreach(var e in entries)
             if(byCrc.TryGetValue(e.Crc,out var name)) archive._files[name]=InflateFile(data,e.Offset,e.Size);
         if(archive._files.Count==0 && entries.Count>0) throw new InvalidDataException($"PFS filename directory resolved 0 of {entries.Count} file entries.");
