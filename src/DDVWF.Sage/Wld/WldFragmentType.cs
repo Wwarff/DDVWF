@@ -5,7 +5,7 @@ namespace DDVWF.Sage.Wld;
 public enum WldFragmentType : uint
 {
     BitmapName = 0x03, BitmapInfo = 0x04, FragmentReference = 0x05,
-    // 0x06-0x09 are not dispatched by the pinned Sage Wld.processFragment implementation; leave them unknown.
+    Sprite2D = 0x06, Sprite2DReference = 0x07, FragmentReference09 = 0x09, // Sage dispatches 0x09 as WldFragmentReference; 0x08 remains unknown.
     SkeletonHierarchy = 0x10, SkeletonHierarchyReference = 0x11, TrackDefinition = 0x12, TrackReference = 0x13,
     ActorDefinition = 0x14, ActorInstance = 0x15, ZoneUnknown = 0x16,
     LightSource = 0x1B, LightSourceReference = 0x1C,
