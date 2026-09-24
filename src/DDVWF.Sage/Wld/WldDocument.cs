@@ -3,7 +3,7 @@ using System.Text;
 
 namespace DDVWF.Sage.Wld;
 
-public sealed record WldFragment(int Index, uint Size, uint RawType, string Name, int PayloadOffset)
+public sealed record WldFragment(int Index, uint Size, uint RawType, string Name, int PayloadOffset, int EndOffset)
 {
     public WldFragmentType? KnownType => Enum.IsDefined(typeof(WldFragmentType), RawType) ? (WldFragmentType)RawType : null;
 }
@@ -61,8 +61,8 @@ public sealed class WldDocument
             var type=BinaryPrimitives.ReadUInt32LittleEndian(data[p..]); p+=4;
             var original=p;
             var nameRef=BinaryPrimitives.ReadInt32LittleEndian(bytes.AsSpan(p)); p+=4;
-            fragments.Add(new(i,size,type,Resolve(nameRef),p));
             var next=checked(original+(int)size);
+            fragments.Add(new(i,size,type,Resolve(nameRef),p,next));
             if(next<p || next>bytes.Length) throw new InvalidDataException($"WLD fragment {i} exceeds file bounds.");
             p=next;
         }
