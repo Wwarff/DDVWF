@@ -122,9 +122,8 @@ jobs:
             if ($rendererDiag.boundsFailed -or $rendererDiag.vertices -lt 8 -or $rendererDiag.visible -lt 1 -or $rendererDiag.validBounds -lt 1) { throw "Renderer smoke did not create visible, bounded geometry: $($rendererDiag | ConvertTo-Json -Compress)" }
             $pixel = Get-Content -Raw $pixelPath | ConvertFrom-Json
             if ($pixel.width -lt 16 -or $pixel.height -lt 16) { throw "Renderer framebuffer has invalid dimensions: $($pixel | ConvertTo-Json -Compress)" }
-            $clear = @(8,10,13)
-            $nonBackground = @($pixel.samples | Where-Object { ([Math]::Abs([int]$_[0]-$clear[0])+[Math]::Abs([int]$_[1]-$clear[1])+[Math]::Abs([int]$_[2]-$clear[2])) -ge 18 }).Count
-            if ($nonBackground -lt 1) { throw "Renderer framebuffer samples are all effectively the clear/background color: $($pixel | ConvertTo-Json -Compress)" }
+            if ($pixel.total -lt 900) { throw "Renderer framebuffer coverage probe is incomplete: $($pixel | ConvertTo-Json -Compress)" }
+            if ($pixel.nonBackground -lt 5 -or $pixel.coverage -le 0.005) { throw "Renderer framebuffer is effectively black/background despite bounded geometry: $($pixel | ConvertTo-Json -Compress)" }
           } finally {
             Stop-Process -Id $rendererProcess.Id -Force -ErrorAction SilentlyContinue
             $env:DDVWF_RENDERER_SMOKE = $null
