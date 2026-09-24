@@ -16,7 +16,7 @@ public static class WldMeshReader
  public static SageMesh Read(WldDocument doc,WldFragment fragment,ReadOnlySpan<byte> source)
  {
   var b=source.ToArray();var p=fragment.PayloadOffset;
-  void Need(int n){if(n<0||p+n>b.Length)throw new InvalidDataException("Mesh fragment is truncated.");}
+  void Need(int n){if(n<0||p+n>fragment.EndOffset)throw new InvalidDataException($"Mesh fragment is truncated at relative offset {p-fragment.PayloadOffset}; need {n} bytes, fragment ends at {fragment.EndOffset-fragment.PayloadOffset} payload bytes.");}
   int I16(){Need(2);var v=BinaryPrimitives.ReadInt16LittleEndian(b.AsSpan(p,2));p+=2;return v;}
   ushort U16(){Need(2);var v=BinaryPrimitives.ReadUInt16LittleEndian(b.AsSpan(p,2));p+=2;return v;}
   uint U32(){Need(4);var v=BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4));p+=4;return v;}
