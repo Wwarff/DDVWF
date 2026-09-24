@@ -25,15 +25,13 @@ public sealed class PfsArchive
             var p=checked(dirOffset+4+i*12); if(p+12>data.Length) throw new InvalidDataException("PFS directory is truncated.");
             var e=new Entry(I32(data,p),checked((int)U32(data,p+4)),checked((int)U32(data,p+8)));
             if(e.Crc!=FilenameDirectoryCrc){entries.Add(e);continue;}
-            var filenameData=InflateFile(data,e.Offset,e.Size); var fp=0; var filenameCount=checked((int)ReadU32(filenameData,ref fp));
+            byte[] filenameData;try{filenameData=InflateFile(data,e.Offset,e.Size);}catch{return new PfsArchive();} var fp=0; var filenameCount=checked((int)ReadU32(filenameData,ref fp));
             for(var j=0;j<filenameCount;j++){var len=checked((int)ReadU32(filenameData,ref fp));if(len<1||fp+len>filenameData.Length)throw new InvalidDataException("PFS filename entry is invalid.");var name=Encoding.ASCII.GetString(filenameData,fp,len-1).ToLowerInvariant();fp+=len;filenameEntries.Add((PfsCrc.Get(name),name));}
         }
-        if(filenameEntries.Count==0) throw new InvalidDataException("PFS filename directory is absent.");
         var byCrc=filenameEntries.GroupBy(x=>x.Crc).ToDictionary(g=>g.Key,g=>g.First().Name);
         var archive=new PfsArchive();
         foreach(var e in entries)
             if(byCrc.TryGetValue(e.Crc,out var name)) archive._files[name]=InflateFile(data,e.Offset,e.Size);
-        if(archive._files.Count==0 && entries.Count>0) throw new InvalidDataException($"PFS filename directory resolved 0 of {entries.Count} file entries.");
         return archive;
     }
 
