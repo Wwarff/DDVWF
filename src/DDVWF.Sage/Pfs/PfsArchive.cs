@@ -19,15 +19,16 @@ public sealed class PfsArchive
         if(Encoding.ASCII.GetString(data,4,4)!="PFS ") throw new InvalidDataException("PFS magic mismatch.");
         if(dirOffset<0 || dirOffset+4>data.Length) throw new InvalidDataException("PFS directory offset is outside the archive.");
         var count=checked((int)U32(data,dirOffset));
-        var entries=new List<Entry>(count); Entry? names=null;
+        var entries=new List<Entry>(count); var filenameEntries=new List<Entry>();
         for(var i=0;i<count;i++)
         {
             var p=checked(dirOffset+4+i*12); if(p+12>data.Length) throw new InvalidDataException("PFS directory is truncated.");
             var e=new Entry(I32(data,p),checked((int)U32(data,p+4)),checked((int)U32(data,p+8)));
-            if(e.Crc==FilenameDirectoryCrc) names=e; else entries.Add(e);
+            if(e.Crc==FilenameDirectoryCrc) filenameEntries.Add(e); else entries.Add(e);
         }
-        if(names is null) throw new InvalidDataException("PFS filename directory is absent.");
-        var filenameData=InflateFile(data,names.Value.Offset,names.Value.Size);
+        if(filenameEntries.Count==0) throw new InvalidDataException("PFS filename directory is absent.");
+        var names=filenameEntries[0];
+        var filenameData=InflateFile(data,names.Offset,names.Size);
         var fp=0; var filenameCount=checked((int)ReadU32(filenameData,ref fp));
         var byCrc=new Dictionary<int,string>();
         for(var i=0;i<filenameCount;i++)
