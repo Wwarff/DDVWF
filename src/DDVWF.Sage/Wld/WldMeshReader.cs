@@ -25,16 +25,16 @@ public static class WldMeshReader
   _=U32();var materials=unchecked((int)U32())-1;var animated=unchecked((int)U32())-1;Need(8);p+=8;var center=V3();Need(12);p+=12;
   var maxDistance=F32();var min=V3();var max=V3();
   var vertexCount=U16();var uvCount=U16();var normalCount=U16();var colorCount=U16();var polygonCount=U16();var vertexPieceCount=U16();var groupCount=U16();var vertexTextureCount=U16();var size9=U16();var exponent=I16();
-  var scale=MathF.Pow(2f,-exponent);var vertices=new List<Vector3>(Math.Max(0,vertexCount));
+  var scale=MathF.Pow(2f,-exponent);var vertices=new List<Vector3>(vertexCount);
   for(var i=0;i<vertexCount;i++)vertices.Add(new(I16()*scale,I16()*scale,I16()*scale));
-  var uvs=new List<Vector2>(Math.Max(0,uvCount));
+  var uvs=new List<Vector2>(uvCount);
   for(var i=0;i<uvCount;i++)uvs.Add(doc.IsNewFormat?new(F32(),F32()):new(I16()/256f,I16()/256f));
-  var normals=new List<Vector3>(Math.Max(0,normalCount));
+  var normals=new List<Vector3>(normalCount);
   for(var i=0;i<normalCount;i++){Need(3);var v=new Vector3(unchecked((sbyte)b[p++])/128f,unchecked((sbyte)b[p++])/128f,unchecked((sbyte)b[p++])/128f);normals.Add(v==Vector3.Zero?v:Vector3.Normalize(v));}
-  var colors=new List<uint>(Math.Max(0,colorCount));for(var i=0;i<colorCount;i++){Need(4);colors.Add(BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4)));p+=4;}
+  var colors=new List<uint>(colorCount);for(var i=0;i<colorCount;i++){Need(4);colors.Add(BinaryPrimitives.ReadUInt32LittleEndian(b.AsSpan(p,4)));p+=4;}
   var polygons=new List<SagePolygon>(polygonCount);for(var i=0;i<polygonCount;i++)polygons.Add(new(I16()==0,U16(),U16(),U16()));
   var pieces=new List<SageMobPiece>(vertexPieceCount);var mobStart=0;for(var i=0;i<vertexPieceCount;i++){var count=U16();var bone=U16();pieces.Add(new(bone,mobStart,count));mobStart+=count;}
-  var groups=new List<SageRenderGroup>(Math.Max(0,groupCount));for(var i=0;i<groupCount;i++)groups.Add(new(U16(),U16()));
+  var groups=new List<SageRenderGroup>(groupCount);for(var i=0;i<groupCount;i++)groups.Add(new(U16(),U16()));
   for(var n=0;n<vertexTextureCount;n++){Need(4);p+=4;}for(var n=0;n<size9;n++){Need(12);p+=12;}
   while(uvs.Count<vertices.Count)uvs.Add(Vector2.Zero);
   return new(materials,animated,center,maxDistance,min,max,vertices,uvs,normals,colors,polygons,groups,pieces);
