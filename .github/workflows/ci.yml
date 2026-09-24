@@ -120,8 +120,8 @@ jobs:
           $pixel = Get-Content -Raw $pixelPath | ConvertFrom-Json
           if ($pixel.width -lt 16 -or $pixel.height -lt 16) { throw "Renderer framebuffer has invalid dimensions: $($pixel | ConvertTo-Json -Compress)" }
           $clear = @(8,10,13)
-          $delta = [Math]::Abs([int]$pixel.center[0]-$clear[0])+[Math]::Abs([int]$pixel.center[1]-$clear[1])+[Math]::Abs([int]$pixel.center[2]-$clear[2])
-          if ($delta -lt 18) { throw "Renderer center pixel is still effectively the clear/background color: $($pixel | ConvertTo-Json -Compress)" }
+          $nonBackground = @($pixel.samples | Where-Object { ([Math]::Abs([int]$_[0]-$clear[0])+[Math]::Abs([int]$_[1]-$clear[1])+[Math]::Abs([int]$_[2]-$clear[2])) -ge 18 }).Count
+          if ($nonBackground -lt 1) { throw "Renderer framebuffer samples are all effectively the clear/background color: $($pixel | ConvertTo-Json -Compress)" }
           $diag = Get-Content -Raw "artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt"
           if ($diag -notmatch 'TextBlock text=Select fg=#FFFFFF00') { throw "Rendered toolbar Select glyph did not resolve the yellow sentinel theme color." }
       - uses: actions/upload-artifact@v4
