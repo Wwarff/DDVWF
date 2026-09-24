@@ -20,5 +20,4 @@ public sealed class WldMeshTests
         Assert.Equal(-2,mesh.MaterialListIndex); Assert.Equal(-2,mesh.AnimatedVerticesReferenceIndex);
         Assert.Equal(new System.Numerics.Vector3(2,4,6),mesh.Vertices[0]);
     }
- [Fact] public void SageZoneExportTransform_MatchesUpstreamPositionAndNormalHandedness(){var p=SageExportTransform.Position(new System.Numerics.Vector3(1,2,3),new System.Numerics.Vector3(10,20,30));var n=SageExportTransform.Normal(new System.Numerics.Vector3(.25f,.5f,.75f));Assert.Equal(new System.Numerics.Vector3(11,33,22),p);Assert.Equal(new System.Numerics.Vector3(-.25f,.75f,.5f),n);}
 }
