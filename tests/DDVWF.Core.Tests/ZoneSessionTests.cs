@@ -35,14 +35,14 @@ public sealed class ZoneSessionTests
     [Fact]
     public async Task Npc_resolution_receives_Sage_texture_variation_input()
     {
-        var client=new NpcResolvingClient();var viewport=new CapturingViewport();var session=new ZoneSession(client,new NpcServer(),viewport);var zone=await session.OpenAsync("eq","poknowledge");var npc=Assert.Single(zone.Entities);Assert.Equal((1,0,0,12),client.Last);Assert.Equal("hum01",npc.ClientAsset);
+        var client=new NpcResolvingClient();var viewport=new CapturingViewport();var session=new ZoneSession(client,new NpcServer(),viewport);var zone=await session.OpenAsync("eq","poknowledge");var npc=Assert.Single(zone.Entities);Assert.Equal((1,0,0,12),client.Last);Assert.Equal("hum01",npc.ClientAsset);Assert.Equal("hum01",Assert.IsType<NpcEntityData>(npc.Data).NativeModel);
     }
 
     private sealed class NpcResolvingClient : IClientZoneProvider, INpcClientAssetResolver
     {
         public (int Race,int Gender,int Model,int Texture) Last {get;private set;}
         public Task PopulateAsync(CompleteZone z,string r,CancellationToken c)=>Task.CompletedTask;
-        public string? ResolveNpcAsset(int race,int gender,int model=0,int texture=0){Last=(race,gender,model,texture);return texture>=10?"hum01":"hum";}
+        public string? ResolveNpcAsset(int race,int gender,int model=0,int texture=0){Last=(race,gender,model,texture);return texture>=10?"hum01":"hum";} public string ResolveNpcModelName(int race,int gender,int model=0,int texture=0)=>texture>=10?"hum01":"hum";
     }
     private sealed class NpcServer : IServerDataProvider
     {
