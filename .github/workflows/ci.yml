@@ -46,6 +46,22 @@ jobs:
           New-Item -ItemType Directory -Force -Path 'artifacts/DDVWF/Renderer' | Out-Null
           Invoke-WebRequest -Uri $uri -OutFile 'artifacts/DDVWF/Renderer/environment.env'
           if ((Get-Item 'artifacts/DDVWF/Renderer/environment.env').Length -ne 350766) { throw 'Pinned Sage environment.env length mismatch.' }
+          $sky = @(
+            @('skybox_px.jpg',19359),
+            @('skybox_py.jpg',9323),
+            @('skybox_pz.jpg',16282),
+            @('skybox_nx.jpg',20336),
+            @('skybox_ny.jpg',1147),
+            @('skybox_nz.jpg',17099)
+          )
+          foreach ($entry in $sky) {
+            $name = $entry[0]
+            $expected = [int]$entry[1]
+            $skyUri = "https://raw.githubusercontent.com/knervous/eqsage/e85bb85a19670eb377d876521bb1adf130b4e83a/public/static/$name"
+            $out = "artifacts/DDVWF/Renderer/$name"
+            Invoke-WebRequest -Uri $skyUri -OutFile $out
+            if ((Get-Item -LiteralPath $out).Length -ne $expected) { throw "Pinned Sage $name length mismatch." }
+          }
       - name: Vendor pinned Babylon 7.2.1 for renderer smoke
         shell: pwsh
         run: |
