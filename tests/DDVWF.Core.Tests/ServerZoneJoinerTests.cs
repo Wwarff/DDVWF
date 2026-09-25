@@ -56,6 +56,17 @@ public sealed class ServerZoneJoinerTests
     }
 
     [Fact]
+    public void Matches_eqemu_ground_object_size_guard()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var obj=new ObjectRecord(9,202,0,1,2,3,0,0,0,"IT63_ACTORDEF",2,0,0,0,0,0,0,0,0,0,5000,0,0,0,0,"Oversize");
+        var snapshot=new ServerZoneSnapshot(Array.Empty<Spawn2Record>(),Array.Empty<SpawnEntryRecord>(),Array.Empty<NpcTypeRecord>(),Array.Empty<DoorRecord>(),Objects:new[]{obj});
+        ServerZoneJoiner.Join(zone,snapshot);
+        var world=Assert.Single(zone.Entities.Where(x=>x.Data is ObjectEntityData));
+        Assert.Equal(1f,world.Scale);
+    }
+
+    [Fact]
     public void Joins_eqemu_object_contents_by_parent_object()
     {
         var zone=new CompleteZone{ShortName="poknowledge"};
