@@ -13,6 +13,7 @@ public interface IClientAssetResolver
 public interface INpcClientAssetResolver
 {
     string? ResolveNpcAsset(int race, int gender, int model = 0, int texture = 0);
+    string ResolveNpcModelName(int race, int gender, int model = 0, int texture = 0);
 }
 
 public sealed record ServerReadDiagnostics(int Spawn2,int SpawnEntries,int NpcTypes,int SpawnGroups,int Doors,int ZonePoints,int Objects,int GroundSpawns,int Grids=0,int GridEntries=0,int ObjectContents=0);
