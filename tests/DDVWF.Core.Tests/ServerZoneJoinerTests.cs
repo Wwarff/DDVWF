@@ -78,4 +78,18 @@ public sealed class ServerZoneJoinerTests
         Assert.Equal("First",npc.Name);
         Assert.Equal(30,Assert.IsType<NpcEntityData>(npc.Data).NpcTypeId);
     }
+
+    [Fact]
+    public void Preserves_zero_npc_size_for_exact_sage_default_scaling()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var snapshot=new ServerZoneSnapshot(
+            [new(10,20,"poknowledge",1,2,3,64,1200,0,0)],
+            [new(20,30,100)],
+            [new(30,"DefaultSize",1,0,0)],
+            Array.Empty<DoorRecord>());
+        ServerZoneJoiner.Join(zone,snapshot);
+        var npc=Assert.Single(zone.Entities.Where(x=>x.Kind==ZoneEntityKind.Npc));
+        Assert.Equal(0f,npc.Scale);
+    }
 }
