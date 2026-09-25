@@ -8,8 +8,8 @@ public static class SageTextureProcessor
   if(data.Length<2)throw new InvalidDataException("Texture is truncated.");
   var bmp=data[0]==0x42&&data[1]==0x4d;
   using var image=bmp?new Bitmap(new MemoryStream(data,false)):DecodeDds(data);
-  if(!bmp)image.RotateFlip(RotateFlipType.RotateNoneFlipY);
   Color? mask=shader==SageShaderType.TransparentMasked?image.GetPixel(0,0):null;
+  if(!bmp)image.RotateFlip(RotateFlipType.RotateNoneFlipY);
   using var output=new Bitmap(image.Width,image.Height,PixelFormat.Format32bppArgb);
   for(var y=0;y<image.Height;y++)for(var x=0;x<image.Width;x++){var p=image.GetPixel(x,y);var a=Alpha(shader,p,mask,bmp);output.SetPixel(x,y,Color.FromArgb(a,p.R,p.G,p.B));}
   using var ms=new MemoryStream();output.Save(ms,ImageFormat.Png);return ms.ToArray();
