@@ -43,9 +43,9 @@ jobs:
         shell: pwsh
         run: |
           $uri = 'https://raw.githubusercontent.com/knervous/eqsage/e85bb85a19670eb377d876521bb1adf130b4e83a/public/static/environment.env'
-          New-Item -ItemType Directory -Force -Path 'artifacts/DDVWF/Renderer' | Out-Null
-          Invoke-WebRequest -Uri $uri -OutFile 'artifacts/DDVWF/Renderer/environment.env'
-          if ((Get-Item 'artifacts/DDVWF/Renderer/environment.env').Length -ne 350766) { throw 'Pinned Sage environment.env length mismatch.' }
+          New-Item -ItemType Directory -Force -Path 'artifacts/DDVWF/static' | Out-Null
+          Invoke-WebRequest -Uri $uri -OutFile 'artifacts/DDVWF/static/environment.env'
+          if ((Get-Item 'artifacts/DDVWF/static/environment.env').Length -ne 350766) { throw 'Pinned Sage environment.env length mismatch.' }
           $sky = @(
             @('skybox_px.jpg',19359),
             @('skybox_py.jpg',9323),
@@ -58,7 +58,7 @@ jobs:
             $name = $entry[0]
             $expected = [int]$entry[1]
             $skyUri = "https://raw.githubusercontent.com/knervous/eqsage/e85bb85a19670eb377d876521bb1adf130b4e83a/public/static/$name"
-            $out = "artifacts/DDVWF/Renderer/$name"
+            $out = "artifacts/DDVWF/static/$name"
             Invoke-WebRequest -Uri $skyUri -OutFile $out
             if ((Get-Item -LiteralPath $out).Length -ne $expected) { throw "Pinned Sage $name length mismatch." }
           }
