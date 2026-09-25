@@ -85,7 +85,7 @@ public static class ServerZoneJoiner
                 ZoneEntityKind.StaticObject,
                 string.IsNullOrWhiteSpace(obj.DisplayName)?native:obj.DisplayName,
                 new EqPosition(obj.X,obj.Y,obj.Z,obj.Heading),
-                obj.Size>0?obj.Size/100f:1f,
+                obj.Size>0&&obj.Size<5000?obj.Size/100f:1f,
                 obj.Id,
                 native,
                 new ObjectEntityData(obj.Version,obj.ItemId,obj.Charges,obj.Type,obj.Icon,obj.SizePercentage,obj.Unknown24,obj.Unknown60,obj.Unknown64,obj.Unknown68,obj.Unknown72,obj.Unknown76,obj.Unknown84,obj.Size,obj.SolidType,obj.Incline,obj.TiltX,obj.TiltY,obj.DisplayName,obj.MinExpansion,obj.MaxExpansion,obj.ContentFlags,obj.ContentFlagsDisabled,(snapshot.ObjectContents??Array.Empty<ObjectContentRecord>()).Where(x=>x.ParentId==obj.Id).Select(x=>new ObjectContentData(x.BagIndex,x.ItemId,x.Charges,x.DropTime,x.AugSlot1,x.AugSlot2,x.AugSlot3,x.AugSlot4,x.AugSlot5,x.AugSlot6)).ToArray()),
