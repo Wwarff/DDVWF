@@ -34,9 +34,9 @@ public static class ServerZoneJoiner
                 new SpawnEntityData(spawn.SpawnGroupId,spawn.RespawnTime,spawn.Variance,spawn.PathGrid,spawn.Version,spawn.PathWhenZoneIdle,spawn.Condition,spawn.ConditionValue,spawn.Animation,spawn.MinExpansion,spawn.MaxExpansion,spawn.ContentFlags,spawn.ContentFlagsDisabled,groups.TryGetValue(spawn.SpawnGroupId,out var sg)?sg.Name:"",sg?.SpawnLimit??0,sg?.Distance??0,sg?.MaxX??0,sg?.MinX??0,sg?.MaxY??0,sg?.MinY??0,sg?.Delay??0,sg?.MinDelay??0,sg?.Despawn??0,sg?.DespawnTimer??0,sg?.WaypointSpawns??false)));
 
             if (!entriesByGroup.TryGetValue(spawn.SpawnGroupId, out var entries)) continue;
-            foreach (var entry in entries)
+            var entry=entries.FirstOrDefault();
+            if (entry is not null && npcs.TryGetValue(entry.NpcId, out var npc))
             {
-                if (!npcs.TryGetValue(entry.NpcId, out var npc)) continue;
                 zone.Add(new ZoneEntity(
                     DeterministicId("npc", spawn.Id, npc.Id),
                     ZoneEntityKind.Npc,
