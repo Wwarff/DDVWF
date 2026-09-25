@@ -11,7 +11,7 @@ public static class SageTextureProcessor
   if(!bmp)image.RotateFlip(RotateFlipType.RotateNoneFlipY);
   Color? mask=shader==SageShaderType.TransparentMasked?image.GetPixel(0,0):null;
   using var output=new Bitmap(image.Width,image.Height,PixelFormat.Format32bppArgb);
-  for(var y=0;y<image.Height;y++)for(var x=0;x<image.Width;x++){var p=image.GetPixel(x,y);var a=Alpha(shader,p,mask,bmp||png);output.SetPixel(x,y,Color.FromArgb(a,p.R,p.G,p.B));}
+  for(var y=0;y<image.Height;y++)for(var x=0;x<image.Width;x++){var p=image.GetPixel(x,y);var a=Alpha(shader,p,mask,bmp);output.SetPixel(x,y,Color.FromArgb(a,p.R,p.G,p.B));}
   using var ms=new MemoryStream();output.Save(ms,ImageFormat.Png);return ms.ToArray();
  }
  static int Alpha(SageShaderType shader,Color p,Color? mask,bool bmp)
