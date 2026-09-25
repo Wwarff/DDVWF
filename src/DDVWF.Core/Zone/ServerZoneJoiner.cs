@@ -98,7 +98,7 @@ public static class ServerZoneJoiner
                 ZoneEntityKind.Door,
                 door.Model,
                 new EqPosition(door.X, door.Y, door.Z, door.Heading),
-                door.Size <= 0 ? 1f : door.Size / 100f,
+                door.Size / 100f,
                 door.Id,
                 door.Model,
                 new DoorEntityData(door.DoorId,door.OpenType,door.Version,door.Lockpick,door.KeyItem,door.TriggerDoor,door.TriggerType,door.DoorIsOpen,door.DestZone,door.DestInstance,door.DestX,door.DestY,door.DestZ,door.DestHeading,door.InvertState,door.Incline)));
