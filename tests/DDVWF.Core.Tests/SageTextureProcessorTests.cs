@@ -10,6 +10,16 @@ public sealed class SageTextureProcessorTests
   Assert.True(png.Length>8);
   Assert.Equal(new byte[]{0x89,0x50,0x4e,0x47},png[..4]);
  }
+ [Fact] public void TransparentMasked_Bmp_preserves_non_mask_pixel_alpha()
+ {
+  if(!OperatingSystem.IsWindows())return;
+  using var source=new System.Drawing.Bitmap(2,1,System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+  source.SetPixel(0,0,System.Drawing.Color.FromArgb(255,255,0,0));source.SetPixel(1,0,System.Drawing.Color.FromArgb(77,0,255,0));
+  using var input=new MemoryStream();source.Save(input,System.Drawing.Imaging.ImageFormat.Bmp);
+  var png=SageTextureProcessor.Process("mask.bmp",input.ToArray(),SageShaderType.TransparentMasked);
+  using var image=new System.Drawing.Bitmap(new MemoryStream(png,false));
+  Assert.Equal(0,image.GetPixel(0,0).A);Assert.Equal(77,image.GetPixel(1,0).A);
+ }
  [Fact] public void TransparentMasked_Dds_samples_mask_before_Sage_vertical_flip()
  {
   if(!OperatingSystem.IsWindows())return;
