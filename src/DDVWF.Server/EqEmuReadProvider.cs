@@ -21,7 +21,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
 
         await using(var cmd=connection.CreateCommand())
         {
-            cmd.CommandText="SELECT id,spawngroupID,zone,x,y,z,heading,respawntime,variance,pathgrid,version,path_when_zone_idle,_condition,cond_value,animation,min_expansion,max_expansion,content_flags,content_flags_disabled FROM spawn2 WHERE zone = @zone AND (version = @version OR version = -1)";
+            cmd.CommandText="SELECT id,spawngroupID,zone,x,y,z,heading,respawntime,variance,pathgrid,version,path_when_zone_idle,_condition,cond_value,animation,min_expansion,max_expansion,content_flags,content_flags_disabled FROM spawn2 WHERE zone = @zone AND version = @version";
             Add(cmd,"@zone",zone.ShortName);Add(cmd,"@version",_zoneVersion);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
