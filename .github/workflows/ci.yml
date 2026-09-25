@@ -157,7 +157,7 @@ jobs:
             $pixel = Get-Content -Raw $pixelPath | ConvertFrom-Json
             if ($pixel.width -lt 16 -or $pixel.height -lt 16) { throw "Renderer framebuffer has invalid dimensions: $($pixel | ConvertTo-Json -Compress)" }
             if ($pixel.total -lt 900) { throw "Renderer framebuffer coverage probe is incomplete: $($pixel | ConvertTo-Json -Compress)" }
-            if ($pixel.nonBackground -lt 5 -or $pixel.coverage -le 0.005) { throw "Renderer framebuffer is effectively black/background despite bounded geometry: $($pixel | ConvertTo-Json -Compress)" }
+            if ($pixel.nonBackground -lt 5 -or $pixel.coverage -le 0.005 -or $pixel.litPixels -lt 5 -or $pixel.litCoverage -le 0.005) { throw "Renderer framebuffer is effectively black/background despite bounded geometry: $($pixel | ConvertTo-Json -Compress)" }
           } finally {
             Stop-Process -Id $rendererProcess.Id -Force -ErrorAction SilentlyContinue
             $env:DDVWF_RENDERER_SMOKE = $null
