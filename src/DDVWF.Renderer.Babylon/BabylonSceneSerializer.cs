@@ -5,7 +5,7 @@ public static class BabylonSceneSerializer
  public static string Serialize(CompleteZone zone,IReadOnlyDictionary<string,RenderMesh> assets,IReadOnlyDictionary<string,byte[]>? textures=null,bool shellOnly=false)
  {
   var renderEntities=shellOnly?zone.Entities.Where(e=>e.Kind==ZoneEntityKind.WorldGeometry):zone.Entities;
-  var meshes=renderEntities.Where(e=>e.ClientAsset is not null&&assets.ContainsKey(e.ClientAsset)).Select(e=>new{e.Id,e.Name,Kind=e.Kind.ToString(),e.Position,e.Rotation,e.Scale,Asset=assets[e.ClientAsset!]}).ToArray();
+  var meshes=renderEntities.Where(e=>e.ClientAsset is not null&&assets.ContainsKey(e.ClientAsset)).Select(e=>new{e.Id,e.Name,Kind=e.Kind.ToString(),e.Position,e.Rotation,e.Scale,e.Data,Asset=assets[e.ClientAsset!]}).ToArray();
   var lights=zone.Entities.Where(e=>e.Kind==ZoneEntityKind.Light&&e.Data is LightEntityData).Select(e=>new{e.Id,e.Name,e.Position,Data=(LightEntityData)e.Data!}).ToArray();
   var markers=(shellOnly?Enumerable.Empty<ZoneEntity>():zone.Entities).Where(e=>e.Kind is ZoneEntityKind.Door or ZoneEntityKind.ZonePoint or ZoneEntityKind.Npc or ZoneEntityKind.GroundSpawn || e.Data is ObjectEntityData).Where(e=>e.ClientAsset is null||!assets.ContainsKey(e.ClientAsset)).Select(e=>new{e.Id,e.Name,Kind=e.Kind.ToString(),e.Position,e.Scale,e.ServerId,Data=e.Data}).ToArray();
   var groundSpawnAreas=(shellOnly?Enumerable.Empty<ZoneEntity>():zone.Entities).Where(e=>e.Kind==ZoneEntityKind.GroundSpawn&&e.Data is GroundSpawnEntityData).Select(e=>new{e.Id,e.Name,e.Position,Data=(GroundSpawnEntityData)e.Data!}).ToArray();
