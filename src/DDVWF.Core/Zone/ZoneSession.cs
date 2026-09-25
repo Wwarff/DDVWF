@@ -31,7 +31,7 @@ public sealed class ZoneSession
             foreach (var entity in zone.Entities.Where(x => x.Kind==ZoneEntityKind.Npc && x.Data is NpcEntityData).ToArray())
             {
                 var npc=(NpcEntityData)entity.Data!;
-                var resolved=npcResolver.ResolveNpcAsset(npc.Race,npc.Gender,npc.Model);
+                var resolved=npcResolver.ResolveNpcAsset(npc.Race,npc.Gender,npc.Model,npc.Texture);
                 if(!string.IsNullOrWhiteSpace(resolved)) zone.Replace(entity with { ClientAsset=resolved });
             }
         }
