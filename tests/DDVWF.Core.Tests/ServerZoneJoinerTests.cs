@@ -39,6 +39,8 @@ public sealed class ServerZoneJoinerTests
         var world=Assert.Single(zone.Entities.Where(x=>x.Data is ObjectEntityData));
         Assert.Equal("POKDOOR",world.ClientAsset);
         Assert.Equal(1.25f,world.Scale);
+        Assert.Equal(new EqPosition(10,20,30,64),world.Position);
+        Assert.Equal(new EqRotation(11,64,12),world.Rotation);
         var data=Assert.IsType<ObjectEntityData>(world.Data);
         Assert.Equal(125,data.NativeSize);
         Assert.Equal(7,data.Unknown84);
