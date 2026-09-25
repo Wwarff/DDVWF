@@ -130,10 +130,12 @@ jobs:
           try {
             $deadline = [DateTime]::UtcNow.AddSeconds(20)
             $rendererDiagPath = "artifacts/DDVWF/DDVWF-RENDERER-DIAGNOSTICS.json"
-            $pixelPath = "artifacts/DDVWF/DDVWF-RENDERER-PIXEL.json"\n            $viewportPath = "artifacts/DDVWF/DDVWF-RENDERER-VIEWPORT.png"
+            $pixelPath = "artifacts/DDVWF/DDVWF-RENDERER-PIXEL.json"
+            $viewportPath = "artifacts/DDVWF/DDVWF-RENDERER-VIEWPORT.png"
             while ([DateTime]::UtcNow -lt $deadline -and (!(Test-Path $rendererDiagPath) -or !(Test-Path $pixelPath) -or !(Test-Path $viewportPath))) { Start-Sleep -Milliseconds 250 }
             if (!(Test-Path $rendererDiagPath)) { throw "Renderer smoke did not produce renderer diagnostics." }
-            if (!(Test-Path $pixelPath)) { throw "Renderer smoke did not produce framebuffer evidence." }\n            if (!(Test-Path $viewportPath) -or (Get-Item $viewportPath).Length -lt 1000) { throw "Renderer smoke did not capture viewport PNG evidence." }
+            if (!(Test-Path $pixelPath)) { throw "Renderer smoke did not produce framebuffer evidence." }
+            if (!(Test-Path $viewportPath) -or (Get-Item $viewportPath).Length -lt 1000) { throw "Renderer smoke did not capture viewport PNG evidence." }
             $rendererDiag = Get-Content -Raw $rendererDiagPath | ConvertFrom-Json
             if ($rendererDiag.boundsFailed -or $rendererDiag.vertices -lt 3 -or $rendererDiag.visible -lt 1 -or $rendererDiag.validBounds -lt 1) { throw "Renderer smoke did not create visible, bounded geometry: $($rendererDiag | ConvertTo-Json -Compress)" }
             $pixel = Get-Content -Raw $pixelPath | ConvertFrom-Json
@@ -155,7 +157,8 @@ jobs:
             artifacts/DDVWF-Renderer-smoke.png
             artifacts/DDVWF/DDVWF-UI-DIAGNOSTICS.txt
             artifacts/DDVWF/DDVWF-RENDERER-DIAGNOSTICS.json
-            artifacts/DDVWF/DDVWF-RENDERER-PIXEL.json\n            artifacts/DDVWF/DDVWF-RENDERER-VIEWPORT.png
+            artifacts/DDVWF/DDVWF-RENDERER-PIXEL.json
+            artifacts/DDVWF/DDVWF-RENDERER-VIEWPORT.png
       - name: Vendor pinned Babylon 7.2.1
         shell: pwsh
         run: |
