@@ -16,7 +16,7 @@ public static class SageTextureProcessor
  }
  static int Alpha(SageShaderType shader,Color p,Color? mask,bool bmp)
  {
-  if(shader==SageShaderType.TransparentMasked&&mask is Color m&&p.R==m.R&&p.G==m.G&&p.B==m.B&&p.A==m.A)return 0;
+  if(shader==SageShaderType.TransparentMasked&&mask is Color m){if(p.R==m.R&&p.G==m.G&&p.B==m.B&&p.A==m.A)return 0;return p.A;}
   var mapped=shader switch{SageShaderType.Transparent25=>64,SageShaderType.Transparent50 or SageShaderType.TransparentSkydome=>128,SageShaderType.Transparent75 or SageShaderType.TransparentAdditive=>192,_=>-1};
   if(mapped>=0)return mapped;
   if(!bmp)return p.A;
