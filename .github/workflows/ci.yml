@@ -149,8 +149,9 @@ jobs:
             $pixelPath = "artifacts/DDVWF/DDVWF-RENDERER-PIXEL.json"
             $viewportPath = "artifacts/DDVWF/DDVWF-RENDERER-VIEWPORT.png"
           $viewerAssetPath = "artifacts/DDVWF/DDVWF-SAGE-VIEWER-ASSETS.json"
-            while ([DateTime]::UtcNow -lt $deadline -and (!(Test-Path $rendererDiagPath) -or !(Test-Path $pixelPath) -or !(Test-Path $viewportPath))) { Start-Sleep -Milliseconds 250 }
-            if (!(Test-Path $rendererDiagPath)) { throw "Renderer smoke did not produce renderer diagnostics." }
+            while ([DateTime]::UtcNow -lt $deadline -and (!(Test-Path $rendererDiagPath) -or !(Test-Path $pixelPath) -or !(Test-Path $viewportPath) -or !(Test-Path $viewerAssetPath))) { if ($rendererProcess.HasExited) { break }; Start-Sleep -Milliseconds 250 }
+            if (!(Test-Path $rendererDiagPath) -or !(Test-Path $pixelPath) -or !(Test-Path $viewportPath) -or !(Test-Path $viewerAssetPath)) { $failurePath="artifacts/DDVWF/DDVWF-RENDERER-SMOKE-FAILURE.txt";$failure=if(Test-Path $failurePath){Get-Content -Raw $failurePath}else{"<no failure file>"};throw "Renderer smoke exited or timed out before complete evidence. Exit=$($rendererProcess.HasExited) Code=$(if($rendererProcess.HasExited){$rendererProcess.ExitCode}else{'running'}) Failure=$failure" }
+          if (!(Test-Path $rendererDiagPath)) { throw "Renderer smoke did not produce renderer diagnostics." }
             if (!(Test-Path $pixelPath)) { throw "Renderer smoke did not produce framebuffer evidence." }
             if (!(Test-Path $viewportPath) -or (Get-Item $viewportPath).Length -lt 1000) { throw "Renderer smoke did not capture viewport PNG evidence." }
           if (!(Test-Path $viewerAssetPath)) { throw "Renderer smoke did not produce Sage viewer asset evidence." }
