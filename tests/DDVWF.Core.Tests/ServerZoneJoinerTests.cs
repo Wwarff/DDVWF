@@ -63,4 +63,19 @@ public sealed class ServerZoneJoinerTests
         var data=Assert.IsType<ObjectEntityData>(Assert.Single(zone.Entities.Where(x=>x.Data is ObjectEntityData)).Data);
         var item=Assert.Single(data.Contents!);Assert.Equal(2,item.BagIndex);Assert.Equal(1001,item.ItemId);Assert.Equal(16,item.AugSlot6);
     }
+
+    [Fact]
+    public void Matches_eq_sage_first_spawnentry_visualization_for_multi_entry_groups()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var snapshot=new ServerZoneSnapshot(
+            [new(10,20,"poknowledge",1,2,3,64,1200,0,0)],
+            [new(20,30,25),new(20,31,75)],
+            [new(30,"First",1,0,6),new(31,"Alternate",1,0,6)],
+            Array.Empty<DoorRecord>());
+        ServerZoneJoiner.Join(zone,snapshot);
+        var npc=Assert.Single(zone.Entities.Where(x=>x.Kind==ZoneEntityKind.Npc));
+        Assert.Equal("First",npc.Name);
+        Assert.Equal(30,Assert.IsType<NpcEntityData>(npc.Data).NpcTypeId);
+    }
 }
