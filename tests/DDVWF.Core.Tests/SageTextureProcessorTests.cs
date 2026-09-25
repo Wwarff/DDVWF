@@ -20,6 +20,22 @@ public sealed class SageTextureProcessorTests
   using var image=new System.Drawing.Bitmap(new MemoryStream(png,false));
   Assert.Equal(0,image.GetPixel(0,0).A);Assert.Equal(255,image.GetPixel(1,0).A);
  }
+ [Fact] public void Dds_diffuse_preserves_source_alpha_like_pinned_Sage_worker()
+ {
+  if(!OperatingSystem.IsWindows())return;
+  var dds=BuildA4R4G4B4(0x8123);
+  var png=SageTextureProcessor.Process("diffuse-alpha.dds",dds,SageShaderType.Diffuse);
+  using var image=new System.Drawing.Bitmap(new MemoryStream(png,false));
+  Assert.Equal(0x88,image.GetPixel(0,0).A);
+ }
+ [Fact] public void Dds_nonmapped_shader_preserves_source_alpha_like_pinned_Sage_worker()
+ {
+  if(!OperatingSystem.IsWindows())return;
+  var dds=BuildA4R4G4B4(0x4123);
+  var png=SageTextureProcessor.Process("unlit-alpha.dds",dds,SageShaderType.TransparentAdditiveUnlit);
+  using var image=new System.Drawing.Bitmap(new MemoryStream(png,false));
+  Assert.Equal(0x44,image.GetPixel(0,0).A);
+ }
  [Fact] public void TransparentMasked_Dds_samples_mask_before_Sage_vertical_flip()
  {
   if(!OperatingSystem.IsWindows())return;
