@@ -44,6 +44,7 @@ public sealed class ServerZoneJoinerTests
         Assert.Equal(7,data.Unknown84);
         var synthetic=Assert.Single(zone.Entities.Where(x=>x.Kind==ZoneEntityKind.Door));
         Assert.Equal(1000000007L,synthetic.ServerId);
+        Assert.Equal(1.5f,synthetic.Scale);
         Assert.Equal(new DoorEntityData(-1,9,0,Incline:9),synthetic.Data);
         var gs=Assert.Single(zone.Entities.Where(x=>x.Kind==ZoneEntityKind.GroundSpawn));
         Assert.Equal(75,gs.Position.X);
