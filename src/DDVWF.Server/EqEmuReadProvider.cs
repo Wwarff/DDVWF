@@ -7,11 +7,11 @@ public sealed record EqEmuConnectionOptions(string Host, int Port, string Databa
 
 public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnosticsProvider
 {
-    private readonly Func<CancellationToken,Task<DbConnection>> _open;private readonly int _zoneVersion;
+    private readonly Func<CancellationToken,Task<DbConnection>> _open;private readonly int _zoneVersion;private readonly string? _serverRoot;
     public bool CanWrite => false;
     public ServerReadDiagnostics? LastReadDiagnostics { get; private set; }
 
-    public EqEmuReadProvider(Func<CancellationToken,Task<DbConnection>> open,int zoneVersion=0) => (_open,_zoneVersion)=(open,zoneVersion);
+    public EqEmuReadProvider(Func<CancellationToken,Task<DbConnection>> open,int zoneVersion=0,string? serverRoot=null) => (_open,_zoneVersion,_serverRoot)=(open,zoneVersion,serverRoot);
 
     public async Task PopulateAsync(CompleteZone zone,CancellationToken cancellationToken)
     {
@@ -141,6 +141,21 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
                 var value=await rule.ExecuteScalarAsync(cancellationToken);
                 if(value is not null&&value is not DBNull&&int.TryParse(Convert.ToString(value,System.Globalization.CultureInfo.InvariantCulture),System.Globalization.NumberStyles.Integer,System.Globalization.CultureInfo.InvariantCulture,out var parsed))findBestZHeightAdjust=parsed;
                 runtime=new(string.IsNullOrWhiteSpace(mapFile)?zone.ShortName:mapFile,underworld,ruleset,findBestZHeightAdjust);
+            }
+        }
+
+        if(runtime is not null&&!string.IsNullOrWhiteSpace(_serverRoot))
+        {
+            var mapPath=EqEmuServerPaths.ResolveBaseMap(_serverRoot,runtime.MapFileName);
+            if(File.Exists(mapPath))
+            {
+                var collision=EqEmuCollisionMap.Load(mapPath);
+                for(var i=0;i<objects.Count;i++)
+                {
+                    var o=objects[i];
+                    var bestZ=collision.FindBestZ(o.X,o.Y,o.Z,runtime.FindBestZHeightAdjust,runtime.Underworld,0);
+                    objects[i]=o with{Z=bestZ};
+                }
             }
         }
 
