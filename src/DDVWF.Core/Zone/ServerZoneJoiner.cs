@@ -80,6 +80,7 @@ public static class ServerZoneJoiner
                     native,
                     new DoorEntityData(-1,openType,obj.Version,Incline:obj.Incline)));
             }
+            if(obj.Type==1&&obj.ItemId!=0)continue;
             zone.Add(new ZoneEntity(
                 DeterministicId("object", obj.Id, obj.ZoneId),
                 ZoneEntityKind.StaticObject,
