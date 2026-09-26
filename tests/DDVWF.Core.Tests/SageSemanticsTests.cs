@@ -78,5 +78,14 @@ public sealed class SageSemanticsTests
         Assert.Equal(expected,provider.ResolveNpcModelName(race,gender,npcModel,texture));
     }
 
+    [Fact] public void Bsp_split_and_combined_region_semantics_match_pinned_Sage_contract()
+    {
+        using var ms=new MemoryStream();using var bw=new BinaryWriter(ms);
+        bw.Write((uint)1);bw.Write(1f);bw.Write(0f);bw.Write(0f);bw.Write(0f);bw.Write(1);bw.Write(0);bw.Write(0);
+        var node=WldBspReader.ReadTree(new WldFragment(0,(uint)ms.Length,(uint)WldFragmentType.BspTree,"",0),ms.ToArray()).Single();
+        Assert.Equal(new System.Numerics.Vector3(1,0,0),node.Normal);Assert.Equal(1,node.RegionId);
+        var classified=WldBspReader.ClassifyTag("wtntp00255000042");Assert.Equal(new[]{RegionSemantic.Water,RegionSemantic.Zoneline},classified.Semantics);Assert.Equal(42,classified.ZoneLineReference);
+    }
+
 }
 
