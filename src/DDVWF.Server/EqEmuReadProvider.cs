@@ -144,19 +144,19 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
         ZoneRuntimeRecord? runtime=null;
         await using(var cmd=connection.CreateCommand())
         {
-            cmd.CommandText="SELECT map_file_name,underworld,max_z,ruleset FROM zone WHERE short_name=@zone AND (version=@version OR version=0) ORDER BY (version=@version) DESC LIMIT 1";
+            cmd.CommandText="SELECT map_file_name,underworld,max_z,ruleset,minclip,maxclip,fog_minclip,fog_maxclip,fog_density,sky,ztype FROM zone WHERE short_name=@zone AND (version=@version OR version=0) ORDER BY (version=@version) DESC LIMIT 1";
             Add(cmd,"@zone",zone.ShortName);Add(cmd,"@version",_zoneVersion);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             if(await r.ReadAsync(cancellationToken))
             {
-                var mapFile=r.IsDBNull(0)?"":r.GetString(0);var underworld=F(r,1);var maxZ=F(r,2);var ruleset=I(r,3);var findBestZHeightAdjust=1;
+                var mapFile=r.IsDBNull(0)?"":r.GetString(0);var underworld=F(r,1);var maxZ=F(r,2);var ruleset=I(r,3);var minClip=F(r,4);var maxClip=F(r,5);var fogMinClip=F(r,6);var fogMaxClip=F(r,7);var fogDensity=F(r,8);var sky=I(r,9);var zoneType=I(r,10);var findBestZHeightAdjust=1;
                 await r.DisposeAsync();
                 await using var rule=connection.CreateCommand();
                 rule.CommandText="SELECT rule_value FROM rule_values WHERE ruleset_id=@ruleset AND rule_name='Map:FindBestZHeightAdjust' LIMIT 1";
                 Add(rule,"@ruleset",ruleset);
                 var value=await rule.ExecuteScalarAsync(cancellationToken);
                 if(value is not null&&value is not DBNull&&int.TryParse(Convert.ToString(value,System.Globalization.CultureInfo.InvariantCulture),System.Globalization.NumberStyles.Integer,System.Globalization.CultureInfo.InvariantCulture,out var parsed))findBestZHeightAdjust=parsed;
-                runtime=new(string.IsNullOrWhiteSpace(mapFile)?zone.ShortName:mapFile,underworld,maxZ,ruleset,findBestZHeightAdjust);
+                runtime=new(string.IsNullOrWhiteSpace(mapFile)?zone.ShortName:mapFile,underworld,maxZ,ruleset,findBestZHeightAdjust,minClip,maxClip,fogMinClip,fogMaxClip,fogDensity,sky,zoneType);
             }
         }
 
