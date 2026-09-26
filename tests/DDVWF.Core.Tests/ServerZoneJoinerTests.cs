@@ -142,4 +142,18 @@ public sealed class ServerZoneJoinerTests
         Assert.Same(runtime,zone.Runtime);
     }
 
+    [Fact]
+    public void Preserves_EQEmu_trap_definition_without_guessing_group_activation_or_render_asset()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var trap=new TrapRecord(7,"poknowledge",0,10,20,30,75,12,8,4,100,200,"alarm",55,60,90,15,2,3,true,true,-1,-1,"","");
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(Array.Empty<Spawn2Record>(),Array.Empty<SpawnEntryRecord>(),Array.Empty<NpcTypeRecord>(),Array.Empty<DoorRecord>(),Traps:new[]{trap}));
+        var entity=Assert.Single(zone.Entities.Where(e=>e.Kind==ZoneEntityKind.Trap));
+        Assert.Null(entity.ClientAsset);
+        var data=Assert.IsType<TrapEntityData>(entity.Data);
+        Assert.Equal(3,data.Group);
+        Assert.Equal(8,data.Radius);
+        Assert.True(data.Undetectable);
+    }
+
 }
