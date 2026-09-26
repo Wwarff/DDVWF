@@ -55,7 +55,7 @@ public class EqEmuCollisionMapTests
    w.Write(0u);w.Write(0u);w.Write(0u);w.Write(0u);w.Write(1u);w.Write(0u);w.Write(1u);w.Write(0u);w.Write(0u);w.Write(0f);
    w.Write((byte)'m');w.Write((byte)0);w.Write(3u);w.Write(1u);
    V(w,0,0,0);V(w,10,0,0);V(w,0,10,0);w.Write(0u);w.Write(1u);w.Write(2u);w.Write((byte)1);
-   V(w,0,0,0);V(w,0,90,0);V(w,1,1,1);V(w,0,0,0);w.Write(1u);
+   V(w,0,0,0);V(w,0,45,0);V(w,1,1,1);V(w,0,0,0);w.Write(1u);
    w.Write((byte)'m');w.Write((byte)0);V(w,20,0,4);V(w,0,0,0);V(w,1,1,1);
   }
   raw.Position=0;using var compressed=new MemoryStream();using(var z=new System.IO.Compression.ZLibStream(compressed,System.IO.Compression.CompressionLevel.SmallestSize,true))raw.CopyTo(z);
@@ -64,7 +64,7 @@ public class EqEmuCollisionMapTests
   {
    using(var f2=File.Create(path))using(var w2=new BinaryWriter(f2)){w2.Write(0x02000000u);w2.Write((uint)compressed.Length);w2.Write((uint)raw.Length);w2.Write(compressed.ToArray());}
    var map=EqEmuCollisionMap.Load(path);
-   Assert.Equal(4f,map.FindBestZ(1,21,20));
+   Assert.Equal(-12.34343f,map.FindBestZ(1,18,20),4);
   }
   finally{File.Delete(path);}
  }
