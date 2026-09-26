@@ -33,7 +33,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
         bool PassContent(int minExpansion,int maxExpansion,string flags,string flagsDisabled)=>EqEmuContentFilter.Passes(currentExpansion,enabledContentFlags,disabledContentFlags,minExpansion,maxExpansion,flags,flagsDisabled);
 
         var spawn2=new List<Spawn2Record>(); var entries=new List<SpawnEntryRecord>();
-        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>(); var objectContents=new List<ObjectContentRecord>() var traps=new List<TrapRecord>();
+        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>(); var objectContents=new List<ObjectContentRecord>(); var traps=new List<TrapRecord>();
 
         await using(var cmd=connection.CreateCommand())
         {
