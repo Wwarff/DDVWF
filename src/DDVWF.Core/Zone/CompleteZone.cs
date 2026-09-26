@@ -41,6 +41,7 @@ public sealed class CompleteZone
     private readonly Dictionary<Guid, ZoneEntity> _entities = new();
     public required string ShortName { get; init; }
     public EqPosition? SafePoint { get; set; }
+    public ZoneRuntimeRecord? Runtime { get; set; }
     public IReadOnlyCollection<ZoneEntity> Entities => _entities.Values;
     public void Add(ZoneEntity entity) => _entities.Add(entity.Id, entity);
     public ZoneEntity Get(Guid id) => _entities[id];
