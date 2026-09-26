@@ -2,7 +2,7 @@ namespace DDVWF.Core.Zone;
 
 public enum ZoneEntityKind
 {
-    WorldGeometry, StaticObject, AnimatedObject, Door, Light, Region, Npc, Spawn, GroundSpawn, ZonePoint
+    WorldGeometry, StaticObject, AnimatedObject, Door, Light, Region, Npc, Spawn, Waypoint, GroundSpawn, ZonePoint
 }
 
 public readonly record struct EqPosition(float X, float Y, float Z, float Heading = 0);

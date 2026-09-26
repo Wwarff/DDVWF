@@ -14,7 +14,7 @@ public static class ServerZoneJoiner
             gridTypes.TryGetValue(wp.GridId,out var grid);
             zone.Add(new ZoneEntity(
                 DeterministicId("waypoint",wp.GridId,wp.Number),
-                ZoneEntityKind.Spawn,
+                ZoneEntityKind.Waypoint,
                 $"Grid {wp.GridId} waypoint {wp.Number}",
                 new EqPosition(wp.X,wp.Y,wp.Z,wp.Heading),
                 1f,null,null,
