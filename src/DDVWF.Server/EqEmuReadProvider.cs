@@ -33,7 +33,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
         bool PassContent(int minExpansion,int maxExpansion,string flags,string flagsDisabled)=>EqEmuContentFilter.Passes(currentExpansion,enabledContentFlags,disabledContentFlags,minExpansion,maxExpansion,flags,flagsDisabled);
 
         var spawn2=new List<Spawn2Record>(); var entries=new List<SpawnEntryRecord>();
-        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>(); var objectContents=new List<ObjectContentRecord>(); var traps=new List<TrapRecord>();
+        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>(); var objectContents=new List<ObjectContentRecord>(); var traps=new List<TrapRecord>(); var blockedSpells=new List<BlockedSpellRecord>();
 
         await using(var cmd=connection.CreateCommand())
         {
@@ -143,6 +143,16 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
 
         await using(var cmd=connection.CreateCommand())
         {
+            cmd.CommandText="SELECT id,spellid,type,zoneid,x,y,z,x_diff,y_diff,z_diff,message,description,min_expansion,max_expansion,content_flags,content_flags_disabled FROM blocked_spells WHERE zoneid=@zoneid ORDER BY id ASC";
+            Add(cmd,"@zoneid",zoneId);
+            await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
+            while(await r.ReadAsync(cancellationToken))
+                if(PassContent(I(r,12),I(r,13),r.IsDBNull(14)?"":r.GetString(14),r.IsDBNull(15)?"":r.GetString(15)))
+                    blockedSpells.Add(new(r.GetInt64(0),Convert.ToUInt32(r.GetValue(1),System.Globalization.CultureInfo.InvariantCulture),I(r,2),I(r,3),F(r,4),F(r,5),F(r,6),F(r,7),F(r,8),F(r,9),r.IsDBNull(10)?"":r.GetString(10),r.IsDBNull(11)?"":r.GetString(11),I(r,12),I(r,13),r.IsDBNull(14)?"":r.GetString(14),r.IsDBNull(15)?"":r.GetString(15)));
+        }
+
+        await using(var cmd=connection.CreateCommand())
+        {
             cmd.CommandText="SELECT id,zone,version,x,y,z,chance,maxzdiff,radius,effect,effectvalue,effectvalue2,message,skill,level,respawn_time,respawn_var,triggered_number,`group`,despawn_when_triggered,undetectable,min_expansion,max_expansion,content_flags,content_flags_disabled FROM traps WHERE zone=@zone AND version=@version";
             Add(cmd,"@zone",zone.ShortName);Add(cmd,"@version",_zoneVersion);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
@@ -187,7 +197,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
         }
 
         LastReadDiagnostics=new(spawn2.Count,entries.Count,npcs.Count,spawnGroups.Count,doors.Count,zonePoints.Count,objects.Count,groundSpawns.Count,grids.Count,gridEntries.Count,objectContents.Count,collisionMapLoaded,findBestZApplied,collisionMapPath);
-        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints,spawnGroups,objects,groundSpawns,grids,gridEntries,objectContents,runtime,traps));
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints,spawnGroups,objects,groundSpawns,grids,gridEntries,objectContents,runtime,traps,blockedSpells));
     }
 
     private static float F(DbDataReader r,int i)=>Convert.ToSingle(r.GetValue(i),System.Globalization.CultureInfo.InvariantCulture);
