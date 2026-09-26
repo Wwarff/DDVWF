@@ -109,11 +109,11 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
 
         await using(var cmd=connection.CreateCommand())
         {
-            cmd.CommandText="SELECT id,doorid,zone,name,pos_x,pos_y,pos_z,heading,opentype,size,version,lockpick,keyitem,triggerdoor,triggertype,doorisopen,dest_zone,dest_instance,dest_x,dest_y,dest_z,dest_heading,invert_state,incline FROM doors WHERE zone = @zone AND (version = @version OR version = -1)";
+            cmd.CommandText="SELECT id,doorid,zone,name,pos_x,pos_y,pos_z,heading,opentype,size,version,lockpick,keyitem,triggerdoor,triggertype,doorisopen,dest_zone,dest_instance,dest_x,dest_y,dest_z,dest_heading,invert_state,incline,guild,nokeyring,disable_timer,door_param,buffer,client_version_mask,is_ldon_door,close_timer_ms,dz_switch_id,min_expansion,max_expansion,content_flags,content_flags_disabled FROM doors WHERE zone = @zone AND (version = @version OR version = -1)";
             Add(cmd,"@zone",zone.ShortName);Add(cmd,"@version",_zoneVersion);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
-                doors.Add(new(r.GetInt64(0),I(r,1),r.GetString(2),r.GetString(3),F(r,4),F(r,5),F(r,6),F(r,7),I(r,8),I(r,9),I(r,10),I(r,11),I(r,12),I(r,13),I(r,14),I(r,15)!=0,r.IsDBNull(16)?"NONE":r.GetString(16),r.IsDBNull(17)?0:Convert.ToUInt32(r.GetValue(17),System.Globalization.CultureInfo.InvariantCulture),F(r,18),F(r,19),F(r,20),F(r,21),I(r,22),I(r,23)));
+                doors.Add(new(r.GetInt64(0),I(r,1),r.GetString(2),r.GetString(3),F(r,4),F(r,5),F(r,6),F(r,7),I(r,8),I(r,9),I(r,10),I(r,11),I(r,12),I(r,13),I(r,14),I(r,15)!=0,r.IsDBNull(16)?"NONE":r.GetString(16),r.IsDBNull(17)?0:Convert.ToUInt32(r.GetValue(17),System.Globalization.CultureInfo.InvariantCulture),F(r,18),F(r,19),F(r,20),F(r,21),I(r,22),I(r,23),I(r,24),I(r,25)!=0,I(r,26)!=0,I(r,27),F(r,28),r.IsDBNull(29)?0xFFFFFFFF:Convert.ToUInt32(r.GetValue(29),System.Globalization.CultureInfo.InvariantCulture),I(r,30)!=0,I(r,31),I(r,32),I(r,33),I(r,34),r.IsDBNull(35)?"":r.GetString(35),r.IsDBNull(36)?"":r.GetString(36)));
         }
 
         await using(var cmd=connection.CreateCommand())

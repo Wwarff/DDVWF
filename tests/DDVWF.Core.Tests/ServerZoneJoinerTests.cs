@@ -27,6 +27,16 @@ public sealed class ServerZoneJoinerTests
         Assert.DoesNotContain(zone.Entities,x=>x.Name=="Elsewhere");
     }
     [Fact]
+    public void Preserves_current_eqemu_door_runtime_semantics()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var door=new DoorRecord(40,5,"poknowledge","POKDOOR",4,5,6,128,2,125,0,10,1001,7,8,true,"nexus",2,11,12,13,64,1,32,77,true,true,1234,6.5f,0x12345678,true,9000,55,2,8,"era","disabled");
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(Array.Empty<Spawn2Record>(),Array.Empty<SpawnEntryRecord>(),Array.Empty<NpcTypeRecord>(),new[]{door}));
+        var data=Assert.IsType<DoorEntityData>(Assert.Single(zone.Entities.Where(x=>x.Kind==ZoneEntityKind.Door)).Data);
+        Assert.Equal(77,data.Guild);Assert.True(data.NoKeyRing);Assert.True(data.DisableTimer);Assert.Equal(1234,data.DoorParam);Assert.Equal(6.5f,data.Buffer);Assert.Equal(0x12345678u,data.ClientVersionMask);Assert.True(data.IsLdonDoor);Assert.Equal(9000,data.CloseTimerMs);Assert.Equal(55,data.DzSwitchId);Assert.Equal(2,data.MinExpansion);Assert.Equal(8,data.MaxExpansion);Assert.Equal("era",data.ContentFlags);Assert.Equal("disabled",data.ContentFlagsDisabled);
+    }
+
+    [Fact]
     public void Preserves_eqemu_world_objects_static_locked_doors_and_ground_spawn_bounds()
     {
         var zone=new CompleteZone{ShortName="poknowledge"};
