@@ -196,7 +196,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
             }
         }
 
-        LastReadDiagnostics=new(spawn2.Count,entries.Count,npcs.Count,spawnGroups.Count,doors.Count,zonePoints.Count,objects.Count,groundSpawns.Count,grids.Count,gridEntries.Count,objectContents.Count,collisionMapLoaded,findBestZApplied,collisionMapPath);
+        LastReadDiagnostics=new(spawn2.Count,entries.Count,npcs.Count,spawnGroups.Count,doors.Count,zonePoints.Count,objects.Count,groundSpawns.Count,grids.Count,gridEntries.Count,objectContents.Count,collisionMapLoaded,findBestZApplied,collisionMapPath,traps.Count,blockedSpells.Count);
         ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints,spawnGroups,objects,groundSpawns,grids,gridEntries,objectContents,runtime,traps,blockedSpells));
     }
 
