@@ -2,7 +2,7 @@ namespace DDVWF.Core.Zone;
 
 public enum ZoneEntityKind
 {
-    WorldGeometry, StaticObject, AnimatedObject, Door, Light, Region, Npc, Spawn, Waypoint, GroundSpawn, ZonePoint
+    WorldGeometry, StaticObject, AnimatedObject, Door, Light, Region, Npc, Spawn, Waypoint, GroundSpawn, ZonePoint, Trap
 }
 
 public readonly record struct EqPosition(float X, float Y, float Z, float Heading = 0);
@@ -15,6 +15,7 @@ public sealed record NpcEntityData(long NpcTypeId,long SpawnGroupId,int Chance,i
 public sealed record EqgLightEffectEntityData(string AltName,byte Unknown,float RotateX,float RotateY,float RotateZ,float ScaleX,float ScaleY,float ScaleZ,float Unknown1) : ZoneEntityData;
 public sealed record EcoLayerEntityData(string EcoName,string LayerName,string LayerKind,string NativeReference,string TextureLayer,float Density,int Iterations,float MinScale,float MaxScale,float MinAlpha,float MinHeight,float MaxHeight,float HeightTolerance,float MinSlope,float MaxSlope,float SlopeTolerance) : ZoneEntityData;
 public sealed record ActorEntityData(float BoundingRadius=0,string? SoundName=null,int? VertexColorReference=null,string UserData="") : ZoneEntityData;
+public sealed record TrapEntityData(int Version,int Chance,float MaxZDiff,float Radius,int Effect,int EffectValue,int EffectValue2,string Message,int Skill,uint Level,uint RespawnTime,uint RespawnVariance,int TriggeredNumber,int Group,bool DespawnWhenTriggered,bool Undetectable,int MinExpansion=-1,int MaxExpansion=-1,string ContentFlags="",string ContentFlagsDisabled="") : ZoneEntityData;
 public sealed record GroundSpawnEntityData(int Version,float MinX,float MaxX,float MinY,float MaxY,float MaxZ,int ItemId,int MaxAllowed,string Comment,int RespawnTimer,bool FixZ,int MinExpansion=-1,int MaxExpansion=-1,string ContentFlags="",string ContentFlagsDisabled="") : ZoneEntityData;
 public sealed record ObjectContentData(int BagIndex,int ItemId,int Charges,DateTime? DropTime,int AugSlot1,int AugSlot2,int AugSlot3,int AugSlot4,int AugSlot5,int AugSlot6);
 public sealed record ObjectEntityData(int Version,int ItemId,int Charges,int Type,int Icon,float SizePercentage,int Unknown24,int Unknown60,int Unknown64,int Unknown68,int Unknown72,int Unknown76,int Unknown84,float NativeSize,int SolidType,int Incline,float TiltX,float TiltY,string DisplayName,int MinExpansion=-1,int MaxExpansion=-1,string ContentFlags="",string ContentFlagsDisabled="",IReadOnlyList<ObjectContentData>? Contents=null) : ZoneEntityData;
