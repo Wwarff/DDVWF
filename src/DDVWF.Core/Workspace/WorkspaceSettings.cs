@@ -11,7 +11,7 @@ public sealed record ThemeSettings(string Accent="#D7FF00",string Separator="#40
     };
 }
 
-public sealed record ServerConnectionSettings(string Host="127.0.0.1",int Port=3306,string Database="eqemu_peq",string User="trinity",string Password="trinity",bool Enabled=true,int ZoneVersion=0);
+public sealed record ServerConnectionSettings(string Host="127.0.0.1",int Port=3306,string Database="eqemu_peq",string User="trinity",string Password="trinity",bool Enabled=true,int ZoneVersion=0,string ServerRoot=@"S:\\EQEmu");
 
 public sealed record WorkspaceSettings
 {
