@@ -91,7 +91,7 @@ public static class ServerZoneJoiner
                 obj.Id,
                 native,
                 new ObjectEntityData(obj.Version,obj.ItemId,obj.Charges,obj.Type,obj.Icon,obj.SizePercentage,obj.Unknown24,obj.Unknown60,obj.Unknown64,obj.Unknown68,obj.Unknown72,obj.Unknown76,obj.Unknown84,obj.Size,obj.SolidType,obj.Incline,obj.TiltX,obj.TiltY,obj.DisplayName,obj.MinExpansion,obj.MaxExpansion,obj.ContentFlags,obj.ContentFlagsDisabled,(snapshot.ObjectContents??Array.Empty<ObjectContentRecord>()).Where(x=>x.ParentId==obj.Id).Select(x=>new ObjectContentData(x.BagIndex,x.ItemId,x.Charges,x.DropTime,x.AugSlot1,x.AugSlot2,x.AugSlot3,x.AugSlot4,x.AugSlot5,x.AugSlot6)).ToArray()),
-                new EqRotation(obj.TiltX,obj.Heading,obj.TiltY)));
+                null));
         }
 
         foreach (var door in snapshot.Doors.Where(x => string.Equals(x.Zone, zone.ShortName, StringComparison.OrdinalIgnoreCase)))

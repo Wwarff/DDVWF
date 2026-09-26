@@ -120,4 +120,17 @@ public sealed class ServerZoneJoinerTests
         var npc=Assert.Single(zone.Entities.Where(x=>x.Kind==ZoneEntityKind.Npc));
         Assert.Equal(0f,npc.Scale);
     }
+    [Fact]
+    public void Preserves_eqemu_object_tilts_without_guessing_babylon_axis_mapping()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var obj=new ObjectRecord(12,202,0,1,2,3,64,0,0,"OBJ_ACTORDEF",2,0,100,0,0,0,0,0,0,0,100,0,0,17.5f,-23.25f,"Tilted");
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(Array.Empty<Spawn2Record>(),Array.Empty<SpawnEntryRecord>(),Array.Empty<NpcTypeRecord>(),Array.Empty<DoorRecord>(),Objects:new[]{obj}));
+        var entity=Assert.Single(zone.Entities.Where(x=>x.Data is ObjectEntityData));
+        var data=Assert.IsType<ObjectEntityData>(entity.Data);
+        Assert.Equal(17.5f,data.TiltX);Assert.Equal(-23.25f,data.TiltY);
+        Assert.Null(entity.Rotation);
+        Assert.Equal(64,entity.Position.Heading);
+    }
+
 }
