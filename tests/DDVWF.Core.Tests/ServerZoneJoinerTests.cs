@@ -133,4 +133,13 @@ public sealed class ServerZoneJoinerTests
         Assert.Equal(64,entity.Position.Heading);
     }
 
+    [Fact]
+    public void Carries_eqemu_runtime_metadata_into_complete_zone_ir()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var runtime=new ZoneRuntimeRecord("poknowledge", -500f, 3000f, 1, 1);
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(Array.Empty<Spawn2Record>(),Array.Empty<SpawnEntryRecord>(),Array.Empty<NpcTypeRecord>(),Array.Empty<DoorRecord>(),Runtime:runtime));
+        Assert.Same(runtime,zone.Runtime);
+    }
+
 }
