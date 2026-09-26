@@ -85,7 +85,7 @@ public static class ServerZoneJoiner
                 DeterministicId("object", obj.Id, obj.ZoneId),
                 ZoneEntityKind.StaticObject,
                 string.IsNullOrWhiteSpace(obj.DisplayName)?native:obj.DisplayName,
-                new EqPosition(obj.X,obj.Y,obj.Z,obj.Heading),
+                new EqPosition(obj.X,obj.Y,obj.BestZ??obj.Z,obj.Heading),
                 obj.Size>0&&obj.Size<5000?obj.Size/100f:1f,
                 obj.Id,
                 native,
