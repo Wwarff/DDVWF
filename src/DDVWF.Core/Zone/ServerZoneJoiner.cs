@@ -79,6 +79,7 @@ public static class ServerZoneJoiner
                     1000000000L+obj.Id,
                     native,
                     new DoorEntityData(-1,openType,obj.Version,Incline:obj.Incline)));
+                continue;
             }
             if(obj.Type==1&&obj.ItemId!=0)continue;
             zone.Add(new ZoneEntity(
