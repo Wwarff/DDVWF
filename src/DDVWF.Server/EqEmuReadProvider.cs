@@ -33,7 +33,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
         bool PassContent(int minExpansion,int maxExpansion,string flags,string flagsDisabled)=>EqEmuContentFilter.Passes(currentExpansion,enabledContentFlags,disabledContentFlags,minExpansion,maxExpansion,flags,flagsDisabled);
 
         var spawn2=new List<Spawn2Record>(); var entries=new List<SpawnEntryRecord>();
-        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>(); var objectContents=new List<ObjectContentRecord>();
+        var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>(); var objectContents=new List<ObjectContentRecord>() var traps=new List<TrapRecord>();
 
         await using(var cmd=connection.CreateCommand())
         {
@@ -141,6 +141,16 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
                 if(PassContent(I(r,17),I(r,18),r.IsDBNull(19)?"":r.GetString(19),r.IsDBNull(20)?"":r.GetString(20)))zonePoints.Add(new(r.GetInt64(0),r.GetString(1),I(r,2),I(r,3),F(r,4),F(r,5),F(r,6),F(r,7),F(r,8),F(r,9),F(r,10),F(r,11),Convert.ToUInt32(r.GetValue(12),System.Globalization.CultureInfo.InvariantCulture),Convert.ToUInt32(r.GetValue(13),System.Globalization.CultureInfo.InvariantCulture),I(r,14),F(r,15),r.IsDBNull(16)?0xFFFFFFFF:Convert.ToUInt32(r.GetValue(16),System.Globalization.CultureInfo.InvariantCulture),I(r,17),I(r,18),r.IsDBNull(19)?"":r.GetString(19),r.IsDBNull(20)?"":r.GetString(20),I(r,21)!=0,I(r,22),I(r,23)));
         }
 
+        await using(var cmd=connection.CreateCommand())
+        {
+            cmd.CommandText="SELECT id,zone,version,x,y,z,chance,maxzdiff,radius,effect,effectvalue,effectvalue2,message,skill,level,respawn_time,respawn_var,triggered_number,`group`,despawn_when_triggered,undetectable,min_expansion,max_expansion,content_flags,content_flags_disabled FROM traps WHERE zone=@zone AND version=@version";
+            Add(cmd,"@zone",zone.ShortName);Add(cmd,"@version",_zoneVersion);
+            await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
+            while(await r.ReadAsync(cancellationToken))
+                if(PassContent(I(r,21),I(r,22),r.IsDBNull(23)?"":r.GetString(23),r.IsDBNull(24)?"":r.GetString(24)))
+                    traps.Add(new(r.GetInt64(0),r.GetString(1),I(r,2),I(r,3),I(r,4),I(r,5),I(r,6),F(r,7),F(r,8),I(r,9),I(r,10),I(r,11),r.IsDBNull(12)?"":r.GetString(12),I(r,13),Convert.ToUInt32(r.GetValue(14),System.Globalization.CultureInfo.InvariantCulture),Convert.ToUInt32(r.GetValue(15),System.Globalization.CultureInfo.InvariantCulture),Convert.ToUInt32(r.GetValue(16),System.Globalization.CultureInfo.InvariantCulture),I(r,17),I(r,18),I(r,19)!=0,I(r,20)!=0,I(r,21),I(r,22),r.IsDBNull(23)?"":r.GetString(23),r.IsDBNull(24)?"":r.GetString(24)));
+        }
+
         ZoneRuntimeRecord? runtime=null;
         await using(var cmd=connection.CreateCommand())
         {
@@ -177,7 +187,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
         }
 
         LastReadDiagnostics=new(spawn2.Count,entries.Count,npcs.Count,spawnGroups.Count,doors.Count,zonePoints.Count,objects.Count,groundSpawns.Count,grids.Count,gridEntries.Count,objectContents.Count,collisionMapLoaded,findBestZApplied,collisionMapPath);
-        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints,spawnGroups,objects,groundSpawns,grids,gridEntries,objectContents,runtime));
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints,spawnGroups,objects,groundSpawns,grids,gridEntries,objectContents,runtime,traps));
     }
 
     private static float F(DbDataReader r,int i)=>Convert.ToSingle(r.GetValue(i),System.Globalization.CultureInfo.InvariantCulture);
