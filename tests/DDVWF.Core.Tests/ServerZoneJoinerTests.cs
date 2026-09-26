@@ -56,6 +56,16 @@ public sealed class ServerZoneJoinerTests
     }
 
     [Fact]
+    public void Matches_eqemu_temporary_item_object_removal()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var obj=new ObjectRecord(10,202,0,1,2,3,64,1001,1,"IT63_ACTORDEF",1,0,0,0,0,0,0,0,0,0,100,0,0,0,0,"Temporary item");
+        var snapshot=new ServerZoneSnapshot(Array.Empty<Spawn2Record>(),Array.Empty<SpawnEntryRecord>(),Array.Empty<NpcTypeRecord>(),Array.Empty<DoorRecord>(),Objects:new[]{obj});
+        ServerZoneJoiner.Join(zone,snapshot);
+        Assert.DoesNotContain(zone.Entities,x=>x.ServerId==10&&x.Data is ObjectEntityData);
+    }
+
+    [Fact]
     public void Matches_eqemu_ground_object_size_guard()
     {
         var zone=new CompleteZone{ShortName="poknowledge"};
