@@ -30,14 +30,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
             await using var r=await contentFlagCmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken)){var flag=r.IsDBNull(0)?"":r.GetString(0);if(flag.Length==0)continue;if(I(r,1)!=0)enabledContentFlags.Add(flag);else disabledContentFlags.Add(flag);}
         }
-        bool PassContent(int minExpansion,int maxExpansion,string flags,string flagsDisabled)
-        {
-            if(minExpansion>-1&&currentExpansion<minExpansion&&currentExpansion!=-1)return false;
-            if(maxExpansion>-1&&currentExpansion>maxExpansion&&currentExpansion!=-1)return false;
-            foreach(var flag in flags.Split(',',StringSplitOptions.RemoveEmptyEntries))if(!enabledContentFlags.Contains(flag))return false;
-            foreach(var flag in flagsDisabled.Split(',',StringSplitOptions.RemoveEmptyEntries))if(!disabledContentFlags.Contains(flag))return false;
-            return true;
-        }
+        bool PassContent(int minExpansion,int maxExpansion,string flags,string flagsDisabled)=>EqEmuContentFilter.Passes(currentExpansion,enabledContentFlags,disabledContentFlags,minExpansion,maxExpansion,flags,flagsDisabled);
 
         var spawn2=new List<Spawn2Record>(); var entries=new List<SpawnEntryRecord>();
         var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>(); var objectContents=new List<ObjectContentRecord>();
