@@ -37,6 +37,11 @@ public class EqEmuCollisionMapTests
   raw.Position=0;using var compressed=new MemoryStream();using(var z=new System.IO.Compression.ZLibStream(compressed,System.IO.Compression.CompressionLevel.SmallestSize,true))raw.CopyTo(z);
   var path=Path.GetTempFileName();try{using(var f=File.Create(path))using(var w=new BinaryWriter(f)){w.Write(0x02000000u);w.Write((uint)compressed.Length);w.Write((uint)raw.Length);w.Write(compressed.ToArray());}var map=EqEmuCollisionMap.Load(path);Assert.Equal(7f,map.FindBestZ(2,2,20));}finally{File.Delete(path);}
  }
+ [Fact]
+ public void V2_flat_terrain_participates_in_collision()
+ {
+  using var raw=new MemoryStream();using(var w=new BinaryWriter(raw,System.Text.Encoding.UTF8,true)){w.Write(0u);w.Write(0u);w.Write(0u);w.Write(0u);w.Write(0u);w.Write(0u);w.Write(0u);w.Write(1u);w.Write(1u);w.Write(10f);w.Write(true);w.Write(0f);w.Write(0f);w.Write(9f);}raw.Position=0;using var compressed=new MemoryStream();using(var z=new System.IO.Compression.ZLibStream(compressed,System.IO.Compression.CompressionLevel.SmallestSize,true))raw.CopyTo(z);var path=Path.GetTempFileName();try{using(var f=File.Create(path))using(var w=new BinaryWriter(f)){w.Write(0x02000000u);w.Write((uint)compressed.Length);w.Write((uint)raw.Length);w.Write(compressed.ToArray());}Assert.Equal(9f,EqEmuCollisionMap.Load(path).FindBestZ(5,5,20));}finally{File.Delete(path);}
+ }
  static void Tri(BinaryWriter w,float ax,float ay,float az,float bx,float by,float bz,float cx,float cy,float cz){V(w,ax,ay,az);V(w,bx,by,bz);V(w,cx,cy,cz);for(int i=0;i<4;i++)w.Write(0f);}
  static void V(BinaryWriter w,float x,float y,float z){w.Write(x);w.Write(y);w.Write(z);}
 }
