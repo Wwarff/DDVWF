@@ -156,4 +156,19 @@ public sealed class ServerZoneJoinerTests
         Assert.True(data.Undetectable);
     }
 
+    [Fact]
+    public void Preserves_EQEmu_blocked_spell_AABB_without_rendering_it()
+    {
+        var zone=new CompleteZone{ShortName="poknowledge"};
+        var blocked=new BlockedSpellRecord(9,0,1,202,100,200,300,10,20,30,"No casting","test region");
+        ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(Array.Empty<Spawn2Record>(),Array.Empty<SpawnEntryRecord>(),Array.Empty<NpcTypeRecord>(),Array.Empty<DoorRecord>(),BlockedSpells:new[]{blocked}));
+        var entity=Assert.Single(zone.Entities.Where(e=>e.Kind==ZoneEntityKind.BlockedSpell));
+        Assert.Null(entity.ClientAsset);
+        var data=Assert.IsType<BlockedSpellEntityData>(entity.Data);
+        Assert.Equal(10,data.XDifference);
+        Assert.Equal(20,data.YDifference);
+        Assert.Equal(30,data.ZDifference);
+        Assert.Equal((uint)0,data.SpellId);
+    }
+
 }
