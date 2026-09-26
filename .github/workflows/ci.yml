@@ -41,6 +41,7 @@ jobs:
           if ($renderer -notmatch "e\.hasGrid\?new BABYLON\.Color3\(0,1,1\):new BABYLON\.Color3\(1,1,1\)" -or $renderer -notmatch 'emissiveColor:spawnEmissive') { throw "Pinned Sage white/cyan spawn marker glow contract regressed." }
           if ($code -notmatch 'loadedGridIds\.Contains\(pathGrid\)' -or $code -notmatch 'pathGrid!=0') { throw "Pinned Sage grid-attached spawn marker classification regressed." }
           if ($code -match "e\.Name\.Split\('_'\)\[0\]" -or $code -match "family\.Name\.Split\('_'\)\[0\]") { throw "Sage zone object model identity regressed to underscore truncation." }
+          if ($code -notmatch 'sagePlacementKeys\.SetEquals\(ddvwfPlacementKeys\)' -or $code -notmatch 'Complete Zone object transform parity failed against Sage') { throw "Exact Sage zone object transform parity gate is missing." }
           if ($renderer -notmatch 'function refreshOverlay\(payload\)' -or $renderer -notmatch "metadata\?\.kind==='WorldGeometry'\|\|node\?\.metadata\?\.sageNative") { throw "Persistent Sage world / overlay refresh contract regressed." }
           $renderActive = [regex]::Match($code,'async Task RenderActiveAsync\(\)\{[^\r\n]*').Value
           if ($renderActive -notmatch 'getSageZoneLoadState' -or $renderActive -notmatch 'refreshOverlay' -or $renderActive -match 'await ScriptAsync\(\$"window\.ddvwf\.loadScene') { throw "Editor refresh regressed to destructive generic scene reload instead of preserving the Sage world." }
