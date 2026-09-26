@@ -37,6 +37,9 @@ jobs:
           if ($code -notmatch 'AdjacentPaneResize\.Apply') { throw "Bottom divider does not use tested adjacent-pair resize math." }
           $renderer = Get-Content -Raw "src/DDVWF.App/Renderer/babylon.html"
           if ($renderer -notmatch 'camera\.angularSensibility=1000') { throw "Accepted RMB camera sensitivity regressed." }
+          if ($renderer -notmatch 'function refreshOverlay\(payload\)' -or $renderer -notmatch "metadata\?\.kind==='WorldGeometry'\|\|node\?\.metadata\?\.sageNative") { throw "Persistent Sage world / overlay refresh contract regressed." }
+          $renderActive = [regex]::Match($code,'async Task RenderActiveAsync\(\)\{[^\r\n]*').Value
+          if ($renderActive -notmatch 'getSageZoneLoadState' -or $renderActive -notmatch 'refreshOverlay' -or $renderActive -match 'await ScriptAsync\(\$"window\.ddvwf\.loadScene') { throw "Editor refresh regressed to destructive generic scene reload instead of preserving the Sage world." }
           if ($renderer -notmatch 'if\(arrowLeft\)camera\.rotation\.y-=1\.35\*dt' -or $renderer -notmatch 'if\(arrowRight\)camera\.rotation\.y\+=1\.35\*dt' -or $renderer -notmatch "type:'heading',yaw:camera.rotation.y") { throw "Keyboard yaw/compass heading contract regressed." }
       - run: dotnet publish src/DDVWF.App/DDVWF.App.csproj -c Release -r win-x64 --self-contained false -o artifacts/DDVWF
       - name: Vendor pinned Sage viewer environment
