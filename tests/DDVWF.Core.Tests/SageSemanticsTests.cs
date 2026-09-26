@@ -67,5 +67,16 @@ public sealed class SageSemanticsTests
     public void Transparent_shader_kinds_remain_distinct_for_Babylon_consumption(uint value,SageShaderType expected)
         => Assert.Equal(expected,SageMaterial.Map(value,1));
 
+    [Theory]
+    [InlineData(1,0,99,0,"hum")]
+    [InlineData(1,1,42,0,"huf")]
+    [InlineData(24,2,1,0,"fis")]
+    [InlineData(1,0,99,12,"hum01")]
+    public void Npc_model_selection_matches_pinned_Sage_race_gender_then_texture_variation(int race,int gender,int npcModel,int texture,string expected)
+    {
+        var provider=new DDVWF.Sage.SageClientZoneProvider();
+        Assert.Equal(expected,provider.ResolveNpcModelName(race,gender,npcModel,texture));
+    }
+
 }
 
