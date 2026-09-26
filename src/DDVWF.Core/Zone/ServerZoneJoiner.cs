@@ -75,7 +75,7 @@ public static class ServerZoneJoiner
                     ZoneEntityKind.Door,
                     native,
                     new EqPosition(obj.X,obj.Y,obj.Z,obj.Heading),
-                    obj.SizePercentage==0?1f:obj.SizePercentage/100f,
+                    1f,
                     1000000000L+obj.Id,
                     native,
                     new DoorEntityData(-1,openType,obj.Version,Incline:obj.Incline)));
