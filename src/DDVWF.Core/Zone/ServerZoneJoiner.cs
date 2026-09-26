@@ -4,6 +4,7 @@ public static class ServerZoneJoiner
 {
     public static void Join(CompleteZone zone, ServerZoneSnapshot snapshot)
     {
+        zone.Runtime=snapshot.Runtime;
         var entriesByGroup = snapshot.SpawnEntries.GroupBy(x => x.SpawnGroupId).ToDictionary(x => x.Key, x => x.ToArray());
         var npcs = snapshot.NpcTypes.ToDictionary(x => x.Id);
         var groups = (snapshot.SpawnGroups ?? Array.Empty<SpawnGroupRecord>()).ToDictionary(x=>x.Id);
