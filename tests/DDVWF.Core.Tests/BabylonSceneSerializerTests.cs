@@ -14,4 +14,6 @@ public sealed class BabylonSceneSerializerTests
 
  [Fact]public void Waypoints_are_distinct_from_runtime_spawn_definitions_and_nonvisual(){var z=new CompleteZone{ShortName="z"};z.Add(new(Guid.NewGuid(),ZoneEntityKind.Spawn,"spawn2",new(1,2,3),1,5,null,new SpawnEntityData(9,30,0,4)));z.Add(new(Guid.NewGuid(),ZoneEntityKind.Waypoint,"grid-waypoint",new(4,5,6),1,null,null,new WaypointEntityData(4,1,0,false,0,0)));Assert.Single(z.Entities.Where(e=>e.Kind==ZoneEntityKind.Spawn));Assert.Single(z.Entities.Where(e=>e.Kind==ZoneEntityKind.Waypoint));var json=BabylonSceneSerializer.Serialize(z,new Dictionary<string,RenderMesh>());Assert.DoesNotContain("spawn2",json);Assert.DoesNotContain("grid-waypoint",json);}
 
+ [Fact]public void Serializer_exposes_preserved_EQEmu_environment_without_inventing_rendering(){var z=new CompleteZone{ShortName="z",Runtime=new ZoneRuntimeRecord("z",-100,1000,1,1,50,2400,800,2400,.33f,1,0)};var json=BabylonSceneSerializer.Serialize(z,new Dictionary<string,RenderMesh>());using var doc=System.Text.Json.JsonDocument.Parse(json);var runtime=doc.RootElement.GetProperty("runtime");Assert.Equal(2400,runtime.GetProperty("fogMaxClip").GetSingle());Assert.Equal(.33f,runtime.GetProperty("fogDensity").GetSingle());Assert.Equal(1,runtime.GetProperty("sky").GetInt32());}
+
 }
