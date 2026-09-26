@@ -75,12 +75,12 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
         uint zoneId;
         await using(var zoneCmd=connection.CreateCommand())
         {
-            zoneCmd.CommandText="SELECT zoneidnumber,safe_x,safe_y,safe_z FROM zone WHERE short_name = @zone AND (version = @version OR version = 0) ORDER BY CASE WHEN version = @version THEN 0 ELSE 1 END LIMIT 1";
+            zoneCmd.CommandText="SELECT zoneidnumber,safe_x,safe_y,safe_z,safe_heading FROM zone WHERE short_name = @zone AND (version = @version OR version = 0) ORDER BY CASE WHEN version = @version THEN 0 ELSE 1 END LIMIT 1";
             Add(zoneCmd,"@zone",zone.ShortName);Add(zoneCmd,"@version",_zoneVersion);
             await using var zr=await zoneCmd.ExecuteReaderAsync(cancellationToken);
             if(!await zr.ReadAsync(cancellationToken))throw new InvalidDataException($"EQEmu zone row was not found for '{zone.ShortName}'.");
             zoneId=Convert.ToUInt32(zr.GetValue(0),System.Globalization.CultureInfo.InvariantCulture);
-            zone.SafePoint=new EqPosition(F(zr,1),F(zr,2),F(zr,3));
+            zone.SafePoint=new EqPosition(F(zr,1),F(zr,2),F(zr,3),F(zr,4));
         }
 
         await using(var cmd=connection.CreateCommand())
