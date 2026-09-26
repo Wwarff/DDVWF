@@ -52,6 +52,19 @@ public static class ServerZoneJoiner
             }
         }
 
+        foreach (var blocked in snapshot.BlockedSpells ?? Array.Empty<BlockedSpellRecord>())
+        {
+            zone.Add(new ZoneEntity(
+                DeterministicId("blocked-spell",blocked.Id,blocked.SpellId),
+                ZoneEntityKind.BlockedSpell,
+                blocked.Description.Length>0?blocked.Description:$"Blocked Spell {blocked.SpellId}",
+                new EqPosition(blocked.X,blocked.Y,blocked.Z),
+                1f,
+                blocked.Id,
+                null,
+                new BlockedSpellEntityData(blocked.SpellId,blocked.Type,blocked.XDifference,blocked.YDifference,blocked.ZDifference,blocked.Message,blocked.Description,blocked.MinExpansion,blocked.MaxExpansion,blocked.ContentFlags,blocked.ContentFlagsDisabled)));
+        }
+
         foreach (var trap in snapshot.Traps ?? Array.Empty<TrapRecord>())
         {
             if (!string.Equals(trap.Zone, zone.ShortName, StringComparison.OrdinalIgnoreCase)) continue;
