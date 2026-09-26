@@ -34,11 +34,12 @@ public static class WldBspReader
  public sealed record BoundedRegion(int SourceRegionIndex,string Tag,RegionEntityData Data,Vector3 Min,Vector3 Max,Vector3 Center);
  public static IReadOnlyList<BoundedRegion> BuildBoundedRegions(WldDocument doc,ReadOnlySpan<byte> source)
  {
+  var bytes=source.ToArray();
   var treeFragment=doc.Fragments.FirstOrDefault(x=>x.KnownType==WldFragmentType.BspTree);if(treeFragment is null)return Array.Empty<BoundedRegion>();
-  var nodes=ReadTree(treeFragment,source).ToArray();if(nodes.Length==0)return Array.Empty<BoundedRegion>();
-  var regions=doc.Fragments.Where(x=>x.KnownType==WldFragmentType.BspRegion).Select((x,i)=>ReadRegion(i,x,source)).ToArray();
-  var typeByRegion=new Dictionary<int,SageRegionType>();foreach(var f in doc.Fragments.Where(x=>x.KnownType==WldFragmentType.RegionType)){var t=ReadType(doc,f,source);foreach(var ri in t.RegionIndices.Where(i=>i>=0&&i<regions.Length))typeByRegion[ri]=t;}
-  var triangles=new List<(Vector3 A,Vector3 B,Vector3 C)>();foreach(var f in doc.Fragments.Where(x=>x.KnownType==WldFragmentType.Mesh)){var m=WldMeshReader.Read(doc,f,source);foreach(var p in m.Polygons){if(p.A>=m.Vertices.Count||p.B>=m.Vertices.Count||p.C>=m.Vertices.Count)continue;Vector3 P(int i)=>m.Vertices[i]+m.Center;triangles.Add((P(p.A),P(p.B),P(p.C)));}}
+  var nodes=ReadTree(treeFragment,bytes).ToArray();if(nodes.Length==0)return Array.Empty<BoundedRegion>();
+  var regions=doc.Fragments.Where(x=>x.KnownType==WldFragmentType.BspRegion).Select((x,i)=>ReadRegion(i,x,bytes)).ToArray();
+  var typeByRegion=new Dictionary<int,SageRegionType>();foreach(var f in doc.Fragments.Where(x=>x.KnownType==WldFragmentType.RegionType)){var t=ReadType(doc,f,bytes);foreach(var ri in t.RegionIndices.Where(i=>i>=0&&i<regions.Length))typeByRegion[ri]=t;}
+  var triangles=new List<(Vector3 A,Vector3 B,Vector3 C)>();foreach(var f in doc.Fragments.Where(x=>x.KnownType==WldFragmentType.Mesh)){var m=WldMeshReader.Read(doc,f,bytes);foreach(var p in m.Polygons){if(p.A>=m.Vertices.Count||p.B>=m.Vertices.Count||p.C>=m.Vertices.Count)continue;Vector3 P(int i)=>m.Vertices[i]+m.Center;triangles.Add((P(p.A),P(p.B),P(p.C)));}}
   static (Vector3 Min,Vector3 Max) MinMax(IEnumerable<(Vector3 A,Vector3 B,Vector3 C)> ts){var pts=ts.SelectMany(t=>new[]{t.A,t.B,t.C}).ToArray();if(pts.Length==0)return(Vector3.Zero,Vector3.Zero);var min=pts[0];var max=pts[0];foreach(var p in pts.Skip(1)){min=Vector3.Min(min,p);max=Vector3.Max(max,p);}return(min,max);}
   bool Left(SageBspNode n,Vector3 p)=>(p.X*n.Normal.X)+.01f+(p.Y*n.Normal.Y)+.01f+(p.Z*n.Normal.Z)+.01f+n.SplitDistance>0;
   var leaves=new List<BoundedRegion>();void Walk(int ni,List<(Vector3 A,Vector3 B,Vector3 C)> polys){if(ni<0||ni>=nodes.Length)return;var n=nodes[ni];var mm=MinMax(polys);var regionIndex=n.RegionId-1;if(regionIndex>=0&&typeByRegion.TryGetValue(regionIndex,out var type)){var min=new Vector3(mm.Min.X,mm.Min.Z,mm.Min.Y);var max=new Vector3(mm.Max.X,mm.Max.Z,mm.Max.Y);leaves.Add(new(regionIndex,type.Tag,type.Data,min,max,(min+max)/2));}var left=new List<(Vector3,Vector3,Vector3)>();var right=new List<(Vector3,Vector3,Vector3)>();foreach(var t in polys){if(Left(n,t.A)&&Left(n,t.B)&&Left(n,t.C))left.Add(t);else right.Add(t);}if(n.Left>=0)Walk(n.Left,left);if(n.Right>=0)Walk(n.Right,right);}
