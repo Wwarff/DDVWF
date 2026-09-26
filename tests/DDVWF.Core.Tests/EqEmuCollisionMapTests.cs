@@ -22,6 +22,11 @@ public class EqEmuCollisionMapTests
   finally{File.Delete(path);}
  }
  [Fact]
+ public void FindBestZ_does_not_hit_beyond_EQEmu_segment_endpoint()
+ {
+  var path=Path.GetTempFileName();try{using(var f=File.Create(path))using(var w=new BinaryWriter(f)){w.Write(0x01000000u);w.Write(1u);w.Write((ushort)0);w.Write(0u);Tri(w,0,0,-100500,10,0,-100500,0,10,-100500);}var map=EqEmuCollisionMap.Load(path);Assert.Equal(EqEmuCollisionMap.BestZInvalid,map.FindBestZ(2,2,0));}finally{File.Delete(path);}
+ }
+ [Fact]
  public void V2_inflation_and_base_collision_match_EQEmu()
  {
   using var raw=new MemoryStream();using(var w=new BinaryWriter(raw,System.Text.Encoding.UTF8,true))
