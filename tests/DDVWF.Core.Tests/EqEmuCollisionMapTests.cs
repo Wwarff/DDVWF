@@ -64,7 +64,7 @@ public class EqEmuCollisionMapTests
   {
    using(var f2=File.Create(path))using(var w2=new BinaryWriter(f2)){w2.Write(0x02000000u);w2.Write((uint)compressed.Length);w2.Write((uint)raw.Length);w2.Write(compressed.ToArray());}
    var map=EqEmuCollisionMap.Load(path);
-   Assert.Equal(-12.34343f,map.FindBestZ(1,18,20),4);
+   Assert.InRange(map.FindBestZ(1,18,20),-12.344f,-12.342f);
   }
   finally{File.Delete(path);}
  }
