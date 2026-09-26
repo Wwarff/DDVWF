@@ -16,16 +16,39 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
     public async Task PopulateAsync(CompleteZone zone,CancellationToken cancellationToken)
     {
         await using var connection=await _open(cancellationToken);
+        var currentExpansion=-1;
+        await using(var contentRule=connection.CreateCommand())
+        {
+            contentRule.CommandText="SELECT rv.rule_value FROM rule_sets rs JOIN rule_values rv ON rv.ruleset_id=rs.ruleset_id WHERE rs.name='default' AND rv.rule_name='Expansion:CurrentExpansion' LIMIT 1";
+            var value=await contentRule.ExecuteScalarAsync(cancellationToken);
+            if(value is not null&&value is not DBNull&&int.TryParse(Convert.ToString(value,System.Globalization.CultureInfo.InvariantCulture),System.Globalization.NumberStyles.Integer,System.Globalization.CultureInfo.InvariantCulture,out var parsedExpansion))currentExpansion=parsedExpansion;
+        }
+        var enabledContentFlags=new HashSet<string>(StringComparer.Ordinal);var disabledContentFlags=new HashSet<string>(StringComparer.Ordinal);
+        await using(var contentFlagCmd=connection.CreateCommand())
+        {
+            contentFlagCmd.CommandText="SELECT flag_name,enabled FROM content_flags";
+            await using var r=await contentFlagCmd.ExecuteReaderAsync(cancellationToken);
+            while(await r.ReadAsync(cancellationToken)){var flag=r.IsDBNull(0)?"":r.GetString(0);if(flag.Length==0)continue;if(I(r,1)!=0)enabledContentFlags.Add(flag);else disabledContentFlags.Add(flag);}
+        }
+        bool PassContent(int minExpansion,int maxExpansion,string flags,string flagsDisabled)
+        {
+            if(minExpansion>-1&&currentExpansion<minExpansion&&currentExpansion!=-1)return false;
+            if(maxExpansion>-1&&currentExpansion>maxExpansion&&currentExpansion!=-1)return false;
+            foreach(var flag in flags.Split(',',StringSplitOptions.RemoveEmptyEntries))if(!enabledContentFlags.Contains(flag))return false;
+            foreach(var flag in flagsDisabled.Split(',',StringSplitOptions.RemoveEmptyEntries))if(!disabledContentFlags.Contains(flag))return false;
+            return true;
+        }
+
         var spawn2=new List<Spawn2Record>(); var entries=new List<SpawnEntryRecord>();
         var npcs=new Dictionary<long,NpcTypeRecord>(); var doors=new List<DoorRecord>(); var zonePoints=new List<ZonePointRecord>(); var spawnGroups=new List<SpawnGroupRecord>(); var objects=new List<ObjectRecord>(); var groundSpawns=new List<GroundSpawnRecord>(); var grids=new List<GridRecord>(); var gridEntries=new List<GridEntryRecord>(); var objectContents=new List<ObjectContentRecord>();
 
         await using(var cmd=connection.CreateCommand())
         {
-            cmd.CommandText="SELECT id,spawngroupID,zone,x,y,z,heading,respawntime,variance,pathgrid,version,path_when_zone_idle,_condition,cond_value,animation,min_expansion,max_expansion,content_flags,content_flags_disabled FROM spawn2 WHERE zone = @zone AND version = @version";
+            cmd.CommandText="SELECT id,spawngroupID,zone,x,y,z,heading,respawntime,variance,pathgrid,version,path_when_zone_idle,_condition,cond_value,animation,min_expansion,max_expansion,content_flags,content_flags_disabled FROM spawn2 WHERE zone = @zone AND (version = @version OR version = -1)";
             Add(cmd,"@zone",zone.ShortName);Add(cmd,"@version",_zoneVersion);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
-                spawn2.Add(new(r.GetInt64(0),r.GetInt64(1),r.GetString(2),F(r,3),F(r,4),F(r,5),F(r,6),I(r,7),I(r,8),I(r,9),I(r,10),I(r,11)!=0,I(r,12),I(r,13),I(r,14),I(r,15),I(r,16),r.IsDBNull(17)?"":r.GetString(17),r.IsDBNull(18)?"":r.GetString(18)));
+                if(PassContent(I(r,15),I(r,16),r.IsDBNull(17)?"":r.GetString(17),r.IsDBNull(18)?"":r.GetString(18)))spawn2.Add(new(r.GetInt64(0),r.GetInt64(1),r.GetString(2),F(r,3),F(r,4),F(r,5),F(r,6),I(r,7),I(r,8),I(r,9),I(r,10),I(r,11)!=0,I(r,12),I(r,13),I(r,14),I(r,15),I(r,16),r.IsDBNull(17)?"":r.GetString(17),r.IsDBNull(18)?"":r.GetString(18)));
         }
 
         var groups=spawn2.Select(x=>x.SpawnGroupId).Distinct().ToArray();
@@ -44,7 +67,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
             cmd.CommandText="SELECT spawngroupID,npcID,chance,condition_value_filter,min_time,max_time,min_expansion,max_expansion,content_flags,content_flags_disabled FROM spawnentry WHERE spawngroupID = @group";
             Add(cmd,"@group",group);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
-            while(await r.ReadAsync(cancellationToken)) entries.Add(new(r.GetInt64(0),r.GetInt64(1),I(r,2),I(r,3),I(r,4),I(r,5),I(r,6),I(r,7),r.IsDBNull(8)?"":r.GetString(8),r.IsDBNull(9)?"":r.GetString(9)));
+            while(await r.ReadAsync(cancellationToken)) if(PassContent(I(r,6),I(r,7),r.IsDBNull(8)?"":r.GetString(8),r.IsDBNull(9)?"":r.GetString(9)))entries.Add(new(r.GetInt64(0),r.GetInt64(1),I(r,2),I(r,3),I(r,4),I(r,5),I(r,6),I(r,7),r.IsDBNull(8)?"":r.GetString(8),r.IsDBNull(9)?"":r.GetString(9)));
         }
 
         foreach(var id in entries.Select(x=>x.NpcId).Distinct())
@@ -86,7 +109,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
             Add(cmd,"@zoneid",zoneId);Add(cmd,"@version",_zoneVersion);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
-                groundSpawns.Add(new(r.GetInt64(0),Convert.ToUInt32(r.GetValue(1),System.Globalization.CultureInfo.InvariantCulture),I(r,2),F(r,3),F(r,4),F(r,5),F(r,6),F(r,7),F(r,8),r.IsDBNull(9)?"":r.GetString(9),I(r,10),I(r,11),r.IsDBNull(12)?"":r.GetString(12),I(r,13),I(r,14)!=0,I(r,15),I(r,16),r.IsDBNull(17)?"":r.GetString(17),r.IsDBNull(18)?"":r.GetString(18)));
+                if(PassContent(I(r,15),I(r,16),r.IsDBNull(17)?"":r.GetString(17),r.IsDBNull(18)?"":r.GetString(18)))groundSpawns.Add(new(r.GetInt64(0),Convert.ToUInt32(r.GetValue(1),System.Globalization.CultureInfo.InvariantCulture),I(r,2),F(r,3),F(r,4),F(r,5),F(r,6),F(r,7),F(r,8),r.IsDBNull(9)?"":r.GetString(9),I(r,10),I(r,11),r.IsDBNull(12)?"":r.GetString(12),I(r,13),I(r,14)!=0,I(r,15),I(r,16),r.IsDBNull(17)?"":r.GetString(17),r.IsDBNull(18)?"":r.GetString(18)));
         }
 
         await using(var cmd=connection.CreateCommand())
@@ -95,7 +118,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
             Add(cmd,"@zoneid",zoneId);Add(cmd,"@version",_zoneVersion);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
-                objects.Add(new(r.GetInt64(0),Convert.ToUInt32(r.GetValue(1),System.Globalization.CultureInfo.InvariantCulture),I(r,2),F(r,3),F(r,4),F(r,5),F(r,6),I(r,7),I(r,8),r.IsDBNull(9)?"":r.GetString(9),I(r,10),I(r,11),F(r,12),I(r,13),I(r,14),I(r,15),I(r,16),I(r,17),I(r,18),I(r,19),F(r,20),I(r,21),I(r,22),F(r,23),F(r,24),r.IsDBNull(25)?"":r.GetString(25),I(r,26),I(r,27),r.IsDBNull(28)?"":r.GetString(28),r.IsDBNull(29)?"":r.GetString(29)));
+                if(PassContent(I(r,26),I(r,27),r.IsDBNull(28)?"":r.GetString(28),r.IsDBNull(29)?"":r.GetString(29)))objects.Add(new(r.GetInt64(0),Convert.ToUInt32(r.GetValue(1),System.Globalization.CultureInfo.InvariantCulture),I(r,2),F(r,3),F(r,4),F(r,5),F(r,6),I(r,7),I(r,8),r.IsDBNull(9)?"":r.GetString(9),I(r,10),I(r,11),F(r,12),I(r,13),I(r,14),I(r,15),I(r,16),I(r,17),I(r,18),I(r,19),F(r,20),I(r,21),I(r,22),F(r,23),F(r,24),r.IsDBNull(25)?"":r.GetString(25),I(r,26),I(r,27),r.IsDBNull(28)?"":r.GetString(28),r.IsDBNull(29)?"":r.GetString(29)));
         }
 
         await using(var cmd=connection.CreateCommand())
@@ -113,7 +136,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
             Add(cmd,"@zone",zone.ShortName);Add(cmd,"@version",_zoneVersion);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
-                doors.Add(new(r.GetInt64(0),I(r,1),r.GetString(2),r.GetString(3),F(r,4),F(r,5),F(r,6),F(r,7),I(r,8),I(r,9),I(r,10),I(r,11),I(r,12),I(r,13),I(r,14),I(r,15)!=0,r.IsDBNull(16)?"NONE":r.GetString(16),r.IsDBNull(17)?0:Convert.ToUInt32(r.GetValue(17),System.Globalization.CultureInfo.InvariantCulture),F(r,18),F(r,19),F(r,20),F(r,21),I(r,22),I(r,23),I(r,24),I(r,25)!=0,I(r,26)!=0,I(r,27),F(r,28),r.IsDBNull(29)?0xFFFFFFFF:Convert.ToUInt32(r.GetValue(29),System.Globalization.CultureInfo.InvariantCulture),I(r,30)!=0,I(r,31),I(r,32),I(r,33),I(r,34),r.IsDBNull(35)?"":r.GetString(35),r.IsDBNull(36)?"":r.GetString(36)));
+                if(PassContent(I(r,33),I(r,34),r.IsDBNull(35)?"":r.GetString(35),r.IsDBNull(36)?"":r.GetString(36)))doors.Add(new(r.GetInt64(0),I(r,1),r.GetString(2),r.GetString(3),F(r,4),F(r,5),F(r,6),F(r,7),I(r,8),I(r,9),I(r,10),I(r,11),I(r,12),I(r,13),I(r,14),I(r,15)!=0,r.IsDBNull(16)?"NONE":r.GetString(16),r.IsDBNull(17)?0:Convert.ToUInt32(r.GetValue(17),System.Globalization.CultureInfo.InvariantCulture),F(r,18),F(r,19),F(r,20),F(r,21),I(r,22),I(r,23),I(r,24),I(r,25)!=0,I(r,26)!=0,I(r,27),F(r,28),r.IsDBNull(29)?0xFFFFFFFF:Convert.ToUInt32(r.GetValue(29),System.Globalization.CultureInfo.InvariantCulture),I(r,30)!=0,I(r,31),I(r,32),I(r,33),I(r,34),r.IsDBNull(35)?"":r.GetString(35),r.IsDBNull(36)?"":r.GetString(36)));
         }
 
         await using(var cmd=connection.CreateCommand())
@@ -122,7 +145,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
             Add(cmd,"@zone",zone.ShortName);Add(cmd,"@version",_zoneVersion);
             await using var r=await cmd.ExecuteReaderAsync(cancellationToken);
             while(await r.ReadAsync(cancellationToken))
-                zonePoints.Add(new(r.GetInt64(0),r.GetString(1),I(r,2),I(r,3),F(r,4),F(r,5),F(r,6),F(r,7),F(r,8),F(r,9),F(r,10),F(r,11),Convert.ToUInt32(r.GetValue(12),System.Globalization.CultureInfo.InvariantCulture),Convert.ToUInt32(r.GetValue(13),System.Globalization.CultureInfo.InvariantCulture),I(r,14),F(r,15),r.IsDBNull(16)?0xFFFFFFFF:Convert.ToUInt32(r.GetValue(16),System.Globalization.CultureInfo.InvariantCulture),I(r,17),I(r,18),r.IsDBNull(19)?"":r.GetString(19),r.IsDBNull(20)?"":r.GetString(20),I(r,21)!=0,I(r,22),I(r,23)));
+                if(PassContent(I(r,17),I(r,18),r.IsDBNull(19)?"":r.GetString(19),r.IsDBNull(20)?"":r.GetString(20)))zonePoints.Add(new(r.GetInt64(0),r.GetString(1),I(r,2),I(r,3),F(r,4),F(r,5),F(r,6),F(r,7),F(r,8),F(r,9),F(r,10),F(r,11),Convert.ToUInt32(r.GetValue(12),System.Globalization.CultureInfo.InvariantCulture),Convert.ToUInt32(r.GetValue(13),System.Globalization.CultureInfo.InvariantCulture),I(r,14),F(r,15),r.IsDBNull(16)?0xFFFFFFFF:Convert.ToUInt32(r.GetValue(16),System.Globalization.CultureInfo.InvariantCulture),I(r,17),I(r,18),r.IsDBNull(19)?"":r.GetString(19),r.IsDBNull(20)?"":r.GetString(20),I(r,21)!=0,I(r,22),I(r,23)));
         }
 
         ZoneRuntimeRecord? runtime=null;
