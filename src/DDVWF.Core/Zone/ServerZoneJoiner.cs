@@ -52,6 +52,20 @@ public static class ServerZoneJoiner
             }
         }
 
+        foreach (var trap in snapshot.Traps ?? Array.Empty<TrapRecord>())
+        {
+            if (!string.Equals(trap.Zone, zone.ShortName, StringComparison.OrdinalIgnoreCase)) continue;
+            zone.Add(new ZoneEntity(
+                DeterministicId("trap",trap.Id,trap.Version),
+                ZoneEntityKind.Trap,
+                $"Trap {trap.Id}",
+                new EqPosition(trap.X,trap.Y,trap.Z),
+                1f,
+                trap.Id,
+                null,
+                new TrapEntityData(trap.Version,trap.Chance,trap.MaxZDiff,trap.Radius,trap.Effect,trap.EffectValue,trap.EffectValue2,trap.Message,trap.Skill,trap.Level,trap.RespawnTime,trap.RespawnVariance,trap.TriggeredNumber,trap.Group,trap.DespawnWhenTriggered,trap.Undetectable,trap.MinExpansion,trap.MaxExpansion,trap.ContentFlags,trap.ContentFlagsDisabled)));
+        }
+
         foreach (var ground in snapshot.GroundSpawns ?? Array.Empty<GroundSpawnRecord>())
         {
             zone.Add(new ZoneEntity(
