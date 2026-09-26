@@ -144,22 +144,23 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
             }
         }
 
+        var collisionMapLoaded=false;var findBestZApplied=0;var collisionMapPath="";
         if(runtime is not null&&!string.IsNullOrWhiteSpace(_serverRoot))
         {
-            var mapPath=EqEmuServerPaths.ResolveBaseMap(_serverRoot,runtime.MapFileName);
-            if(File.Exists(mapPath))
+            collisionMapPath=EqEmuServerPaths.ResolveBaseMap(_serverRoot,runtime.MapFileName);
+            if(File.Exists(collisionMapPath))
             {
-                var collision=EqEmuCollisionMap.Load(mapPath);
+                var collision=EqEmuCollisionMap.Load(collisionMapPath);collisionMapLoaded=true;
                 for(var i=0;i<objects.Count;i++)
                 {
                     var o=objects[i];
                     var bestZ=collision.FindBestZ(o.X,o.Y,o.Z,runtime.FindBestZHeightAdjust,runtime.Underworld,0);
-                    objects[i]=o with{Z=bestZ};
+                    objects[i]=o with{Z=bestZ};findBestZApplied++;
                 }
             }
         }
 
-        LastReadDiagnostics=new(spawn2.Count,entries.Count,npcs.Count,spawnGroups.Count,doors.Count,zonePoints.Count,objects.Count,groundSpawns.Count,grids.Count,gridEntries.Count,objectContents.Count);
+        LastReadDiagnostics=new(spawn2.Count,entries.Count,npcs.Count,spawnGroups.Count,doors.Count,zonePoints.Count,objects.Count,groundSpawns.Count,grids.Count,gridEntries.Count,objectContents.Count,collisionMapLoaded,findBestZApplied,collisionMapPath);
         ServerZoneJoiner.Join(zone,new ServerZoneSnapshot(spawn2,entries,npcs.Values.ToArray(),doors,zonePoints,spawnGroups,objects,groundSpawns,grids,gridEntries,objectContents,runtime));
     }
 
