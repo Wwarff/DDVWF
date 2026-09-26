@@ -155,7 +155,7 @@ public sealed class EqEmuReadProvider : IServerDataProvider, IServerReadDiagnost
                 {
                     var o=objects[i];
                     var bestZ=collision.FindBestZ(o.X,o.Y,o.Z,runtime.FindBestZHeightAdjust,runtime.Underworld,0);
-                    objects[i]=o with{Z=bestZ};findBestZApplied++;
+                    objects[i]=o with{BestZ=bestZ};findBestZApplied++;
                 }
             }
         }
